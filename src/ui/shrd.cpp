@@ -15,13 +15,13 @@ static std::vector<data::titleData> shared;
 //Stolen 3Dbrew descriptions
 static const std::string sharedDesc[] =
 {
-    "NAND JPEG/MPO files and phtcache.bin from the camera application are stored here. This also contains UploadData.dat.",
-    "NAND M4A files from the sound application are stored here.",
-    "Used for SpotPass content storage for notifications.",
-    "Contains idb.dat, idbt.dat, gamecoin.dat, ubll.lst, CFL_DB.dat, and CFL_OldDB.dat. These files contain cleartext Miis and some data relating (including cached ICN data) to Play/Usage Records.",
-    "Contains bashotorya.dat and bashotorya2.dat.",
-    "Home Menu SpotPass content data storage.",
-    "Contains versionlist.dat, used by Home Menu for the software update notification added with 7.0.0-13."
+    "NAND JPEG/MPO 文件和 phtcache.bin 由相机应用程序存储在这里。这也包含 UploadData.dat.",
+    "声音应用程序中的 NAND M4A 文件存储在这里.",
+    "适用于通知的 SpotPass 内容存储.",
+    "包含 idb.dat, idbt.dat, gamecoin.dat, ubll.lst, CFL_DB.dat 以及 CFL_OldDB.dat. 这些文件包含明文 Miis 数据和一些与播放/使用记录相关的数据 (也包括缓存的图标数据).",
+    "包含 bashotorya.dat 以及 bashotorya2.dat.",
+    "主页菜单的 SpotPass 内容数据存储.",
+    "包含 versionlist.dat, 用于 7.0.0-13 系统引入的主页菜单软件更新通知."
 };
 
 static inline void addSharedEntry(const uint32_t& _id, const std::string& _icnTxt)
@@ -120,7 +120,7 @@ void ui::shrdUpdate()
 void ui::shrdDrawTop()
 {
     shrdView->draw();
-    ui::drawUIBar(TITLE_TEXT + "- Shared ExtData", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + "- 共享追加数据", ui::SCREEN_TOP, true);
 }
 
 void ui::shrdDrawBot()
@@ -133,6 +133,6 @@ void ui::shrdDrawBot()
     else
     {
         gfx::drawTextWrap("3DBREW: " + sharedDesc[shrdView->getSelected()], 8, 8, GFX_DEPTH_DEFAULT, 0.5f, 300, 0xFFFFFFFF);
-        ui::drawUIBar("\ue000 Open \ue01A\ue077\ue019 Save Type", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

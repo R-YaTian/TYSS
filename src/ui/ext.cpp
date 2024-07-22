@@ -63,7 +63,7 @@ void ui::extInit(void *a)
     extView = new ui::titleview(data::extDataTitles, extViewCallback, NULL);
     extOpts = new ui::menu;
 
-    extOpts->addOpt("Delete ExtData", 320);
+    extOpts->addOpt("删除追加数据", 320);
 
     t->finished = true;
 }
@@ -90,7 +90,7 @@ void ui::extRefresh()
 void ui::extDrawTop()
 {
     extView->draw();
-    ui::drawUIBar(TITLE_TEXT + "- Extra Data", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + "- 追加数据", ui::SCREEN_TOP, true);
 }
 
 void ui::extDrawBot()
@@ -103,6 +103,6 @@ void ui::extDrawBot()
     else
     {
         data::extDataTitles[extView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 Open \ue01A\ue077\ue019 Save Type", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

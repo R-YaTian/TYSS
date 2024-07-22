@@ -288,7 +288,7 @@ void data::titleData::drawInfo(unsigned x, unsigned y)
     switch(getMedia())
     {
         case MEDIATYPE_GAME_CARD:
-            media = "Game Card";
+            media = "游戏卡带";
             break;
 
         case MEDIATYPE_SD:
@@ -326,7 +326,7 @@ void data::titleData::assignIcon(C3D_Tex *_icon)
 static void loadcart(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("Loading Cart Data...");
+    t->status->setStatus("正在读取卡带数据...");
     uint64_t cartID = 0;
     AM_GetTitleList(NULL, MEDIATYPE_GAME_CARD, 1, &cartID);
     data::titleData cartData;
@@ -406,7 +406,7 @@ static inline bool checkHigh(const uint64_t& id)
 void data::loadTitles(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("Loading Titles...");
+    t->status->setStatus("正在加载 Titles...");
 
     titles.clear();
     usrSaveTitles.clear();
@@ -448,7 +448,7 @@ void data::loadTitles(void *a)
         }
         delete[] ids;
 
-        t->status->setStatus("Writing cache...");
+        t->status->setStatus("正在写入缓存...");
         createCache(titles, titlePath);
     }
 
@@ -711,7 +711,7 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path, bool
 
 void data::datDrawTop()
 {
-    ui::drawUIBar("Loading...", ui::SCREEN_TOP, true);
+    ui::drawUIBar("正在加载...", ui::SCREEN_TOP, true);
 }
 
 void data::datDrawBot()

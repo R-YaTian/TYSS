@@ -32,7 +32,7 @@ int ui::state = DAT, ui::prev = DAT;
 static ui::threadProcMngr *thrdMgr;
 static ui::button *ok, *yes, *no;
 
-const std::string TITLE_TEXT = "JK's Save Manager - 12.11.2021 ";
+const std::string TITLE_TEXT = "JKSM 简体中文版 - 07.22.2024 ";
 
 uint32_t ui::down = 0, ui::held = 0;
 touchPosition ui::p;
@@ -40,9 +40,9 @@ touchPosition ui::p;
 void ui::init()
 {
     thrdMgr = new ui::threadProcMngr;
-    ok = new ui::button("OK \ue000", 96, 184, 128, 32);
-    yes = new ui::button("Yes \ue000", 32, 184, 120, 32);
-    no  = new ui::button("No \ue001", 168, 184, 120, 32);
+    ok = new ui::button("好 \ue000", 96, 184, 128, 32);
+    yes = new ui::button("是 \ue000", 32, 184, 120, 32);
+    no  = new ui::button("否 \ue001", 168, 184, 120, 32);
 }
 
 void ui::exit()

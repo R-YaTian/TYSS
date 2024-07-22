@@ -79,7 +79,7 @@ void ui::bossViewUpdate()
 void ui::bossViewDrawTop()
 {
     bossView->draw();
-    ui::drawUIBar(TITLE_TEXT + "- BOSS Extra Data", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + "- BOSS 追加数据", ui::SCREEN_TOP, true);
 }
 
 void ui::bossViewDrawBot()
@@ -92,6 +92,6 @@ void ui::bossViewDrawBot()
     else
     {
         data::bossDataTitles[bossView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 Open \ue01A\ue077\ue019 Save Type", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

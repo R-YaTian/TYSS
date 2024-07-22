@@ -57,7 +57,7 @@ void fs::exit()
 void fs::driveInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("Starting Google Drive...");
+    t->status->setStatus("正在启动 Google Drive...");
     fs::gDrive = new drive::gd(cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken);
     if(fs::gDrive->hasToken())
     {
@@ -185,7 +185,7 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& arch, bool error)
     if(R_FAILED(res))
     {
         if(error)
-            ui::showMessage("The archive could not be opened. The save data type may not exist for this title.\nError: 0x%08X", (unsigned)res);
+            ui::showMessage("无法打开该存档位. 该存档类型可能不存在适用此 title 的数据.\n错误: 0x%08X", (unsigned)res);
         return false;
     }
 
@@ -198,7 +198,7 @@ void fs::commitData(const uint32_t& mode)
     {
         Result res = FSUSER_ControlArchive(saveArch, ARCHIVE_ACTION_COMMIT_SAVE_DATA, NULL, 0, NULL, 0);
         if(res)
-            ui::showMessage("Failed to commit save data!\nError: 0x%08X", (unsigned)res);
+            ui::showMessage("提交存档数据失败!\n错误: 0x%08X", (unsigned)res);
     }
 }
 
@@ -212,7 +212,7 @@ void fs::deleteSv(const uint32_t& mode)
 
         res = FSUSER_ControlSecureSave(SECURESAVE_ACTION_DELETE, &in, 8, &out, 1);
         if(R_FAILED(res))
-            ui::showMessage("Failed to delete secure value.\nError: 0x%08X", (unsigned)res);
+            ui::showMessage("删除安全值失败.\n错误: 0x%08X", (unsigned)res);
     }
 }
 
@@ -540,7 +540,7 @@ void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const 
         return;
     
     if(t)
-        t->status->setStatus("Copying " + util::toUtf8(_src) +"...");
+        t->status->setStatus("正在复制 " + util::toUtf8(_src) +"...");
 
     size_t readIn = 0;
     uint8_t *buffer = new uint8_t[buff_size];
@@ -636,9 +636,9 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
             time_t raw;
             time(&raw);
             tm *locTime = localtime(&raw);
-            zip_fileinfo inf = { (unsigned)locTime->tm_sec, (unsigned)locTime->tm_min, (unsigned)locTime->tm_hour,
-                                 (unsigned)locTime->tm_mday, (unsigned)locTime->tm_mon, (unsigned)(1900 + locTime->tm_year), 0, 0, 0 };
-            
+            zip_fileinfo inf = { locTime->tm_sec, locTime->tm_min, locTime->tm_hour,
+                                 locTime->tm_mday, locTime->tm_mon, (1900 + locTime->tm_year), 0, 0, 0 };
+
             std::string filename = util::toUtf8(_src + archList->getItem(i));
             int openZip = zipOpenNewFileInZip64(_zip, filename.c_str(), &inf, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_DEFAULT_COMPRESSION, 0);
             if(openZip == 0)
@@ -662,7 +662,7 @@ void copyArchToZip_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     cpyArgs *cpy = (cpyArgs *)t->argPtr;
-    t->status->setStatus("Compressing archive to zip...");
+    t->status->setStatus("正在压缩存档位到 zip 文件...");
 
     zipFile zip = zipOpen64("/tmp.zip", 0);
     fs::copyArchToZip(cpy->srcArch, util::toUtf16("/"), zip, t);
@@ -719,7 +719,7 @@ void copyZipToArch_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     cpyArgs *cpy = (cpyArgs *)t->argPtr;
-    t->status->setStatus("Decompressing save to archive...");
+    t->status->setStatus("正在解压存档到存档位...");
 
     FS_Path srcPath = fsMakePath(PATH_UTF16, cpy->src.c_str());
     FS_Path dstPath = fsMakePath(PATH_ASCII, "/tmp.zip");
@@ -750,7 +750,7 @@ void fs::backupAll()
     ui::progressBar prog(data::usrSaveTitles.size());
     for(unsigned i = 0; i < data::usrSaveTitles.size(); i++)
     {
-        std::string copyStr = "Working on '" + util::toUtf8(data::usrSaveTitles[i].getTitle()) + "'...";
+        std::string copyStr = "正在处理 '" + util::toUtf8(data::usrSaveTitles[i].getTitle()) + "'...";
         prog.update(i);
 
         //Sue me
@@ -786,4 +786,3 @@ void fs::backupAll()
         }
     }
 }
-

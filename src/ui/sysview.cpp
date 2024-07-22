@@ -79,7 +79,7 @@ void ui::sysUpdate()
 void ui::sysDrawTop()
 {
     sysView->draw();
-    ui::drawUIBar(TITLE_TEXT + "- System Saves", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + "- 系统存档", ui::SCREEN_TOP, true);
 }
 
 void ui::sysDrawBot()
@@ -92,6 +92,6 @@ void ui::sysDrawBot()
     else
     {
         data::sysDataTitles[sysView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 Open \ue01A\ue077\ue019 Save Type", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

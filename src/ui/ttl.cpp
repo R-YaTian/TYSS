@@ -107,7 +107,7 @@ static void ttlOptResetSaveData_t(void *a)
     threadInfo *t = (threadInfo *)a;
     if(fs::openArchive(data::curData, fs::getSaveMode(), false))
     {
-        t->status->setStatus("Resetting save data...");
+        t->status->setStatus("正在重置存档数据...");
         fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
         fs::commitData(fs::getSaveMode());
         fs::closeSaveArch();
@@ -118,7 +118,7 @@ static void ttlOptResetSaveData_t(void *a)
 static void ttlOptResetSaveData(void *a)
 {
     data::titleData *t = &data::usrSaveTitles[ttlView->getSelected()];
-    std::string q = "Are you sure would like to reset the save data for " + util::toUtf8(t->getTitle()) + "?";
+    std::string q = "你确定要为 " + util::toUtf8(t->getTitle()) + " 重置存档数据吗?";
     ui::confirm(q, ttlOptResetSaveData_t, NULL, NULL);
 }
 
@@ -130,7 +130,7 @@ void ui::ttlInit(void *a)
 
     ttlOpts = new ui::menu;
     ttlOpts->setCallback(ttlOptCallback, NULL);
-    ttlOpts->addOpt("Reset Save Data", 320);
+    ttlOpts->addOpt("重置存档数据", 320);
     ttlOpts->addOptEvent(0, KEY_A, ttlOptResetSaveData, NULL);
 
     t->finished = true;
@@ -160,7 +160,7 @@ void ui::ttlUpdate()
 void ui::ttlDrawTop()
 {
     ttlView->draw();
-    ui::drawUIBar(TITLE_TEXT + "- User Saves", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + "- 用户存档", ui::SCREEN_TOP, true);
 }
 
 void ui::ttlDrawBot()
@@ -173,11 +173,11 @@ void ui::ttlDrawBot()
     else if(ttlOptsOpen)
     {
         ttlOpts->draw(0, 2, 0xFFFFFFFF, 320, false);
-        ui::drawUIBar("\ue000 Select \ue001 Close", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
     }
     else
     {
         data::usrSaveTitles[ttlView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 Open \ue002 Options \ue003 Favorite \ue01A\ue077\ue019 Save Type", ui::SCREEN_BOT, true);
+        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, true);
     }
 }

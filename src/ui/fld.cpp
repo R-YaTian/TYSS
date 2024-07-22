@@ -24,8 +24,8 @@ void fldMenuNew(void *a)
     else if(held & KEY_R)
         newFolder = util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
     else
-        newFolder = util::safeString(util::toUtf16(util::getString("Enter a new folder name", true)));
-    
+        newFolder = util::safeString(util::toUtf16(util::getString("输入新文件夹名称", true)));
+
     if(!newFolder.empty() && cfg::config["zip"])
     {
         std::u16string fullOut = targetDir + newFolder + util::toUtf16(".zip");
@@ -48,7 +48,7 @@ void fldMenuOverwrite_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
-    t->status->setStatus("Overwriting backup...");
+    t->status->setStatus("正在覆盖存档...");
     if(in->isDir)
     {
         std::u16string overwrite = targetDir + in->name;
@@ -78,7 +78,7 @@ void fldMenuOverwrite_t(void *a)
 void fldMenuOverwrite(void *a)
 {
     fs::dirItem *in = (fs::dirItem *)a;
-    std::string q = "Are you sure you'd like to overwrite " + util::toUtf8(in->name) + "?";
+    std::string q = "是否覆盖 " + util::toUtf8(in->name) + "?";
     ui::confirm(q, fldMenuOverwrite_t, NULL, a);
 }
 
@@ -86,7 +86,7 @@ void fldMenuDelete_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
-    t->status->setStatus("Deleting backup...");
+    t->status->setStatus("正在删除存档...");
     std::u16string del = targetDir + in->name;
     if(in->isDir)
         fs::delDirRec(fs::getSDMCArch(), del);
@@ -101,7 +101,7 @@ void fldMenuDelete_t(void *a)
 void fldMenuDelete(void *a)
 {
     fs::dirItem *in = (fs::dirItem *)a;
-    std::string q = "Are you sure you would like to delete " + util::toUtf8(in->name) + "?";
+    std::string q = "你确定要删除 " + util::toUtf8(in->name) + "?";
     ui::confirm(q, fldMenuDelete_t, NULL, a);
 }
 
@@ -115,7 +115,7 @@ void fldMenuRestore_t(void *a)
         std::u16string rest = targetDir + in->name + util::toUtf16("/");
         fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
         fs::commitData(fs::getSaveMode());
-        t->status->setStatus("Restoring data to archive...");
+        t->status->setStatus("正在恢复数据到存档位...");
         fs::copyDirToDir(fs::getSDMCArch(), rest, fs::getSaveArch(), util::toUtf16("/"), true, NULL);
     }
     else
@@ -128,7 +128,7 @@ void fldMenuRestore_t(void *a)
         fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
         fs::commitData(fs::getSaveMode());
 
-        t->status->setStatus("Decompressing zip to archive...");
+        t->status->setStatus("正在解压数据到存档位...");
         unzFile unz = unzOpen64("/JKSV/tmp.zip");
         fs::copyZipToArch(fs::getSaveArch(), unz, t);
         unzClose(unz);
@@ -142,7 +142,7 @@ void fldMenuRestore_t(void *a)
 void fldMenuRestore(void *a)
 {
     fs::dirItem *in = (fs::dirItem *)a;
-    std::string q = "Are you sure you want to restore " + util::toUtf8(in->name) + "?";
+    std::string q = "你确定要恢复 " + util::toUtf8(in->name) + "?";
     ui::confirm(q, fldMenuRestore_t, NULL, a);
 }
 
@@ -151,7 +151,7 @@ void fldMenuUpload_t(void *a)
     threadInfo *t = (threadInfo *)a;
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
     std::u16string src = targetDir + in->name;
-    t->status->setStatus("Uploading " + util::toUtf8(in->name) + "...");
+    t->status->setStatus("正在上传 " + util::toUtf8(in->name) + "...");
 
     //For now
     FS_Path srcPath = fsMakePath(PATH_UTF16, src.c_str());
@@ -189,7 +189,7 @@ void fldMenuDriveDownload_t(void *a)
     threadInfo *t = (threadInfo *)a;
     drive::gdItem *in = (drive::gdItem *)t->argPtr;
 
-    t->status->setStatus("Downloading " + in->name + "...");
+    t->status->setStatus("正在下载 " + in->name + "...");
 
     std::u16string target = targetDir + util::toUtf16(in->name);
     FS_Path targetPath = fsMakePath(PATH_UTF16, target.c_str());
@@ -214,7 +214,7 @@ void fldMenuDriveDownload(void *a)
     drive::gdItem *in = (drive::gdItem *)a;
     std::u16string checkPath = targetDir + util::toUtf16(in->name);
     if(fs::fsfexists(fs::getSDMCArch(), checkPath))
-        ui::confirm("Downloading this backup will replace the one on your SD card. Are you sure you still want to download it?", fldMenuDriveDownload_t, NULL, a);
+        ui::confirm("下载此存档将会替换 SD 卡中的数据. 你确定仍要进行下载吗?", fldMenuDriveDownload_t, NULL, a);
     else
         ui::newThread(fldMenuDriveDownload_t, a, NULL);
 }
@@ -223,7 +223,7 @@ void fldMenuDriveDelete_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     drive::gdItem *in = (drive::gdItem *)t->argPtr;
-    t->status->setStatus("Deleting " + in->name + "...");
+    t->status->setStatus("正在删除 " + in->name + "...");
     fs::gDrive->deleteFile(in->id);
     ui::fldRefresh();
     t->finished = true;
@@ -232,20 +232,20 @@ void fldMenuDriveDelete_t(void *a)
 void fldMenuDriveDelete(void *a)
 {
     drive::gdItem *in = (drive::gdItem *)a;
-    ui::confirm("Are you sure you want to delete " + in->name + " from your drive?", fldMenuDriveDelete_t, NULL, a);
+    ui::confirm("你确定要删除云盘中的 " + in->name + " 文件吗?", fldMenuDriveDelete_t, NULL, a);
 }
 
 void fldMenuDriveRestore_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     drive::gdItem *in = (drive::gdItem *)t->argPtr;
-    t->status->setStatus("Downloading " + in->name + "...");
+    t->status->setStatus("正在下载 " + in->name + "...");
 
     FILE *tmp = fopen("/JKSV/tmp.zip", "wb");
     fs::gDrive->downloadFile(in->id, tmp);
     fclose(tmp);
 
-    t->status->setStatus("Decompressing backup to archive...");
+    t->status->setStatus("正在解压存档到存档位...");
     unzFile unz = unzOpen64("/JKSV/tmp.zip");
     fs::copyZipToArch(fs::getSaveArch(), unz, NULL);
     unzClose(unz);
@@ -258,7 +258,7 @@ void fldMenuDriveRestore_t(void *a)
 void fldMenuDriveRestore(void *a)
 {
     drive::gdItem *in = (drive::gdItem *)a;
-    ui::confirm("Are you sure you want to download and restore " + in->name + "?", fldMenuDriveRestore_t, NULL, a);
+    ui::confirm("你确定要下载并恢复 " + in->name + "?", fldMenuDriveRestore_t, NULL, a);
 }
 
 void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, funcPtr _func, void *_args)
@@ -269,7 +269,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
     targetDir = _path;
     uploadParent = _uploadParent;
 
-    fldMenu.addOpt("New", 0);
+    fldMenu.addOpt("新", 0);
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
@@ -304,7 +304,7 @@ void ui::fldRefresh()
     fldMenu.reset();
     fldList.reassign(fs::getSDMCArch(), targetDir);
 
-    fldMenu.addOpt("New", 0);
+    fldMenu.addOpt("新", 0);
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;

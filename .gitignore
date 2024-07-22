@@ -2,3 +2,7 @@
 build/
 *.cbp
 *.layout
+*.elf
+*.3dsx
+*.cia
+*.smdh

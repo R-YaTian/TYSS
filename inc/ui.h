@@ -32,7 +32,7 @@ enum states
 
 extern const std::string TITLE_TEXT;
 
-#define FLD_GUIDE_TEXT "\ue000 Select \ue002 Delete \ue003 Restore \ue005 Upload \ue001 Close"
+#define FLD_GUIDE_TEXT "\ue000 选择 \ue002 删除 \ue003 恢复 \ue005 上传 \ue001 关闭"
 
 namespace ui
 {
