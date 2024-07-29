@@ -187,6 +187,7 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt)
             publisher.assign((char16_t *)(smdh->applicationTitles[1].publisher));
 
         icon = readIconFromSMDH(smdh);
+        bhaveIcon = true;
         delete smdh;
     }
     else if(hasSaveData())
@@ -195,10 +196,7 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt)
         titleUTF8 = idStr;
         titleSafe.assign(util::toUtf16(idStr));
         publisher.assign(util::toUtf16("Someone?"));
-        unsigned lowerFour = low & 0x0000FFFF;
-        char tmp[16];
-        sprintf(tmp, "%04X", lowerFour);
-        icon = util::createIconGeneric(tmp, &gfx::iconSubTex);
+        icon = gfx::noIcon();
     }
 
     return true;
@@ -597,11 +595,11 @@ C2D_Image data::readIconFromSMDH(smdh_s *smdh)
 
 void data::createCache(std::vector<titleData>& vect, const std::string& path)
 {
-    //JIC
+    // JIC
     fs::fdelete(path);
     fs::fsfile cache(fs::getSDMCArch(), path, FS_OPEN_CREATE | FS_OPEN_WRITE);
 
-    //Buffer to compress icons
+    // Buffer to compress icons
     size_t iconCmpSize = 0;
     uint8_t *iconOut = new uint8_t[ICON_BUFF_SIZE];
 
@@ -629,11 +627,18 @@ void data::createCache(std::vector<titleData>& vect, const std::string& path)
         data::titleSaveTypes tmp = t.getSaveTypes();
         cache.write(&tmp, sizeof(data::titleSaveTypes));
 
-        iconCmpSize = ICON_BUFF_SIZE;
-        compress(iconOut, (uLongf *)&iconCmpSize, t.getIconData(), ICON_BUFF_SIZE);
-        cache.write(&iconCmpSize, sizeof(size_t));
-        cache.write(iconOut, iconCmpSize);
+        if (t.getIconFlag())
+        {
+            iconCmpSize = ICON_BUFF_SIZE;
+            compress(iconOut, (uLongf *)&iconCmpSize, t.getIconData(), ICON_BUFF_SIZE);
+            cache.write(&iconCmpSize, sizeof(size_t));
+            cache.write(iconOut, iconCmpSize);
+        } else {
+            iconCmpSize = 0xFFFFFFFF;
+            cache.write(&iconCmpSize, sizeof(size_t));
+        }
     }
+
     delete[] iconOut;
 }
 
@@ -691,15 +696,21 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path, bool
         size_t iconSize = 0;
         memset(readBuff, 0x00, ICON_BUFF_SIZE);
         cache.read(&iconSize, sizeof(size_t));
-        cache.read(readBuff, iconSize);
 
-        C3D_Tex *icon = new C3D_Tex;
-        if(C3D_TexInit(icon, 64, 64, GPU_RGB565))
-        {
-            uLongf sz = ICON_BUFF_SIZE;
-            uncompress((uint8_t *)icon->data, &sz, readBuff, iconSize);
-            newData.assignIcon(icon);
+        if (iconSize == 0xFFFFFFFF)
+            newData.setIcon(gfx::noIcon());
+        else {
+            cache.read(readBuff, iconSize);
+
+            C3D_Tex *icon = new C3D_Tex;
+            if(C3D_TexInit(icon, 64, 64, GPU_RGB565))
+            {
+                uLongf sz = ICON_BUFF_SIZE;
+                uncompress((uint8_t *)icon->data, &sz, readBuff, iconSize);
+                newData.assignIcon(icon);
+            }
         }
+
         newData.initFromCache(newID, title, pub, prodCode, tmp, nand ? MEDIATYPE_NAND : MEDIATYPE_SD);
         vect.push_back(newData);
     }

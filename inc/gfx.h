@@ -3,9 +3,12 @@
 
 #include <citro2d.h>
 #include <string>
+#include "sprites.h"
 #include "type.h"
 
 #define GFX_DEPTH_DEFAULT 0.5f
+
+inline C2D_SpriteSheet spritesheet;
 
 namespace gfx
 {
@@ -14,6 +17,8 @@ namespace gfx
 
     extern C3D_RenderTarget *top, *bot;
     extern Tex3DS_SubTexture iconSubTex;
+
+    C2D_Image noIcon(void);
 
     inline void frameBegin()
     {

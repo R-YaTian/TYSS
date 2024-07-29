@@ -167,7 +167,6 @@ bool ui::runApp()
     thrdMgr->update();
     if(thrdMgr->empty())
     {
-        
         if(ui::padKeysDown() & KEY_START)
         return false;
 

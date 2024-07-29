@@ -225,29 +225,6 @@ void util::copyDirlistToMenu(fs::dirList &d, ui::menu &m)
     m.adjust();
 }
 
-C2D_Image util::createIconGeneric(const std::string &txt, Tex3DS_SubTexture *sub)
-{
-    C3D_Tex *ret = new C3D_Tex;
-    if (C3D_TexInit(ret, 64, 64, GPU_RGB565))
-    {
-        C3D_RenderTarget *icnTarget = C3D_RenderTargetCreateFromTex(ret, GPU_TEXFACE_2D, 0, GPU_RB_RGB565);
-        C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-        C2D_SceneBegin(icnTarget);
-        C2D_DrawRectSolid(0, 16, 0.5f, 48, 48, 0xFF505050);
-        // These are TINY
-        uint8_t txtX = 24 - (gfx::getTextWidth(txt) / 2);
-        gfx::drawText(txt, txtX, 14 + 18, 0.5f, 0.5f, 0xFFFFFFFF);
-        C3D_FrameEnd(0);
-        C3D_RenderTargetDelete(icnTarget);
-    }
-    else
-    {
-        delete ret;
-        ret = NULL;
-    }
-    return (C2D_Image){ret, sub};
-}
-
 void util::setPC()
 {
     data::titleData tmp;

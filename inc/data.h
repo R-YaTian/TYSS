@@ -36,6 +36,7 @@ namespace data
             uint32_t getExtData() const { return extdata; }
             uint8_t getMedia() const { return m; }
             bool getFav() const { return fav; }
+            bool getIconFlag() const { return bhaveIcon; }
 
             void setFav(bool _set) { fav = _set; }
             void setExtdata(const uint32_t& ex) { extdata = ex; }
@@ -65,6 +66,7 @@ namespace data
             std::u16string title, titleSafe, publisher;
             FS_MediaType m;
             bool fav = false;
+            bool bhaveIcon = false;
             titleSaveTypes types;
             C2D_Image icon = {NULL, NULL};
     };

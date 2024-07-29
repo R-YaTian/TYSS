@@ -36,10 +36,9 @@ BUILD		:=	build
 SOURCES		:=	src src/ui
 #DATA		:=	data
 INCLUDES	:=	inc inc/ui
-#GRAPHICS	:=	gfx
-#GFXBUILD	:=	$(BUILD)
-#GFXBUILD	:=	$(ROMFS)/gfx
+GRAPHICS	:=	gfx
 ROMFS		:=  romfs
+GFXBUILD	:=	$(ROMFS)/gfx
 APP_TITLE   := JKSM
 APP_AUTHOR  := JK
 APP_DESCRIPTION := 3DS Save Manager
@@ -49,7 +48,7 @@ APP_DESCRIPTION := 3DS Save Manager
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-g -Wall -O2 -mword-relocations \
+CFLAGS	:=	-g -Wall -O2 -mword-relocations -flto=auto \
 			-fomit-frame-pointer -ffunction-sections \
 			$(ARCH)
 
@@ -109,6 +108,9 @@ endif
 
 export T3XFILES		:=	$(GFXFILES:.t3s=.t3x)
 
+export ROMFS_T3XFILES	:=	$(patsubst %.t3s, $(GFXBUILD)/%.t3x, $(GFXFILES))
+export T3XHFILES		:=	$(patsubst %.t3s, $(BUILD)/%.h, $(GFXFILES))
+
 export OFILES_SOURCES 	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 
 export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES)) \
@@ -153,8 +155,7 @@ endif
 .PHONY: all clean
 
 #---------------------------------------------------------------------------------
-all:
-	@mkdir -p $(BUILD) $(GFXBUILD)
+all: $(ROMFS_T3XFILES) $(T3XHFILES)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
@@ -172,6 +173,12 @@ cia: $(TARGET)-strip.elf
 send:
 	@3dslink $(TARGET).3dsx
 
+#---------------------------------------------------------------------------------
+$(GFXBUILD)/%.t3x	$(BUILD)/%.h	:	%.t3s
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@mkdir -p $(BUILD) $(GFXBUILD)
+	@tex3ds -i $< -H $(BUILD)/$*.h -d $(DEPSDIR)/$*.d -o $(GFXBUILD)/$*.t3x
 
 #---------------------------------------------------------------------------------
 else
@@ -229,7 +236,7 @@ endef
 %.t3x	%.h	:	%.t3s
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
-	@tex3ds -i $< -H $*.h -d $*.d -o $(TOPDIR)/$(GFXBUILD)/$*.t3x
+	@tex3ds -i $< -H $*.h -d $*.d -o $*.t3x
 
 -include $(DEPSDIR)/*.d
 

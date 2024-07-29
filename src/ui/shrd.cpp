@@ -15,13 +15,13 @@ static std::vector<data::titleData> shared;
 //Stolen 3Dbrew descriptions
 static const std::string sharedDesc[] =
 {
-    "NAND JPEG/MPO 文件和 phtcache.bin 由相机应用程序存储在这里。这也包含 UploadData.dat.",
-    "声音应用程序中的 NAND M4A 文件存储在这里.",
-    "适用于通知的 SpotPass 内容存储.",
-    "包含 idb.dat, idbt.dat, gamecoin.dat, ubll.lst, CFL_DB.dat 以及 CFL_OldDB.dat. 这些文件包含明文 Miis 数据和一些与播放/使用记录相关的数据 (也包括缓存的图标数据).",
-    "包含 bashotorya.dat 以及 bashotorya2.dat.",
-    "主页菜单的 SpotPass 内容数据存储.",
-    "包含 versionlist.dat, 用于 7.0.0-13 系统引入的主页菜单软件更新通知."
+    "F1: NAND JPEG/MPO 文件和 phtcache.bin 由相机应用程序存储在这里。这也包含 UploadData.dat.",
+    "F2: 声音应用程序中的 NAND M4A 文件存储在这里.",
+    "F9: 适用于通知的 SpotPass 内容存储.",
+    "FB: 包含 idb.dat, idbt.dat, gamecoin.dat, ubll.lst, CFL_DB.dat 以及 CFL_OldDB.dat. 这些文件包含明文 Miis 数据和一些与播放/使用记录相关的数据 (也包括缓存的图标数据).",
+    "FC: 包含 bashotorya.dat 以及 bashotorya2.dat.",
+    "FD: 主页菜单的 SpotPass 内容数据存储.",
+    "FE: 包含 versionlist.dat, 用于 7.0.0-13 系统引入的主页菜单软件更新通知."
 };
 
 static inline void addSharedEntry(const uint32_t& _id, const std::string& _icnTxt)
@@ -32,7 +32,7 @@ static inline void addSharedEntry(const uint32_t& _id, const std::string& _icnTx
     data::titleData newShrd;
     newShrd.setExtdata(_id);
     newShrd.setTitle(util::toUtf16(tmp));
-    C2D_Image icn = util::createIconGeneric(_icnTxt, &gfx::iconSubTex);
+    C2D_Image icn = gfx::noIcon();
     newShrd.setIcon(icn);
     shared.push_back(newShrd);
 }

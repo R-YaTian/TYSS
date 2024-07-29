@@ -15,6 +15,11 @@ C3D_RenderTarget *gfx::top, *gfx::bot;
 //Needed for icon sub tex. Top UV needs to be higher than bottom so it's rotated.
 Tex3DS_SubTexture gfx::iconSubTex = {48, 48, 0.0f, 0.75f, 0.75f, 0.0f};
 
+C2D_Image gfx::noIcon(void)
+{
+    return C2D_SpriteSheetGetImage(spritesheet, sprites_noicon_idx);
+}
+
 void gfx::init()
 {
     gfxInitDefault();
@@ -22,12 +27,14 @@ void gfx::init()
     C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
     C2D_Prepare();
 
+    spritesheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
     top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
     bot = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 }
 
 void gfx::exit()
 {
+    C2D_SpriteSheetFree(spritesheet);
     C2D_Fini();
     C3D_Fini();
     gfxExit();
