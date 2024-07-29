@@ -30,6 +30,7 @@ void fldMenuNew(void *a)
     {
         std::u16string fullOut = targetDir + newFolder + util::toUtf16(".zip");
         fs::copyArchToZipThreaded(fs::getSaveArch(), util::toUtf16("/"), fullOut);
+        ui::fldRefresh();
     }
     else if(!newFolder.empty())
     {
@@ -41,6 +42,7 @@ void fldMenuNew(void *a)
         fullOut += util::toUtf16("/");
 
         fs::copyDirToDirThreaded(fs::getSaveArch(), util::toUtf16("/"), fs::getSDMCArch(), fullOut, false);
+        ui::fldRefresh();
     }
 }
 
@@ -269,7 +271,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
     targetDir = _path;
     uploadParent = _uploadParent;
 
-    fldMenu.addOpt("新", 0);
+    fldMenu.addOpt("新建", 0);
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
@@ -304,7 +306,7 @@ void ui::fldRefresh()
     fldMenu.reset();
     fldList.reassign(fs::getSDMCArch(), targetDir);
 
-    fldMenu.addOpt("新", 0);
+    fldMenu.addOpt("新建", 0);
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
