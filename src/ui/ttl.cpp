@@ -17,7 +17,7 @@ static int findTitleNewIndex(const uint64_t& tid)
         if(data::usrSaveTitles[i].getID() == tid)
             return i;
     }
-    return 0;
+    return -1;
 }
 
 static void fldCallback(void *)

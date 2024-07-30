@@ -102,7 +102,8 @@ void ui::extDrawBot()
     }
     else
     {
-        data::extDataTitles[extView->getSelected()].drawInfo(0, 0);
+        if (!data::extDataTitles.empty())
+            data::extDataTitles[extView->getSelected()].drawInfo(0, 0);
         ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

@@ -128,7 +128,7 @@ static C3D_Tex *loadIcon(smdh_s *smdh)
     C3D_Tex *ret = new C3D_Tex;
     C3D_TexSetFilter(ret, GPU_LINEAR, GPU_LINEAR);
     uint16_t *icon = smdh->bigIconData;
-    if(C3D_TexInitVRAM(ret, 64, 64, GPU_RGB565))//GPU can't use below 64x64
+    if(C3D_TexInit(ret, 64, 64, GPU_RGB565))//GPU can't use below 64x64
     {
         uint16_t *tex  = (uint16_t *)ret->data + (16 * 64);
         for(unsigned y = 0; y < 48; y += 8, icon += 48 *8, tex += 64 * 8)
@@ -469,10 +469,14 @@ void data::loadTitles(void *a)
             bossDataTitles.push_back(titles[i]);
     }
 
-    std::sort(usrSaveTitles.begin(), usrSaveTitles.end(), sortTitles);
-    std::sort(extDataTitles.begin(), extDataTitles.end(), sortTitles);
-    std::sort(sysDataTitles.begin(), sysDataTitles.end(), sortTitles);
-    std::sort(bossDataTitles.begin(), bossDataTitles.end(), sortTitles);
+    if (!usrSaveTitles.empty())
+        std::sort(usrSaveTitles.begin(), usrSaveTitles.end(), sortTitles);
+    if (!extDataTitles.empty())
+        std::sort(extDataTitles.begin(), extDataTitles.end(), sortTitles);
+    if (!sysDataTitles.empty())
+        std::sort(sysDataTitles.begin(), sysDataTitles.end(), sortTitles);
+    if (!bossDataTitles.empty())
+        std::sort(bossDataTitles.begin(), bossDataTitles.end(), sortTitles);
 
     t->finished = true;
 }
@@ -711,7 +715,7 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path)
             cache.read(readBuff, iconSize);
 
             C3D_Tex *icon = new C3D_Tex;
-            if(C3D_TexInitVRAM(icon, 64, 64, GPU_RGB565))
+            if(C3D_TexInit(icon, 64, 64, GPU_RGB565))
             {
                 uLongf sz = ICON_BUFF_SIZE;
                 uncompress((uint8_t *)icon->data, &sz, readBuff, iconSize);

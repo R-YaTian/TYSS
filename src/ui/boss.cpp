@@ -91,7 +91,8 @@ void ui::bossViewDrawBot()
     }
     else
     {
-        data::bossDataTitles[bossView->getSelected()].drawInfo(0, 0);
+        if (!data::bossDataTitles.empty())
+            data::bossDataTitles[bossView->getSelected()].drawInfo(0, 0);
         ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

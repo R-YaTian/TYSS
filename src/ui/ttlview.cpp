@@ -24,6 +24,8 @@ ui::titleview::titleview(std::vector<data::titleData>& _t, funcPtr _cb, void *ar
 {
     callback = _cb;
     cbArgs = args;
+    if (_t.empty())
+        return;
     for(data::titleData& d : _t)
         tiles.emplace_back(d.getFav(), d.getIcon());
 }
@@ -79,7 +81,8 @@ void ui::titleview::update()
 void ui::titleview::refesh(std::vector<data::titleData>& _t)
 {
     tiles.clear();
-
+    if (_t.empty())
+        return;
     for(data::titleData& d : _t)
         tiles.emplace_back(d.getFav(), d.getIcon());
 }

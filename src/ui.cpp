@@ -170,7 +170,7 @@ bool ui::runApp()
         if(ui::padKeysDown() & KEY_START)
         return false;
 
-        data::cartCheck();
+        //data::cartCheck();
 
         switch(state)
         {
