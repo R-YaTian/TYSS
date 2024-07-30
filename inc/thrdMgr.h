@@ -12,7 +12,7 @@ namespace ui
             threadProcMngr();
             ~threadProcMngr();
 
-            threadInfo *newThread(ThreadFunc func, void *args, funcPtr _drawFunc);
+            threadInfo *newThread(ThreadFunc func, void *args, funcPtr _drawFunc, size_t stackSize);
             void update();
             void drawTop();
             void drawBot();

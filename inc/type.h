@@ -3,6 +3,11 @@
 #include <string>
 #include <3ds.h>
 
+#define THRD_STACK_SIZE 0x10000
+#define SOCU_ALIGN 0x1000
+#define SOCU_BUFFERSIZE 0x80000
+static_assert(SOCU_BUFFERSIZE % SOCU_ALIGN == 0);
+
 typedef void (*funcPtr)(void *);
 
 class threadStatus
@@ -46,7 +51,8 @@ class threadInfo
         funcPtr drawFunc = NULL;
         threadStatus *status;
         int thrdID = 0;
-    
+        size_t stackSize = THRD_STACK_SIZE;
+
     private:
         Handle threadLock;
 };

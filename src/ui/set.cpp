@@ -26,7 +26,7 @@ static std::string getBoolText(const bool& g)
 static void setMenuReloadTitles(void *a)
 {
     remove("/JKSV/cache.bin");
-    ui::newThread(data::loadTitles, NULL, NULL);
+    ui::newThread(data::loadTitles, NULL, NULL, 0x200000);
 }
 
 static void setMenuReloadDriveList_t(void *a)

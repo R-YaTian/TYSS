@@ -78,7 +78,7 @@ std::vector<data::titleData> data::sysDataTitles;
 std::vector<data::titleData> data::bossDataTitles;
 
 //This is a master list now
-static std::vector<data::titleData> titles;
+std::vector<data::titleData> titles;
 std::vector<uint32_t> filterIds;
 data::titleData data::curData;
 
@@ -128,7 +128,7 @@ static C3D_Tex *loadIcon(smdh_s *smdh)
     C3D_Tex *ret = new C3D_Tex;
     C3D_TexSetFilter(ret, GPU_LINEAR, GPU_LINEAR);
     uint16_t *icon = smdh->bigIconData;
-    if(C3D_TexInit(ret, 64, 64, GPU_RGB565))//GPU can't use below 64x64
+    if(C3D_TexInitVRAM(ret, 64, 64, GPU_RGB565))//GPU can't use below 64x64
     {
         uint16_t *tex  = (uint16_t *)ret->data + (16 * 64);
         for(unsigned y = 0; y < 48; y += 8, icon += 48 *8, tex += 64 * 8)
@@ -414,7 +414,7 @@ void data::loadTitles(void *a)
     loadBlacklist();
     loadFav();
 
-    if(!readCache(titles, titlePath, false))
+    if(!readCache(titles, titlePath))
     {
         uint32_t count = 0;
         AM_GetTitleCount(MEDIATYPE_SD, &count);
@@ -605,7 +605,7 @@ void data::createCache(std::vector<titleData>& vect, const std::string& path)
 
     uint16_t countOut = vect.size();
     cache.write(&countOut, sizeof(uint16_t));
-    cache.putByte(0x05);
+    cache.putByte(0x06);
 
     for(auto t : vect)
     {
@@ -627,10 +627,14 @@ void data::createCache(std::vector<titleData>& vect, const std::string& path)
         data::titleSaveTypes tmp = t.getSaveTypes();
         cache.write(&tmp, sizeof(data::titleSaveTypes));
 
+        uint8_t mediaType = t.getMedia();
+        cache.write(&mediaType, sizeof(uint8_t));
+
         if (t.getIconFlag())
         {
+            memset(iconOut, 0, ICON_BUFF_SIZE);
             iconCmpSize = ICON_BUFF_SIZE;
-            compress(iconOut, (uLongf *)&iconCmpSize, t.getIconData(), ICON_BUFF_SIZE);
+            compress2(iconOut, (uLongf *)&iconCmpSize, t.getIconData(), t.getIconSize(), Z_BEST_COMPRESSION);
             cache.write(&iconCmpSize, sizeof(size_t));
             cache.write(iconOut, iconCmpSize);
         } else {
@@ -639,10 +643,11 @@ void data::createCache(std::vector<titleData>& vect, const std::string& path)
         }
     }
 
+    cache.close();
     delete[] iconOut;
 }
 
-bool data::readCache(std::vector<titleData>& vect, const std::string& path, bool nand)
+bool data::readCache(std::vector<titleData>& vect, const std::string& path)
 {
     if(!util::fexists(path))
         return false;
@@ -654,7 +659,7 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path, bool
     rev = cache.getByte();
     cache.seek(0, fs::seek_beg);
 
-    if(rev != 5)
+    if(rev != 0x06)
         return false;
 
     uint16_t count = 0;
@@ -672,7 +677,7 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path, bool
         uint16_t titleLength = 0;
         char16_t title[0x40];
         memset(title, 0x00, 0x40 * sizeof(char16_t));
-        cache.read(&titleLength, sizeof(char16_t));
+        cache.read(&titleLength, sizeof(uint16_t));
         cache.read(title, titleLength * sizeof(char16_t));
 
         uint16_t pubLength = 0;
@@ -693,6 +698,9 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path, bool
         data::titleSaveTypes tmp;
         cache.read(&tmp, sizeof(data::titleSaveTypes));
 
+        uint8_t mediaType = 0;
+        cache.read(&mediaType, sizeof(uint8_t));
+
         size_t iconSize = 0;
         memset(readBuff, 0x00, ICON_BUFF_SIZE);
         cache.read(&iconSize, sizeof(size_t));
@@ -703,7 +711,7 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path, bool
             cache.read(readBuff, iconSize);
 
             C3D_Tex *icon = new C3D_Tex;
-            if(C3D_TexInit(icon, 64, 64, GPU_RGB565))
+            if(C3D_TexInitVRAM(icon, 64, 64, GPU_RGB565))
             {
                 uLongf sz = ICON_BUFF_SIZE;
                 uncompress((uint8_t *)icon->data, &sz, readBuff, iconSize);
@@ -711,10 +719,11 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path, bool
             }
         }
 
-        newData.initFromCache(newID, title, pub, prodCode, tmp, nand ? MEDIATYPE_NAND : MEDIATYPE_SD);
+        newData.initFromCache(newID, title, pub, prodCode, tmp, mediaType);
         vect.push_back(newData);
     }
 
+    cache.close();
     delete[] readBuff;
 
     return true;

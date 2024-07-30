@@ -177,7 +177,8 @@ void ui::ttlDrawBot()
     }
     else
     {
-        data::usrSaveTitles[ttlView->getSelected()].drawInfo(0, 0);
+        if (!data::usrSaveTitles.empty())
+            data::usrSaveTitles[ttlView->getSelected()].drawInfo(0, 0);
         ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, true);
     }
 }

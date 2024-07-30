@@ -210,9 +210,9 @@ void ui::showMessage(const char *fmt, ...)
 
 }
 
-void ui::newThread(ThreadFunc _thrdFunc, void *_args, funcPtr _drawFunc)
+void ui::newThread(ThreadFunc _thrdFunc, void *_args, funcPtr _drawFunc, size_t stackSize)
 {
-    thrdMgr->newThread(_thrdFunc, _args, _drawFunc);
+    thrdMgr->newThread(_thrdFunc, _args, _drawFunc, stackSize);
 }
 
 ui::progressBar::progressBar(const uint32_t& _max)

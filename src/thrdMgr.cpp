@@ -28,7 +28,7 @@ ui::threadProcMngr::~threadProcMngr()
     }
 }
 
-threadInfo *ui::threadProcMngr::newThread(ThreadFunc func, void *args, funcPtr _drawFunc)
+threadInfo *ui::threadProcMngr::newThread(ThreadFunc func, void *args, funcPtr _drawFunc, size_t stackSize)
 {
     threadInfo *t = new threadInfo;
     t->status = new threadStatus;
@@ -38,6 +38,7 @@ threadInfo *ui::threadProcMngr::newThread(ThreadFunc func, void *args, funcPtr _
     t->drawFunc = _drawFunc;
     t->argPtr = args;
     t->thrdID = cnt++;
+    t->stackSize = stackSize;
 
     svcWaitSynchronization(threadLock, U64_MAX);
     threads.push_back(t);
@@ -53,7 +54,7 @@ void ui::threadProcMngr::update()
         threadInfo *t = threads[0];
         if(!t->running)
         {
-            t->thrd = threadCreate(t->thrdFunc, t, 0x10000, sys::threadPrio, sys::threadCore, false);
+            t->thrd = threadCreate(t->thrdFunc, t, t->stackSize, sys::threadPrio, sys::threadCore, false);
             t->running = true;
         }
         else if(t->finished)

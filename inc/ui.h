@@ -66,7 +66,7 @@ namespace ui
     void init();
     void exit();
     void showMessage(const char *fmt, ...);
-    void newThread(ThreadFunc _thrdFunc, void *_args, funcPtr _drawFunc);
+    void newThread(ThreadFunc _thrdFunc, void *_args, funcPtr _drawFunc, size_t stackSize = THRD_STACK_SIZE);
     bool runApp();
 
     std::u16string getFolder(const data::titleData& dat, const uint32_t& mode, const FS_Archive& arch, const bool& newFolder);

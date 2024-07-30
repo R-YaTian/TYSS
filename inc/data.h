@@ -52,6 +52,7 @@ namespace data
 
             void drawInfo(unsigned x, unsigned y);
             void setIcon(C2D_Image _set) { icon = _set; }
+            size_t getIconSize() { return icon.tex->size; }
             uint8_t *getIconData() { return (uint8_t *)icon.tex->data; }
             C2D_Image *getIcon() { return &icon; }
             void drawIconAt(float x, float y, uint16_t w, uint16_t h, float depth);
@@ -95,7 +96,7 @@ namespace data
     C2D_Image readIconFromSMDH(smdh_s *smdh);
 
     //Writes title data cache to path
-    bool readCache(std::vector<titleData>& vect, const std::string& path, bool nand);
+    bool readCache(std::vector<titleData>& vect, const std::string& path);
     void createCache(std::vector<titleData>& vect, const std::string& path);
 
     //Just functions to draw while data load thread runs

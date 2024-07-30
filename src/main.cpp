@@ -27,12 +27,12 @@ int main(int argc, const char *argv[])
     ui::init();
 
     //Need to init soc so curl and drive work
-    socBuffer = (uint32_t *)memalign(0x1000, 0x80000);
-    socInit(socBuffer, 0x80000);
+    socBuffer = (uint32_t *)memalign(SOCU_ALIGN, SOCU_BUFFERSIZE);
+    socInit(socBuffer, SOCU_BUFFERSIZE);
 
     curl_global_init(CURL_GLOBAL_ALL);
 
-    ui::newThread(data::loadTitles, NULL, NULL);
+    ui::newThread(data::loadTitles, NULL, NULL, 0x200000);
     ui::newThread(ui::ttlInit, NULL, NULL);
     ui::newThread(ui::extInit, NULL, NULL);
     ui::newThread(ui::sysInit, NULL, NULL);
