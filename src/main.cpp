@@ -32,7 +32,7 @@ int main(int argc, const char *argv[])
 
     curl_global_init(CURL_GLOBAL_ALL);
 
-    ui::newThread(data::loadTitles, NULL, NULL, 0x200000);
+    ui::newThread(data::loadTitles, NULL, NULL);
     ui::newThread(ui::ttlInit, NULL, NULL);
     ui::newThread(ui::extInit, NULL, NULL);
     ui::newThread(ui::sysInit, NULL, NULL);

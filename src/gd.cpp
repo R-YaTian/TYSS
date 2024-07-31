@@ -521,7 +521,7 @@ void drive::gd::downloadFile(const std::string& _fileID, FILE *_download)
     curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, 0x8000);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataFile);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, _download);
-    int error = curl_easy_perform(curl);
+    curl_easy_perform(curl);
     curl_slist_free_all(getHeaders);
     curl_easy_cleanup(curl);
 }
@@ -548,12 +548,14 @@ void drive::gd::deleteFile(const std::string& _fileID)
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     int error = curl_easy_perform(curl);
 
-    for(unsigned i = 0; i < driveList.size(); i++)
-    {
-        if(driveList[i].id == _fileID)
+    if(error == CURLE_OK) {
+        for(unsigned i = 0; i < driveList.size(); i++)
         {
-            driveList.erase(driveList.begin() + i);
-            break;
+            if(driveList[i].id == _fileID)
+            {
+                driveList.erase(driveList.begin() + i);
+                break;
+            }
         }
     }
 

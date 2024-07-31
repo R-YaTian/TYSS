@@ -168,9 +168,9 @@ bool ui::runApp()
     if(thrdMgr->empty())
     {
         if(ui::padKeysDown() & KEY_START)
-        return false;
+            return false;
 
-        //data::cartCheck();
+        data::cartCheck();
 
         switch(state)
         {

@@ -91,6 +91,7 @@ namespace fs
     typedef struct
     {
         std::u16string name;
+        std::string nameUTF8;
         bool isDir;
     } dirItem;
 

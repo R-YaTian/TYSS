@@ -78,7 +78,7 @@ std::vector<data::titleData> data::sysDataTitles;
 std::vector<data::titleData> data::bossDataTitles;
 
 //This is a master list now
-std::vector<data::titleData> titles;
+static std::vector<data::titleData> titles;
 std::vector<uint32_t> filterIds;
 data::titleData data::curData;
 
@@ -92,14 +92,17 @@ struct
         if(a.getFav() != b.getFav())
             return a.getFav() == true;
 
-        for(unsigned i = 0; i < a.getTitle().length(); i++)
+        unsigned aLen = a.getTitleUTF8().length();
+        unsigned bLen = b.getTitleUTF8().length();
+        unsigned minLen = std::min(aLen, bLen);
+        for(unsigned i = 0; i < minLen; i++)
         {
-            int aChar = tolower(a.getTitle()[i]), bChar = tolower(b.getTitle()[i]);
+            int aChar = std::tolower(a.getTitleUTF8()[i]), bChar = std::tolower(b.getTitleUTF8()[i]);
             if(aChar != bChar)
                 return aChar < bChar;
         }
 
-        return false;
+        return aLen < bLen;
     }
 } sortTitles;
 
@@ -311,11 +314,6 @@ void data::titleData::drawInfo(unsigned x, unsigned y)
     gfx::drawText(media, 8,64, GFX_DEPTH_DEFAULT, 0.5f, 0xFFFFFFFF);
 }
 
-void data::titleData::drawIconAt(float x, float y, uint16_t w, uint16_t h, float depth)
-{
-    C2D_DrawImageAt(icon, x, y, depth);
-}
-
 void data::titleData::assignIcon(C3D_Tex *_icon)
 {
     icon = {_icon, &gfx::iconSubTex};
@@ -345,6 +343,9 @@ static void loadcart(void *a)
 
 static bool checkForCart()
 {
+    if (data::usrSaveTitles.empty() || data::extDataTitles.empty())
+        return false;
+
     return data::usrSaveTitles[0].getMedia() == MEDIATYPE_GAME_CARD || data::extDataTitles[0].getMedia() == MEDIATYPE_GAME_CARD;
 }
 
@@ -357,14 +358,14 @@ void data::cartCheck()
         ui::newThread(loadcart, NULL, NULL);
     else if(!ins)
     {
-        if(data::usrSaveTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
+        if(!data::usrSaveTitles.empty() && data::usrSaveTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
         {
             data::usrSaveTitles[0].freeIcon();
             data::usrSaveTitles.erase(data::usrSaveTitles.begin());
             ui::ttlRefresh();
         }
 
-        if(data::extDataTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
+        if(!data::extDataTitles.empty() && data::extDataTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
         {
             data::extDataTitles[0].freeIcon();
             data::extDataTitles.erase(data::extDataTitles.begin());
@@ -469,14 +470,10 @@ void data::loadTitles(void *a)
             bossDataTitles.push_back(titles[i]);
     }
 
-    if (!usrSaveTitles.empty())
-        std::sort(usrSaveTitles.begin(), usrSaveTitles.end(), sortTitles);
-    if (!extDataTitles.empty())
-        std::sort(extDataTitles.begin(), extDataTitles.end(), sortTitles);
-    if (!sysDataTitles.empty())
-        std::sort(sysDataTitles.begin(), sysDataTitles.end(), sortTitles);
-    if (!bossDataTitles.empty())
-        std::sort(bossDataTitles.begin(), bossDataTitles.end(), sortTitles);
+    std::sort(usrSaveTitles.begin(), usrSaveTitles.end(), sortTitles);
+    std::sort(extDataTitles.begin(), extDataTitles.end(), sortTitles);
+    std::sort(sysDataTitles.begin(), sysDataTitles.end(), sortTitles);
+    std::sort(bossDataTitles.begin(), bossDataTitles.end(), sortTitles);
 
     t->finished = true;
 }
@@ -506,6 +503,7 @@ void data::saveBlacklist()
         bl.writef("0x%016llX\n", blacklist[i]);
 }
 
+// TODO: Blacklist things
 void data::blacklistAdd(titleData& t)
 {
     if(t.getMedia() == MEDIATYPE_GAME_CARD)
@@ -525,8 +523,8 @@ void data::blacklistAdd(titleData& t)
     }
 
     //Erase cart if it's there
-    if(titles[0].getMedia() == MEDIATYPE_GAME_CARD)
-        titles.erase(titles.begin());
+    // if(titles[0].getMedia() == MEDIATYPE_GAME_CARD)
+    //     titles.erase(titles.begin());
 
     //Recreate cache with title missing now
     createCache(titles, titlePath);
@@ -647,6 +645,11 @@ void data::createCache(std::vector<titleData>& vect, const std::string& path)
         }
     }
 
+    // EOF
+    cache.putByte(0x00);
+    cache.putByte(0x45);
+    cache.putByte(0x4F);
+    cache.putByte(0x46);
     cache.close();
     delete[] iconOut;
 }

@@ -431,14 +431,17 @@ struct
         if(a.isDir != b.isDir)
             return a.isDir;
 
-        for(unsigned i = 0; i < 0x106; i++)
+        unsigned aLen = a.nameUTF8.length();
+        unsigned bLen = b.nameUTF8.length();
+        unsigned minLen = std::min(aLen, bLen);
+        for(unsigned i = 0; i < minLen; i++)
         {
-            int charA = std::tolower(a.name[i]), charB = std::tolower(b.name[i]);
+            int charA = std::tolower(a.nameUTF8[i]), charB = std::tolower(b.nameUTF8[i]);
             if(charA != charB)
                 return charA < charB;
         }
 
-        return false;
+        return aLen < bLen;
     }
 } sortDirs;
 
@@ -457,7 +460,9 @@ fs::dirList::dirList(const FS_Archive& arch, const std::u16string& p)
         FSDIR_Read(d, &read, 1, &ent);
         if(read == 1)
         {
-            fs::dirItem newEntry = {std::u16string((char16_t *)ent.name), ent.attributes == FS_ATTRIBUTE_DIRECTORY};
+            fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
+                                    util::toUtf8(std::u16string((char16_t *)ent.name)),
+                                    ent.attributes == FS_ATTRIBUTE_DIRECTORY};
             entry.push_back(newEntry);
         }
     }
@@ -486,7 +491,9 @@ void fs::dirList::rescan()
         FSDIR_Read(d, &read, 1, &ent);
         if(read == 1)
         {
-            fs::dirItem newEntry = {std::u16string((char16_t *)ent.name), ent.attributes == FS_ATTRIBUTE_DIRECTORY};
+            fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
+                                    util::toUtf8(std::u16string((char16_t *)ent.name)),
+                                    ent.attributes == FS_ATTRIBUTE_DIRECTORY};
             entry.push_back(newEntry);
         }
     }
@@ -512,7 +519,9 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
         FSDIR_Read(d, &read, 1, &ent);
         if(read == 1)
         {
-            fs::dirItem newEntry = {std::u16string((char16_t *)ent.name), ent.attributes == FS_ATTRIBUTE_DIRECTORY};
+            fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
+                                    util::toUtf8(std::u16string((char16_t *)ent.name)),
+                                    ent.attributes == FS_ATTRIBUTE_DIRECTORY};
             entry.push_back(newEntry);
         }
     }
@@ -523,14 +532,13 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
     std::sort(entry.begin(), entry.end(), sortDirs);
 }
 
-static std::u16string getItemFromPath(const std::u16string& path)
-{
-    size_t ls = path.find_last_of('/');
-    if(ls != path.npos)
-        return path.substr(ls + 1, path.npos);
-
-    return (char16_t *)"";
-}
+// static std::u16string getItemFromPath(const std::u16string& path)
+// {
+//     size_t ls = path.find_last_of('/');
+//     if(ls != path.npos)
+//         return path.substr(ls + 1, path.npos);
+//     return (char16_t *)"";
+// }
 
 void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t)
 {
@@ -639,7 +647,7 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
             zip_fileinfo inf = { locTime->tm_sec, locTime->tm_min, locTime->tm_hour,
                                  locTime->tm_mday, locTime->tm_mon, (1900 + locTime->tm_year), 0, 0, 0 };
 
-            std::string filename = util::toUtf8(_src + archList->getItem(i));
+            std::string filename = util::toUtf8(archList->getItem(i));
             int openZip = zipOpenNewFileInZip64(_zip, filename.c_str(), &inf, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_DEFAULT_COMPRESSION, 0);
             if(openZip == 0)
             {

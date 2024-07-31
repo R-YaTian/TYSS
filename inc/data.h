@@ -55,7 +55,6 @@ namespace data
             size_t getIconSize() { return icon.tex->size; }
             uint8_t *getIconData() { return (uint8_t *)icon.tex->data; }
             C2D_Image *getIcon() { return &icon; }
-            void drawIconAt(float x, float y, uint16_t w, uint16_t h, float depth);
 
             void assignIcon(C3D_Tex *_icon);
             void freeIcon() { if(icon.tex) { C3D_TexDelete(icon.tex); } }

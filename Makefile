@@ -54,7 +54,7 @@ CFLAGS	:=	-g -Wall -O2 -mword-relocations -flto=auto \
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -Wno-psabi -std=gnu++23 -Wno-unused-variable -Wno-unused-function
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -Wno-psabi -std=gnu++23
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
