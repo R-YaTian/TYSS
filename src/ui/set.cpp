@@ -23,6 +23,12 @@ static std::string getBoolText(const bool& g)
     return "关";
 }
 
+static void setMenuClearFavList(void *a)
+{
+    remove("/JKSV/favorites.txt");
+    ui::newThread(data::clearFav, NULL, NULL);
+}
+
 static void setMenuReloadTitles(void *a)
 {
     remove("/JKSV/cache.bin");
@@ -46,6 +52,7 @@ static void setMenuReloadDriveList(void *a)
 void ui::setInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
+
     setMenu.addOpt("重载 Titles", 320);
     setMenu.addOptEvent(0, KEY_A, setMenuReloadTitles, NULL);
 
@@ -54,6 +61,10 @@ void ui::setInit(void *a)
 
     setMenu.addOpt("导出到 ZIP", 320);
     setMenu.addOptEvent(2, KEY_A, toggleBool, &cfg::config["zip"]);
+
+    setMenu.addOpt("重置收藏列表", 320);
+    setMenu.addOptEvent(3, KEY_A, setMenuClearFavList, NULL);
+
     t->finished = true;
 }
 

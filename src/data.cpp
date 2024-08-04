@@ -20,6 +20,8 @@ const char *blPath    = "/JKSV/blacklist.txt";
 const char *favPath   = "/JKSV/favorites.txt";
 const char *titlePath = "/JKSV/cache.bin";
 static uint8_t lang = CFG_LANGUAGE_EN;
+static bool cartValid = true;
+static bool titleLoaded = false;
 
 static uint32_t extdataRedirect(const uint32_t& low)
 {
@@ -116,7 +118,8 @@ static bool isBlacklisted(const uint64_t& id)
 
     return false;
 }
-static bool isFavorite(const uint64_t& id)
+
+bool isFavorite(const uint64_t& id)
 {
     for(unsigned i = 0; i < favorites.size(); i++)
     {
@@ -323,26 +326,48 @@ static void loadcart(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在读取卡带数据...");
-    uint64_t cartID = 0;
-    AM_GetTitleList(NULL, MEDIATYPE_GAME_CARD, 1, &cartID);
-    data::titleData cartData;
-    if(cartData.init(cartID, MEDIATYPE_GAME_CARD))
-    {
-        data::titleSaveTypes tmp = cartData.getSaveTypes();
-        if(tmp.hasUser)
-            data::usrSaveTitles.insert(data::usrSaveTitles.begin(), cartData);
+    Result res = 0;
+    u32 count  = 0;
+    FS_CardType cardType;
+    res = FSUSER_GetCardType(&cardType);
+    if (R_SUCCEEDED(res)) {
+        if (cardType == CARD_CTR) {
+            res = AM_GetTitleCount(MEDIATYPE_GAME_CARD, &count);
+            if (R_SUCCEEDED(res) && count > 0) {
+                uint64_t cartID = 0;
+                res = AM_GetTitleList(NULL, MEDIATYPE_GAME_CARD, count, &cartID);
+                if (R_SUCCEEDED(res)) {
+                    data::titleData cartData;
+                    if(cartData.init(cartID, MEDIATYPE_GAME_CARD))
+                    {
+                        data::titleSaveTypes tmp = cartData.getSaveTypes();
+                        if(tmp.hasUser)
+                            data::usrSaveTitles.insert(data::usrSaveTitles.begin(), cartData);
 
-        if(tmp.hasExt)
-            data::extDataTitles.insert(data::extDataTitles.begin(), cartData);
+                        if(tmp.hasExt)
+                            data::extDataTitles.insert(data::extDataTitles.begin(), cartData);
 
-        ui::ttlRefresh();
-        ui::extRefresh();
-    }
+                        ui::ttlRefresh();
+                        ui::extRefresh();
+                        if (!cartValid) cartValid = true;
+                    }
+                } else
+                    cartValid = false;
+            } else
+                cartValid = false; // Is CARD_CTR, but no valid titles, maybe GW cart without game loaded?
+        } else
+            cartValid = false; // Not yet support CARD_TWL
+    } else
+        cartValid = false;
+
     t->finished = true;
 }
 
 static bool checkForCart()
 {
+    if (!cartValid)
+        return true;
+
     if (data::usrSaveTitles.empty() || data::extDataTitles.empty())
         return false;
 
@@ -371,6 +396,8 @@ void data::cartCheck()
             data::extDataTitles.erase(data::extDataTitles.begin());
             ui::extRefresh();
         }
+
+        if (!cartValid) cartValid = true;
     }
 }
 
@@ -412,6 +439,7 @@ void data::loadTitles(void *a)
     extDataTitles.clear();
     sysDataTitles.clear();
     bossDataTitles.clear();
+    favorites.clear();
     loadBlacklist();
     loadFav();
 
@@ -475,6 +503,14 @@ void data::loadTitles(void *a)
     std::sort(sysDataTitles.begin(), sysDataTitles.end(), sortTitles);
     std::sort(bossDataTitles.begin(), bossDataTitles.end(), sortTitles);
 
+    if (!titleLoaded)
+        titleLoaded = true;
+    else {
+        ui::ttlRefresh();
+        ui::extRefresh();
+        ui::sysRefresh();
+        ui::bossViewRefresh();
+    }
     t->finished = true;
 }
 
@@ -555,6 +591,28 @@ void data::saveFav()
         for(unsigned i = 0; i < favorites.size(); i++)
             fav.writef("0x%016llX\n", favorites[i]);
     }
+}
+
+void data::clearFav(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在重置收藏列表...");
+
+    favorites.clear();
+
+    // resort with new fav
+    std::sort(data::usrSaveTitles.begin(), data::usrSaveTitles.end(), sortTitles);
+    std::sort(data::extDataTitles.begin(), data::extDataTitles.end(), sortTitles);
+    std::sort(data::bossDataTitles.begin(), data::bossDataTitles.end(), sortTitles);
+    std::sort(data::sysDataTitles.begin(), data::sysDataTitles.end(), sortTitles);
+
+    // refresh
+    ui::extRefresh();
+    ui::sysRefresh();
+    ui::ttlRefresh();
+    ui::bossViewRefresh();
+
+    t->finished = true;
 }
 
 void data::favAdd(titleData& t)
@@ -730,8 +788,13 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path)
         vect.push_back(newData);
     }
 
+    uint32_t eof = 0;
+    cache.read(&eof, sizeof(uint32_t));
     cache.close();
     delete[] readBuff;
+
+    if(eof != 0x464F4500)
+        return false;
 
     return true;
 }
@@ -744,4 +807,17 @@ void data::datDrawTop()
 void data::datDrawBot()
 {
     ui::drawUIBar("", ui::SCREEN_BOT, false);
+}
+
+int data::findTitleNewIndex(std::vector<data::titleData>& _t, const uint64_t& tid)
+{
+    if (!_t.empty())
+    {
+        for(unsigned i = 0; i < _t.size(); i++)
+        {
+            if(_t[i].getID() == tid)
+                return i;
+        }
+    }
+    return -1;
 }

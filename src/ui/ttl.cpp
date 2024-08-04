@@ -10,16 +10,6 @@ static ui::titleview *ttlView;
 static ui::menu *ttlOpts;
 static bool fldOpen = false, ttlOptsOpen = false;
 
-static int findTitleNewIndex(const uint64_t& tid)
-{
-    for(unsigned i = 0; i < data::usrSaveTitles.size(); i++)
-    {
-        if(data::usrSaveTitles[i].getID() == tid)
-            return i;
-    }
-    return -1;
-}
-
 static void fldCallback(void *)
 {
     switch(ui::padKeysDown())
@@ -75,9 +65,12 @@ static void ttlViewCallback(void *a)
                     data::favRem(*t);
                 else
                     data::favAdd(*t);
-                ttlView->refesh(data::usrSaveTitles);
-                int newSel = findTitleNewIndex(tid);
+                ttlView->refresh(data::usrSaveTitles);
+                int newSel = data::findTitleNewIndex(data::usrSaveTitles, tid);
                 ttlView->setSelected(newSel);
+                ui::extRefresh();
+                ui::sysRefresh();
+                ui::bossViewRefresh();
             }
             break;
 
@@ -144,7 +137,7 @@ void ui::ttlExit()
 
 void ui::ttlRefresh()
 {
-    ttlView->refesh(data::usrSaveTitles);
+    ttlView->refresh(data::usrSaveTitles);
 }
 
 void ui::ttlUpdate()

@@ -29,7 +29,7 @@ namespace ui
             ~titleview();
 
             void update();
-            void refesh(std::vector<data::titleData>& _t);
+            void refresh(std::vector<data::titleData>& _t);
             void draw();
             size_t debGetSize(){ return tiles.size(); }
 

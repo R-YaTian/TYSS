@@ -47,6 +47,23 @@ static void extViewCallback(void *a)
             }
             break;
 
+        case KEY_Y:
+            {
+                data::titleData *t = &data::extDataTitles[extView->getSelected()];
+                uint64_t tid = t->getID();
+                if(t->getFav())
+                    data::favRem(*t);
+                else
+                    data::favAdd(*t);
+                extView->refresh(data::extDataTitles);
+                int newSel = data::findTitleNewIndex(data::extDataTitles, tid);
+                extView->setSelected(newSel);
+                ui::bossViewRefresh();
+                ui::sysRefresh();
+                ui::ttlRefresh();
+            }
+            break;
+
         case KEY_CPAD_LEFT:
             ui::state = USR;
             break;
@@ -84,7 +101,7 @@ void ui::extUpdate()
 
 void ui::extRefresh()
 {
-    extView->refesh(data::extDataTitles);
+    extView->refresh(data::extDataTitles);
 }
 
 void ui::extDrawTop()
@@ -104,6 +121,6 @@ void ui::extDrawBot()
     {
         if (!data::extDataTitles.empty())
             data::extDataTitles[extView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

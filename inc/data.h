@@ -8,6 +8,8 @@
 
 #include "smdh.h"
 
+bool isFavorite(const uint64_t& id);
+
 namespace data
 {
     void init();
@@ -35,7 +37,7 @@ namespace data
             uint32_t getUnique() const { return unique; }
             uint32_t getExtData() const { return extdata; }
             uint8_t getMedia() const { return m; }
-            bool getFav() const { return fav; }
+            bool getFav() const { return isFavorite(id); }
             bool getIconFlag() const { return bhaveIcon; }
 
             void setFav(bool _set) { fav = _set; }
@@ -88,6 +90,7 @@ namespace data
 
     void loadFav();
     void saveFav();
+    void clearFav(void *a);
     void favAdd(titleData& t);
     void favRem(titleData& t);
 
@@ -101,6 +104,9 @@ namespace data
     //Just functions to draw while data load thread runs
     void datDrawTop();
     void datDrawBot();
+
+    //For fav feat
+    int findTitleNewIndex(std::vector<data::titleData>& _t, const uint64_t& tid);
 }
 
 #endif // DATA_H

@@ -78,7 +78,7 @@ void ui::titleview::update()
         (*(callback))(cbArgs);
 }
 
-void ui::titleview::refesh(std::vector<data::titleData>& _t)
+void ui::titleview::refresh(std::vector<data::titleData>& _t)
 {
     tiles.clear();
     if (_t.empty())

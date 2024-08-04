@@ -46,6 +46,23 @@ static void bossViewCallback(void *a)
             }
             break;
 
+        case KEY_Y:
+            {
+                data::titleData *t = &data::bossDataTitles[bossView->getSelected()];
+                uint64_t tid = t->getID();
+                if(t->getFav())
+                    data::favRem(*t);
+                else
+                    data::favAdd(*t);
+                bossView->refresh(data::bossDataTitles);
+                int newSel = data::findTitleNewIndex(data::bossDataTitles, tid);
+                bossView->setSelected(newSel);
+                ui::extRefresh();
+                ui::sysRefresh();
+                ui::ttlRefresh();
+            }
+            break;
+
         case KEY_CPAD_LEFT:
             ui::state = SYS;
             break;
@@ -76,6 +93,11 @@ void ui::bossViewUpdate()
         bossView->update();
 }
 
+void ui::bossViewRefresh()
+{
+    bossView->refresh(data::bossDataTitles);
+}
+
 void ui::bossViewDrawTop()
 {
     bossView->draw();
@@ -93,6 +115,6 @@ void ui::bossViewDrawBot()
     {
         if (!data::bossDataTitles.empty())
             data::bossDataTitles[bossView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

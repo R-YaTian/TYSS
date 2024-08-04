@@ -46,6 +46,23 @@ static void sysViewCallback(void *a)
             }
             break;
 
+        case KEY_Y:
+            {
+                data::titleData *t = &data::sysDataTitles[sysView->getSelected()];
+                uint64_t tid = t->getID();
+                if(t->getFav())
+                    data::favRem(*t);
+                else
+                    data::favAdd(*t);
+                sysView->refresh(data::sysDataTitles);
+                int newSel = data::findTitleNewIndex(data::sysDataTitles, tid);
+                sysView->setSelected(newSel);
+                ui::bossViewRefresh();
+                ui::extRefresh();
+                ui::ttlRefresh();
+            }
+            break;
+
         case KEY_CPAD_LEFT:
             ui::state = EXT;
             break;
@@ -76,6 +93,11 @@ void ui::sysUpdate()
         sysView->update();
 }
 
+void ui::sysRefresh()
+{
+    sysView->refresh(data::sysDataTitles);
+}
+
 void ui::sysDrawTop()
 {
     sysView->draw();
@@ -93,6 +115,6 @@ void ui::sysDrawBot()
     {
         if (!data::sysDataTitles.empty())
             data::sysDataTitles[sysView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }
