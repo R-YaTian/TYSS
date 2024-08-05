@@ -3,6 +3,7 @@
 #include "ui.h"
 #include "cfg.h"
 #include "fs.h"
+#include "util.h"
 
 static ui::menu setMenu;
 
@@ -21,6 +22,11 @@ static std::string getBoolText(const bool& g)
         return "开";
     
     return "关";
+}
+
+static void setMenuHackPlayCoin(void *a)
+{
+    util::setPC();
 }
 
 static void setMenuClearFavList(void *a)
@@ -62,8 +68,11 @@ void ui::setInit(void *a)
     setMenu.addOpt("导出到 ZIP", 320);
     setMenu.addOptEvent(2, KEY_A, toggleBool, &cfg::config["zip"]);
 
+    setMenu.addOpt("修改 PlayCoin", 320);
+    setMenu.addOptEvent(3, KEY_A, setMenuHackPlayCoin, NULL);
+
     setMenu.addOpt("重置收藏列表", 320);
-    setMenu.addOptEvent(3, KEY_A, setMenuClearFavList, NULL);
+    setMenu.addOptEvent(4, KEY_A, setMenuClearFavList, NULL);
 
     t->finished = true;
 }

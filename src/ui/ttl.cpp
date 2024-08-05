@@ -98,7 +98,7 @@ static void ttlOptCallback(void *a)
 static void ttlOptResetSaveData_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    if(fs::openArchive(data::curData, fs::getSaveMode(), false))
+    if(fs::openArchive(data::curData, ARCHIVE_USER_SAVEDATA, false))
     {
         t->status->setStatus("正在重置存档数据...");
         fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
