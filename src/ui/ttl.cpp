@@ -41,7 +41,7 @@ static void ttlViewCallback(void *a)
 
                 if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false))
                 {
-                    util::createTitleDir(*t, ARCHIVE_USER_SAVEDATA);
+                    //util::createTitleDir(*t, ARCHIVE_USER_SAVEDATA);
                     std::u16string targetPath = util::createPath(*t, ARCHIVE_USER_SAVEDATA);
                     ui::fldInit(targetPath, uploadParent, fldCallback, NULL);
                     fldOpen = true;

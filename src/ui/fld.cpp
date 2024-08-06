@@ -14,8 +14,10 @@ static std::u16string targetDir;
 static std::string uploadParent;
 std::vector<drive::gdItem *> gdList;
 
-void fldMenuNew(void *a)
+void fldMenuNew_t(void *a)
 {
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在准备备份...");
     std::u16string newFolder;
     uint32_t held = ui::padKeysHeld();
 
@@ -25,6 +27,8 @@ void fldMenuNew(void *a)
         newFolder = util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
     else
         newFolder = util::safeString(util::toUtf16(util::getString("输入新文件夹名称", true)));
+
+    FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, targetDir.data()), 0);
 
     if(!newFolder.empty() && cfg::config["zip"])
     {
@@ -44,6 +48,13 @@ void fldMenuNew(void *a)
         fs::copyDirToDirThreaded(fs::getSaveArch(), util::toUtf16("/"), fs::getSDMCArch(), fullOut, false);
         ui::fldRefresh();
     }
+
+    t->finished = true;
+}
+
+void fldMenuNew(void *a)
+{
+    ui::newThread(fldMenuNew_t, NULL, NULL);
 }
 
 void fldMenuOverwrite_t(void *a)

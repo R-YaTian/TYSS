@@ -38,7 +38,7 @@ static void bossViewCallback(void *a)
 
                 if(fs::openArchive(*t, ARCHIVE_BOSS_EXTDATA, false))
                 {
-                    util::createTitleDir(*t, ARCHIVE_BOSS_EXTDATA);
+                    //util::createTitleDir(*t, ARCHIVE_BOSS_EXTDATA);
                     std::u16string targetDir = util::createPath(*t, ARCHIVE_BOSS_EXTDATA);
                     ui::fldInit(targetDir, uploadParent, fldCallback, NULL);
                     fldOpen = true;
