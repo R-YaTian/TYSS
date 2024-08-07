@@ -207,7 +207,17 @@ bool ui::runApp()
 
 void ui::showMessage(const char *fmt, ...)
 {
+    va_list args;
+    va_start(args, fmt);
 
+    size_t size = std::vsnprintf(nullptr, 0, fmt, args) + 1;
+    std::vector<char> buf(size);
+    std::vsnprintf(buf.data(), size, fmt, args);
+
+    va_end(args);
+
+    std::string txt(buf.data(), buf.size() - 1);
+    ui::message(txt, NULL, NULL);
 }
 
 void ui::newThread(ThreadFunc _thrdFunc, void *_args, funcPtr _drawFunc, size_t stackSize)
@@ -234,6 +244,51 @@ void ui::progressBar::draw(const std::string& text)
     gfx::drawTextWrap(text, 16, 16, GFX_DEPTH_DEFAULT, 0.5f, 240, 0xFF000000);
     C2D_DrawRectSolid(16, 200, GFX_DEPTH_DEFAULT, 288, 16, 0xFF000000);
     C2D_DrawRectSolid(16, 200, GFX_DEPTH_DEFAULT, width, 16, 0xFF00FF00);
+}
+
+void message_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    ui::confArgs *in = (ui::confArgs *)t->argPtr;
+    while(true)
+    {
+        uint32_t down = ui::padKeysDown();
+        ok->update();
+
+        if(down & KEY_A || down & KEY_B || ok->getEvent() == BUTTON_RELEASED)
+        {
+            if(in->onConfirm)
+                ui::newThread(in->onConfirm, in->args, NULL);
+            break;
+        }
+        svcSleepThread(1e+9 / 60);
+    }
+    t->lock();
+    delete in;
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+static void messageDrawFunc(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    if(t->argPtr && t->running)
+    {
+        ui::confArgs *in = (ui::confArgs *)t->argPtr;
+        C2D_DrawRectSolid(24, 24, GFX_DEPTH_DEFAULT, 272, 200, 0xFFE7E7E7);
+        gfx::drawTextWrap(in->q, 32, 32, GFX_DEPTH_DEFAULT, 0.5f, 240, 0xFF000000);
+        ok->draw();
+    }
+}
+
+void ui::message(const std::string& mess, funcPtr _onConfirm, void *args)
+{
+    confArgs *send = new confArgs;
+    send->q = mess;
+    send->onConfirm = _onConfirm;
+    send->args = args;
+    ui::newThread(message_t, send, messageDrawFunc);
 }
 
 void confirm_t(void *a)

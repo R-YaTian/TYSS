@@ -90,6 +90,7 @@ namespace ui
     };
 
     void confirm(const std::string& mess, funcPtr _onConfirm, funcPtr _onCancel, void *args);
+    void message(const std::string& mess, funcPtr _onConfirm, void *args);
     extern const std::string loadGlyphArray[];
     extern int state, prev;
 }

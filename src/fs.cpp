@@ -197,8 +197,21 @@ void fs::commitData(const uint32_t& mode)
     if(mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
     {
         Result res = FSUSER_ControlArchive(saveArch, ARCHIVE_ACTION_COMMIT_SAVE_DATA, NULL, 0, NULL, 0);
-        if(res)
+        if(R_FAILED(res))
             ui::showMessage("提交存档数据失败!\n错误: 0x%08X", (unsigned)res);
+    }
+}
+
+void fs::getTimestamp(const FS_Archive& _arch, const std::u16string& _path, u64* _timeStamp)
+{
+    FS_Path fs_path = fsMakePath(PATH_UTF16, _path.c_str());
+    Result res = FSUSER_ControlArchive(_arch, ARCHIVE_ACTION_GET_TIMESTAMP, (void*) fs_path.data, fs_path.size, _timeStamp, sizeof(*_timeStamp));
+    if(R_FAILED(res))
+        ui::showMessage("获取文件修改日期失败.\n错误: 0x%08X", (unsigned) res);
+    else {
+        *_timeStamp /= 1000;
+        /* convert from 2000-based timestamp to UNIX timestamp */
+        *_timeStamp += 946684800;
     }
 }
 
@@ -641,8 +654,9 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
         }
         else
         {
-            time_t raw;
-            time(&raw);
+            u64 timestamp;
+            getTimestamp(_arch, _src + archList->getItem(i), &timestamp);
+            time_t raw = timestamp;
             tm *locTime = localtime(&raw);
             zip_fileinfo inf = { locTime->tm_sec, locTime->tm_min, locTime->tm_hour,
                                  locTime->tm_mday, locTime->tm_mon, (1900 + locTime->tm_year), 0, 0, 0 };
