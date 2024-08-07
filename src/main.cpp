@@ -9,9 +9,6 @@
 #include "sys.h"
 #include "cfg.h"
 
-//Needed for zip/minizip
-u32 __stacksize__ = 0x100000;
-
 extern int state;
 
 static uint32_t *socBuffer;

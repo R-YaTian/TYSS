@@ -555,13 +555,13 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
 
 void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t)
 {
+    if(t)
+        t->status->setStatus("正在复制 " + util::toUtf8(_src) +"...");
+
     fs::fsfile src(_srcArch, _src, FS_OPEN_READ);
     fs::fsfile dst(_dstArch, _dst, FS_OPEN_WRITE, src.getSize());
     if(!src.isOpen() || !dst.isOpen())
         return;
-    
-    if(t)
-        t->status->setStatus("正在复制 " + util::toUtf8(_src) +"...");
 
     size_t readIn = 0;
     uint8_t *buffer = new uint8_t[buff_size];
@@ -626,6 +626,9 @@ static void copyDirToDir_t(void *a)
     cpyArgs *cpy = (cpyArgs *)t->argPtr;
     fs::copyDirToDir(cpy->srcArch, cpy->src, cpy->dstArch, cpy->dst, cpy->commit, t);
     delete cpy;
+
+    ui::fldRefresh();
+
     t->argPtr = NULL;
     t->drawFunc = NULL;
     t->finished = true;
@@ -654,9 +657,8 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
         }
         else
         {
-            u64 timestamp;
-            getTimestamp(_arch, _src + archList->getItem(i), &timestamp);
-            time_t raw = timestamp;
+            time_t raw;
+            time(&raw);
             tm *locTime = localtime(&raw);
             zip_fileinfo inf = { locTime->tm_sec, locTime->tm_min, locTime->tm_hour,
                                  locTime->tm_mday, locTime->tm_mon, (1900 + locTime->tm_year), 0, 0, 0 };
@@ -671,7 +673,7 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
                 uint8_t *buff = new uint8_t[buff_size];
                 while((readIn = readFile.read(buff, buff_size)))
                     zipWriteInFileInZip(_zip, buff, readIn);
-        
+
                 delete[] buff;
                 readFile.close();
             }
@@ -707,7 +709,7 @@ void fs::copyArchToZipThreaded(const FS_Archive& _arch, const std::u16string& _s
     send->srcArch = _arch;
     send->src = _src;
     send->dst = _dst;
-    ui::newThread(copyArchToZip_t, send, NULL);
+    ui::newThread(copyArchToZip_t, send, NULL, ZIP_THRD_STACK_SIZE);
 }
 
 void fs::copyZipToArch(const FS_Archive& arch, unzFile _unz, threadInfo *t)
@@ -764,7 +766,7 @@ void fs::copyZipToArchThreaded(const FS_Archive& _arch, const std::u16string& _s
     cpyArgs *send = new cpyArgs;
     send->dstArch = _arch;
     send->src = _src;
-    ui::newThread(copyZipToArch_t, send, NULL);
+    ui::newThread(copyZipToArch_t, send, NULL, ZIP_THRD_STACK_SIZE);
 }
 
 void fs::backupAll()

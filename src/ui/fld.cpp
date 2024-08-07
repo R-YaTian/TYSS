@@ -17,7 +17,7 @@ std::vector<drive::gdItem *> gdList;
 void fldMenuNew_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在准备备份...");
+    t->status->setStatus("正在准备...");
     std::u16string newFolder;
     uint32_t held = ui::padKeysHeld();
 
@@ -34,7 +34,6 @@ void fldMenuNew_t(void *a)
     {
         std::u16string fullOut = targetDir + newFolder + util::toUtf16(".zip");
         fs::copyArchToZipThreaded(fs::getSaveArch(), util::toUtf16("/"), fullOut);
-        ui::fldRefresh();
     }
     else if(!newFolder.empty())
     {
@@ -46,7 +45,6 @@ void fldMenuNew_t(void *a)
         fullOut += util::toUtf16("/");
 
         fs::copyDirToDirThreaded(fs::getSaveArch(), util::toUtf16("/"), fs::getSDMCArch(), fullOut, false);
-        ui::fldRefresh();
     }
 
     t->finished = true;
@@ -345,6 +343,9 @@ void ui::fldRefresh()
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
         fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
     }
+
+    fldMenu.setSelected(0);
+    fldUpdate();
 }
 
 void ui::fldUpdate()

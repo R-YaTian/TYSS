@@ -4,6 +4,7 @@
 #include <3ds.h>
 
 #define THRD_STACK_SIZE 0x10000
+#define ZIP_THRD_STACK_SIZE 0x100000
 #define SOCU_ALIGN 0x1000
 #define SOCU_BUFFERSIZE 0x80000
 static_assert(SOCU_BUFFERSIZE % SOCU_ALIGN == 0);
