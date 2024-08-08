@@ -55,18 +55,23 @@ void drive::gd::exhangeAuthCode(const std::string& _authCode)
     json_object_object_add(post, "redirect_uri", redirectUriString);
     json_object_object_add(post, "grant_type", grantTypeString);
 
+    // Create curl with mime
+    CURL *curl = curl_easy_init();
+    curl_mime *mime = curl_mime_init(curl);
+    curl_mimepart *part = curl_mime_addpart(mime);
+    curl_mime_data(part, json_object_get_string(post), CURL_ZERO_TERMINATED);
+    curl_mime_type(part, "application/json");
+
     // Curl Request
     std::string *jsonResp = new std::string;
-    CURL *curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_MIMEPOST, 1);
+    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeader);
     curl_easy_setopt(curl, CURLOPT_URL, tokenURL);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
-    
+
     int error = curl_easy_perform(curl);
 
     json_object *respParse = json_tokener_parse(jsonResp->c_str());
@@ -85,6 +90,7 @@ void drive::gd::exhangeAuthCode(const std::string& _authCode)
     delete jsonResp;
     json_object_put(post);
     json_object_put(respParse);
+    curl_mime_free(mime);
     curl_slist_free_all(postHeader);
     curl_easy_cleanup(curl);
 }
@@ -106,17 +112,23 @@ void drive::gd::refreshToken()
     json_object_object_add(post, "refresh_token", refreshTokenString);
     json_object_object_add(post, "grant_type", grantTypeString);
 
-    // Curl
-    std::string *jsonResp = new std::string;
+    // Create curl with mime
     CURL *curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_MIMEPOST, 1);
+    curl_mime *mime = curl_mime_init(curl);
+    curl_mimepart *part = curl_mime_addpart(mime);
+    curl_mime_data(part, json_object_get_string(post), CURL_ZERO_TERMINATED);
+    curl_mime_type(part, "application/json");
+
+    // Curl Request
+    std::string *jsonResp = new std::string;
+    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
     curl_easy_setopt(curl, CURLOPT_URL, tokenURL);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
+
     int error = curl_easy_perform(curl);
 
     json_object *parse = json_tokener_parse(jsonResp->c_str());
@@ -133,6 +145,7 @@ void drive::gd::refreshToken()
     delete jsonResp;
     json_object_put(post);
     json_object_put(parse);
+    curl_mime_free(mime);
     curl_slist_free_all(header);
     curl_easy_cleanup(curl);
 }
@@ -289,19 +302,25 @@ bool drive::gd::createDir(const std::string& _dirName, const std::string& _paren
         json_object_object_add(post, "parents", parentsArray);
     }
 
+    // Create curl with mime
+    CURL *curl = curl_easy_init();
+    curl_mime *mime = curl_mime_init(curl);
+    curl_mimepart *part = curl_mime_addpart(mime);
+    curl_mime_data(part, json_object_get_string(post), CURL_ZERO_TERMINATED);
+    curl_mime_type(part, "application/json");
+
     // Curl Request
     std::string *jsonResp = new std::string;
-    CURL *curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_MIMEPOST, 1);
+    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeaders);
     curl_easy_setopt(curl, CURLOPT_URL, driveURL);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
+
     int error = curl_easy_perform(curl);
-    
+
     json_object *respParse = json_tokener_parse(jsonResp->c_str()), *checkError;
     json_object_object_get_ex(respParse, "error", &checkError);
     if (error == CURLE_OK && !checkError)
@@ -324,6 +343,7 @@ bool drive::gd::createDir(const std::string& _dirName, const std::string& _paren
     delete jsonResp;
     json_object_put(post);
     json_object_put(respParse);
+    curl_mime_free(mime);
     curl_slist_free_all(postHeaders);
     curl_easy_cleanup(curl);
     return ret;
@@ -394,19 +414,24 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
         json_object_object_add(post, "parents", parentArray);
     }
 
+    // Create curl with mime
+    CURL *curl = curl_easy_init();
+    curl_mime *mime = curl_mime_init(curl);
+    curl_mimepart *part = curl_mime_addpart(mime);
+    curl_mime_data(part, json_object_get_string(post), CURL_ZERO_TERMINATED);
+    curl_mime_type(part, "application/json");
+
     // Curl upload request
     std::string *jsonResp = new std::string;
     std::vector<std::string> *headers = new std::vector<std::string>;
-    CURL *curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_MIMEPOST, 1);
+    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeaders);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, curlFuncs::writeHeaders);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, headers);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
-    
+
     int error = curl_easy_perform(curl);
     std::string location = curlFuncs::getHeader("Location", headers);
     if (error == CURLE_OK && location != HEADER_ERROR)
@@ -444,7 +469,9 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
     delete jsonResp;
     delete headers;
     json_object_put(post);
+    curl_mime_free(mime);
     curl_slist_free_all(postHeaders);
+    curl_easy_cleanup(curl);
 }
 
 void drive::gd::updateFile(const std::string& _fileID, FILE *_upload)
