@@ -42,7 +42,7 @@ namespace fs
     void closeSaveArch();
     void commitData(const uint32_t& mode);
     void deleteSv(const uint32_t& mode);
-    void getTimestamp(const FS_Archive& _arch, const std::u16string& _path, u64* _timeStamp);
+    void getTimestamp(const std::u16string& _path, u64* _timeStamp);
 
     bool fsfexists(const FS_Archive& _arch, const std::string& _path);
     bool fsfexists(const FS_Archive& _arch, const std::u16string& _path);

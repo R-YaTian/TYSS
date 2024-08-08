@@ -55,6 +55,23 @@ static void setMenuReloadDriveList(void *a)
         ui::newThread(setMenuReloadDriveList_t, NULL, NULL);
 }
 
+static void setMenuToggleZIP_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在保存设置...");
+    toggleBool(t->argPtr);
+    cfg::saveCommon();
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+static void setMenuToggleZIP(void *a)
+{
+    ui::newThread(setMenuToggleZIP_t, a, NULL);
+}
+
 void ui::setInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -66,7 +83,7 @@ void ui::setInit(void *a)
     setMenu.addOptEvent(1, KEY_A, setMenuReloadDriveList, NULL);
 
     setMenu.addOpt("导出到 ZIP", 320);
-    setMenu.addOptEvent(2, KEY_A, toggleBool, &cfg::config["zip"]);
+    setMenu.addOptEvent(2, KEY_A, setMenuToggleZIP, &cfg::config["zip"]);
 
     setMenu.addOpt("修改 PlayCoin", 320);
     setMenu.addOptEvent(3, KEY_A, setMenuHackPlayCoin, NULL);

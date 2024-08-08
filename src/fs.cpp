@@ -63,7 +63,7 @@ void fs::driveInit(void *a)
     {
         cfg::driveRefreshToken = fs::gDrive->getRefreshToken();
         if(!cfg::driveAuthCode.empty())
-            cfg::save();
+            cfg::saveGD();
 
         fs::gDrive->loadDriveList();
         if(!fs::gDrive->dirExists(DRIVE_JKSM_DIR))
@@ -202,10 +202,10 @@ void fs::commitData(const uint32_t& mode)
     }
 }
 
-void fs::getTimestamp(const FS_Archive& _arch, const std::u16string& _path, u64* _timeStamp)
+void fs::getTimestamp(const std::u16string& _path, u64* _timeStamp)
 {
     FS_Path fs_path = fsMakePath(PATH_UTF16, _path.c_str());
-    Result res = FSUSER_ControlArchive(_arch, ARCHIVE_ACTION_GET_TIMESTAMP, (void*) fs_path.data, fs_path.size, _timeStamp, sizeof(*_timeStamp));
+    Result res = FSUSER_ControlArchive(fs::getSaveArch(), ARCHIVE_ACTION_GET_TIMESTAMP, (void*) fs_path.data, fs_path.size, _timeStamp, sizeof(*_timeStamp));
     if(R_FAILED(res))
         ui::showMessage("获取文件修改日期失败.\n错误: 0x%08X", (unsigned) res);
     else {

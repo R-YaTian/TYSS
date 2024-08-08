@@ -44,7 +44,6 @@ int main(int argc, const char *argv[])
 
     curl_global_cleanup();
 
-    cfg::save();
     data::saveFav();
     data::saveBlacklist();
     sys::exit();

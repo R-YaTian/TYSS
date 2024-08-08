@@ -54,7 +54,7 @@ void cfg::load()
     }
 }
 
-void cfg::save()
+void cfg::saveCommon()
 {
     FILE *cfgOut = fopen("/JKSV/cfg.bin", "wb");
     if(cfgOut)
@@ -62,7 +62,10 @@ void cfg::save()
         fwrite(&cfg::config["zip"], sizeof(bool), 1, cfgOut);
         fclose(cfgOut);
     }
+}
 
+void cfg::saveGD()
+{
     if(!cfg::driveRefreshToken.empty())
     {
         json_object *drvCfg = json_object_new_object();
