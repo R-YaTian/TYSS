@@ -45,7 +45,6 @@ int main(int argc, const char *argv[])
     curl_global_cleanup();
 
     data::saveFav();
-    data::saveBlacklist();
     sys::exit();
     gfx::exit();
     fs::driveExit();

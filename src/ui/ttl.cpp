@@ -115,6 +115,19 @@ static void ttlOptResetSaveData(void *a)
     ui::confirm(q, ttlOptResetSaveData_t, NULL, NULL);
 }
 
+static void ttlOptAddtoBlackList_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    data::blacklistAdd(data::curData);
+    t->finished = true;
+}
+
+static void ttlOptAddtoBlackList(void *a)
+{
+    std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
+    ui::confirm(q, ttlOptAddtoBlackList_t, NULL, NULL);
+}
+
 void ui::ttlInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -125,6 +138,8 @@ void ui::ttlInit(void *a)
     ttlOpts->setCallback(ttlOptCallback, NULL);
     ttlOpts->addOpt("重置存档数据", 320);
     ttlOpts->addOptEvent(0, KEY_A, ttlOptResetSaveData, NULL);
+    ttlOpts->addOpt("添加到黑名单", 320);
+    ttlOpts->addOptEvent(1, KEY_A, ttlOptAddtoBlackList, NULL);
 
     t->finished = true;
 }
@@ -133,6 +148,12 @@ void ui::ttlExit()
 {
     delete ttlView;
     delete ttlOpts;
+}
+
+void ui::ttlOptBack()
+{
+    ttlOptsOpen = false;
+    ui::ttlUpdate();
 }
 
 void ui::ttlRefresh()

@@ -469,9 +469,12 @@ void data::loadTitles(void *a)
         AM_GetTitleList(NULL, MEDIATYPE_NAND, count, ids);
         for(unsigned i = 0; i < count; i++)
         {
-            titleData newNandTitle;
-            if(newNandTitle.init(ids[i], MEDIATYPE_NAND) && newNandTitle.hasSaveData() && !newNandTitle.getTitle().empty())
-                titles.push_back(newNandTitle);
+            if (!isBlacklisted(ids[i]))
+            {
+                titleData newNandTitle;
+                if(newNandTitle.init(ids[i], MEDIATYPE_NAND) && newNandTitle.hasSaveData() && !newNandTitle.getTitle().empty())
+                    titles.push_back(newNandTitle);
+            }
         }
         delete[] ids;
 
@@ -539,18 +542,18 @@ void data::saveBlacklist()
         bl.writef("0x%016llX\n", blacklist[i]);
 }
 
-// TODO: Blacklist things
-void data::blacklistAdd(titleData& t)
+void data::blacklistAdd_t(void *a)
 {
-    if(t.getMedia() == MEDIATYPE_GAME_CARD)
-        return;
+    threadInfo *t = (threadInfo *)a;
+    titleData *in = (titleData *)t->argPtr;
+    t->status->setStatus("正在保存黑名单并重写缓存...");
 
-    blacklist.push_back(t.getID());
+    saveBlacklist();
 
     //Remove it
     for(unsigned i = 0; i < titles.size(); i++)
     {
-        if(titles[i].getID() == t.getID())
+        if(titles[i].getID() == in->getID())
         {
             titles[i].freeIcon();
             titles.erase(titles.begin() + i);
@@ -559,11 +562,61 @@ void data::blacklistAdd(titleData& t)
     }
 
     //Erase cart if it's there
-    // if(titles[0].getMedia() == MEDIATYPE_GAME_CARD)
-    //     titles.erase(titles.begin());
+    if(titles[0].getMedia() == MEDIATYPE_GAME_CARD)
+        titles.erase(titles.begin());
 
     //Recreate cache with title missing now
     createCache(titles, titlePath);
+
+    //Refresh titleview
+    usrSaveTitles.clear();
+    extDataTitles.clear();
+    sysDataTitles.clear();
+    bossDataTitles.clear();
+
+    for(unsigned i = 0; i < titles.size(); i++)
+    {
+        data::titleSaveTypes tmp = titles[i].getSaveTypes();
+
+        if(tmp.hasUser)
+            usrSaveTitles.push_back(titles[i]);
+
+        if(tmp.hasExt)
+            extDataTitles.push_back(titles[i]);
+
+        if(tmp.hasSys)
+            sysDataTitles.push_back(titles[i]);
+
+        if(tmp.hasBoss)
+            bossDataTitles.push_back(titles[i]);
+    }
+
+    std::sort(usrSaveTitles.begin(), usrSaveTitles.end(), sortTitles);
+    std::sort(extDataTitles.begin(), extDataTitles.end(), sortTitles);
+    std::sort(sysDataTitles.begin(), sysDataTitles.end(), sortTitles);
+    std::sort(bossDataTitles.begin(), bossDataTitles.end(), sortTitles);
+
+    ui::ttlRefresh();
+    if (ui::state == USR) ui::ttlOptBack();
+    ui::extRefresh();
+    ui::sysRefresh();
+    ui::bossViewRefresh();
+
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+void data::blacklistAdd(titleData& t)
+{
+    if(t.getMedia() == MEDIATYPE_GAME_CARD)
+        return;
+
+    blacklist.push_back(t.getID());
+
+    void *a = &t;
+    ui::newThread(blacklistAdd_t, a, NULL);
 }
 
 void data::loadFav()
@@ -781,6 +834,7 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path)
                 uLongf sz = ICON_BUFF_SIZE;
                 uncompress((uint8_t *)icon->data, &sz, readBuff, iconSize);
                 newData.assignIcon(icon);
+                newData.setIconFlag(true);
             }
         }
 

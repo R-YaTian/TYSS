@@ -30,10 +30,12 @@ void gfx::init()
     spritesheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
     top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
     bot = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+    font = C2D_FontLoadSystem(CFG_REGION_CHN);
 }
 
 void gfx::exit()
 {
+    C2D_FontFree(font);
     C2D_SpriteSheetFree(spritesheet);
     C2D_Fini();
     C3D_Fini();

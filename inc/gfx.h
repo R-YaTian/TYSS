@@ -9,6 +9,7 @@
 #define GFX_DEPTH_DEFAULT 0.5f
 
 inline C2D_SpriteSheet spritesheet;
+inline C2D_Font font;
 
 namespace gfx
 {

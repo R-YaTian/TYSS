@@ -40,6 +40,7 @@ namespace data
             bool getFav() const { return isFavorite(id); }
             bool getIconFlag() const { return bhaveIcon; }
 
+            void setIconFlag(bool _haveIcon) { bhaveIcon = _haveIcon; }
             void setFav(bool _set) { fav = _set; }
             void setExtdata(const uint32_t& ex) { extdata = ex; }
             void setTitle(const std::u16string& _t);
@@ -86,6 +87,7 @@ namespace data
 
     void loadBlacklist();
     void saveBlacklist();
+    void blacklistAdd_t(void *a);
     void blacklistAdd(titleData& t);
 
     void loadFav();

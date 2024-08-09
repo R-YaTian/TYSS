@@ -6,7 +6,7 @@
 #include "util.h"
 
 static ui::titleview *extView;
-static bool fldOpen = false;
+static bool fldOpen = false, extOptsOpen = false;
 static ui::menu *extOpts;
 
 static void fldCallback(void *a)
@@ -47,6 +47,14 @@ static void extViewCallback(void *a)
             }
             break;
 
+        case KEY_X:
+            {
+                data::titleData *t = &data::extDataTitles[extView->getSelected()];
+                data::curData = *t;
+                extOptsOpen = true;
+            }
+            break;
+
         case KEY_Y:
             {
                 data::titleData *t = &data::extDataTitles[extView->getSelected()];
@@ -74,13 +82,46 @@ static void extViewCallback(void *a)
     }
 }
 
+static void extOptCallback(void *a)
+{
+    uint32_t down = ui::padKeysDown();
+    switch (down)
+    {
+        case KEY_B:
+            extOptsOpen = false;
+            break;
+    }
+}
+
+static void extOptResetExtData_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    if(fs::openArchive(data::curData, ARCHIVE_EXTDATA, false))
+    {
+        t->status->setStatus("正在删除追加数据...");
+        fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
+        fs::commitData(fs::getSaveMode());
+        fs::closeSaveArch();
+    }
+    t->finished = true;
+}
+
+static void extOptResetExtData(void *a)
+{
+    data::titleData *t = &data::extDataTitles[extView->getSelected()];
+    std::string q = "你确定要删除 " + util::toUtf8(t->getTitle()) + " 的追加数据吗?";
+    ui::confirm(q, extOptResetExtData_t, NULL, NULL);
+}
+
 void ui::extInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     extView = new ui::titleview(data::extDataTitles, extViewCallback, NULL);
-    extOpts = new ui::menu;
 
+    extOpts = new ui::menu;
     extOpts->addOpt("删除追加数据", 320);
+    extOpts->setCallback(extOptCallback, NULL);
+    extOpts->addOptEvent(0, KEY_A, extOptResetExtData, NULL);
 
     t->finished = true;
 }
@@ -95,6 +136,8 @@ void ui::extUpdate()
 {
     if(fldOpen)
         ui::fldUpdate();
+    else if(extOptsOpen)
+        extOpts->update();
     else
         extView->update();
 }
@@ -117,10 +160,15 @@ void ui::extDrawBot()
         ui::fldDraw();
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
     }
+    else if(extOptsOpen)
+    {
+        extOpts->draw(0, 2, 0xFFFFFFFF, 320, false);
+        ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
+    }
     else
     {
         if (!data::extDataTitles.empty())
             data::extDataTitles[extView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }
