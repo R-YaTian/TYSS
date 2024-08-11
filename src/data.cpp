@@ -434,6 +434,11 @@ void data::loadTitles(void *a)
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在加载 Titles...");
 
+    if (titleLoaded && !titles.empty())
+    {
+        for(auto t : titles) t.freeIcon();
+    }
+
     titles.clear();
     usrSaveTitles.clear();
     extDataTitles.clear();
@@ -517,6 +522,63 @@ void data::loadTitles(void *a)
     t->finished = true;
 }
 
+void data::deleteExtData_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    titleData *in = (titleData *)t->argPtr;
+    t->status->setStatus("正在删除追加数据...");
+
+    FS_ExtSaveDataInfo del = { MEDIATYPE_SD, 0, 0, in->getExtData(), 0 };
+    Result res = FSUSER_DeleteExtSaveData(del);
+    if(R_SUCCEEDED(res))
+    {
+        // Remove it
+        for(unsigned i = 0; i < titles.size(); i++)
+        {
+            if(titles[i].getID() == in->getID())
+            {
+                titles[i].freeIcon();
+                titles.erase(titles.begin() + i);
+                break;
+            }
+        }
+
+        t->status->setStatus("正在重写缓存并刷新...");
+
+        // Erase cart if it's there
+        if(titles[0].getMedia() == MEDIATYPE_GAME_CARD)
+            titles.erase(titles.begin());
+
+        // Recreate cache with title missing now
+        createCache(titles, titlePath);
+
+        // Refresh
+        extDataTitles.clear();
+        for(unsigned i = 0; i < titles.size(); i++)
+        {
+            data::titleSaveTypes tmp = titles[i].getSaveTypes();
+            if(tmp.hasExt) extDataTitles.push_back(titles[i]);
+        }
+        std::sort(extDataTitles.begin(), extDataTitles.end(), sortTitles);
+
+        ui::extRefresh();
+        ui::extOptBack();
+        ui::showMessage("追加数据删除成功!");
+    } else
+        ui::showMessage("追加数据删除失败!\n错误: 0x%08X", (unsigned) res);
+
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+void data::deleteExtData(titleData& t)
+{
+    void *a = &t;
+    ui::newThread(deleteExtData_t, a, NULL);
+}
+
 void data::loadBlacklist()
 {
     blacklist.clear();
@@ -546,7 +608,7 @@ void data::blacklistAdd_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     titleData *in = (titleData *)t->argPtr;
-    t->status->setStatus("正在保存黑名单并重写缓存...");
+    t->status->setStatus("正在保存黑名单...");
 
     saveBlacklist();
 
@@ -560,13 +622,6 @@ void data::blacklistAdd_t(void *a)
             break;
         }
     }
-
-    //Erase cart if it's there
-    if(titles[0].getMedia() == MEDIATYPE_GAME_CARD)
-        titles.erase(titles.begin());
-
-    //Recreate cache with title missing now
-    createCache(titles, titlePath);
 
     //Refresh titleview
     usrSaveTitles.clear();
@@ -599,8 +654,11 @@ void data::blacklistAdd_t(void *a)
     ui::ttlRefresh();
     if (ui::state == USR) ui::ttlOptBack();
     ui::extRefresh();
+    if (ui::state == EXT) ui::extOptBack();
     ui::sysRefresh();
+    if (ui::state == SYS) ui::sysOptBack();
     ui::bossViewRefresh();
+    if (ui::state == BOS) ui::bossViewOptBack();
 
     t->lock();
     t->argPtr = NULL;
@@ -617,6 +675,19 @@ void data::blacklistAdd(titleData& t)
 
     void *a = &t;
     ui::newThread(blacklistAdd_t, a, NULL);
+}
+
+void data::clearBlacklist(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在重置黑名单...");
+
+    blacklist.clear();
+    remove("/JKSV/blacklist.txt");
+    remove("/JKSV/cache.bin");
+    ui::newThread(data::loadTitles, NULL, NULL);
+
+    t->finished = true;
 }
 
 void data::loadFav()
@@ -822,6 +893,12 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path)
         size_t iconSize = 0;
         memset(readBuff, 0x00, ICON_BUFF_SIZE);
         cache.read(&iconSize, sizeof(size_t));
+
+        if (isBlacklisted(newID))
+        {
+            if (iconSize != 0xFFFFFFFF) cache.seek(iconSize, fs::seek_cur);
+            continue;
+        }
 
         if (iconSize == 0xFFFFFFFF)
             newData.setIcon(gfx::noIcon());

@@ -132,7 +132,7 @@ void ui::shrdDrawBot()
     }
     else
     {
-        gfx::drawTextWrap("3DBREW: " + sharedDesc[shrdView->getSelected()], 8, 8, GFX_DEPTH_DEFAULT, 0.5f, 300, 0xFFFFFFFF);
+        gfx::drawTextWrap("3DBREW: " + sharedDesc[shrdView->getSelected()], 8, 8, GFX_DEPTH_DEFAULT, 0.5f, 304, 0xFFFFFFFF);
         ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

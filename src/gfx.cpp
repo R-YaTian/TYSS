@@ -30,12 +30,12 @@ void gfx::init()
     spritesheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
     top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
     bot = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-    font = C2D_FontLoadSystem(CFG_REGION_CHN);
+    //font = C2D_FontLoadSystem(CFG_REGION_CHN);
 }
 
 void gfx::exit()
 {
-    C2D_FontFree(font);
+    //C2D_FontFree(font);
     C2D_SpriteSheetFree(spritesheet);
     C2D_Fini();
     C3D_Fini();
@@ -47,7 +47,10 @@ void gfx::drawText(const std::string& str, const int& x, const int& y, const flo
     C2D_Text tmpTxt;
     C2D_TextBuf tmpBuf = C2D_TextBufNew(512);
 
-    C2D_TextParse(&tmpTxt, tmpBuf, str.c_str());
+    if (font)
+        C2D_TextFontParse(&tmpTxt, font, tmpBuf, str.c_str());
+    else
+        C2D_TextParse(&tmpTxt, tmpBuf, str.c_str());
     C2D_TextOptimize(&tmpTxt);
     C2D_DrawText(&tmpTxt, C2D_WithColor, (float)x, (float)y, depth, txtScale, txtScale, clr);
     C2D_TextBufDelete(tmpBuf);
@@ -61,16 +64,47 @@ void gfx::drawTextWrap(const std::string& str, const int& x, int y, const float&
     int tmpX = x;
     for(int i = 0; i < (int)str.length(); )
     {
-        if(str[i] == '\n')
+        size_t forceBreak = str.find_first_of("\n", i);
+        size_t nextBreak = str.find_first_of(" /_.", i);
+        if(forceBreak != str.npos && forceBreak < nextBreak)
         {
-            ++i;
+            std::string temp = str.substr(i, forceBreak - i);
+            size_t width = getTextWidth(temp);
+            if((int)(tmpX + width) > (x + maxWidth))
+            {
+                tmpX = x;
+                y += 16;
+            }
+            if (font)
+                C2D_TextFontParse(&tmpTxt, font, tmpBuf, temp.c_str());
+            else
+                C2D_TextParse(&tmpTxt, tmpBuf, temp.c_str());
+
+            C2D_TextOptimize(&tmpTxt);
+            C2D_DrawText(&tmpTxt, C2D_WithColor, (float)tmpX, (float)y, depth, txtScale, txtScale, clr);
             tmpX = x;
             y += 16;
+            i += temp.length() + 1;
+            continue;
+        } else if (forceBreak == 0)
+        {
+            y += 16;
+            continue;
         }
-        size_t nextBreak = str.find_first_of(" /_.", i);
+
         if(nextBreak == str.npos)
         {
-            C2D_TextParse(&tmpTxt, tmpBuf, str.substr(i, str.length() - i).c_str());
+            std::string temp = str.substr(i, str.length() - i);
+            size_t width = getTextWidth(temp);
+            if((int)(tmpX + width) > (x + maxWidth))
+            {
+                tmpX = x;
+                y += 16;
+            }
+            if (font)
+                C2D_TextFontParse(&tmpTxt, font, tmpBuf, str.substr(i, str.length() - i).c_str());
+            else
+                C2D_TextParse(&tmpTxt, tmpBuf, str.substr(i, str.length() - i).c_str());
             C2D_TextOptimize(&tmpTxt);
             C2D_DrawText(&tmpTxt, C2D_WithColor, (float)tmpX, (float)y, depth, txtScale, txtScale, clr);
             break;
@@ -79,13 +113,16 @@ void gfx::drawTextWrap(const std::string& str, const int& x, int y, const float&
         {
             std::string temp = str.substr(i, (nextBreak + 1) - i);
             size_t width = getTextWidth(temp);
-            if((int)(tmpX + width) >= maxWidth)
+            if((int)(tmpX + width) > (x + maxWidth))
             {
                 tmpX = x;
                 y += 16;
             }
 
-            C2D_TextParse(&tmpTxt, tmpBuf, temp.c_str());
+            if (font)
+                C2D_TextFontParse(&tmpTxt, font, tmpBuf, temp.c_str());
+            else
+                C2D_TextParse(&tmpTxt, tmpBuf, temp.c_str());
 
             C2D_TextOptimize(&tmpTxt);
             C2D_DrawText(&tmpTxt, C2D_WithColor, (float)tmpX, (float)y, depth, txtScale, txtScale, clr);
@@ -103,7 +140,10 @@ void gfx::drawU16Text(const std::u16string& str, const int& x, const int& y, con
 
     std::string tmp = util::toUtf8(str);
 
-    C2D_TextParse(&tmpTxt, tmpBuf, tmp.c_str());
+    if (font)
+        C2D_TextFontParse(&tmpTxt, font, tmpBuf, tmp.c_str());
+    else
+        C2D_TextParse(&tmpTxt, tmpBuf, tmp.c_str());
     C2D_TextOptimize(&tmpTxt);
     C2D_DrawText(&tmpTxt, C2D_WithColor, (float)x, (float)y, depth, 0.5f, 0.5f, clr);
     C2D_TextBufDelete(tmpBuf);
@@ -115,7 +155,10 @@ size_t gfx::getTextWidth(const std::string& str)
     C2D_Text tmpTxt;
     C2D_TextBuf tmpBuf = C2D_TextBufNew(512);
 
-    C2D_TextParse(&tmpTxt, tmpBuf, str.c_str());
+    if (font)
+        C2D_TextFontParse(&tmpTxt, font, tmpBuf, str.c_str());
+    else
+        C2D_TextParse(&tmpTxt, tmpBuf, str.c_str());
     C2D_TextOptimize(&tmpTxt);
 
     C2D_TextGetDimensions(&tmpTxt, 0.5f, 0.5f, &ret, NULL);

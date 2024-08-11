@@ -18,6 +18,9 @@ void fldMenuNew_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在准备...");
+
+    FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, targetDir.data()), 0);
+
     std::u16string newFolder;
     uint32_t held = ui::padKeysHeld();
 
@@ -27,8 +30,6 @@ void fldMenuNew_t(void *a)
         newFolder = util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
     else
         newFolder = util::safeString(util::toUtf16(util::getString("输入新文件夹名称", true)));
-
-    FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, targetDir.data()), 0);
 
     if(!newFolder.empty() && cfg::config["zip"])
     {

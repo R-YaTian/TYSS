@@ -60,7 +60,7 @@ namespace data
             C2D_Image *getIcon() { return &icon; }
 
             void assignIcon(C3D_Tex *_icon);
-            void freeIcon() { if(icon.tex) { C3D_TexDelete(icon.tex); } }
+            void freeIcon() { if(icon.tex && bhaveIcon) { C3D_TexDelete(icon.tex); } }
 
         private:
             uint64_t id;
@@ -84,9 +84,12 @@ namespace data
 
     smdh_s *loadSMDH(const uint32_t& low, const uint32_t& high, const uint8_t& media);
     void loadTitles(void *a);
+    void deleteExtData_t(void *a);
+    void deleteExtData(titleData& t);
 
     void loadBlacklist();
     void saveBlacklist();
+    void clearBlacklist(void *a);
     void blacklistAdd_t(void *a);
     void blacklistAdd(titleData& t);
 

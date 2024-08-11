@@ -153,6 +153,7 @@ void ui::ttlExit()
 void ui::ttlOptBack()
 {
     ttlOptsOpen = false;
+    ttlView->setSelected(0);
     ui::ttlUpdate();
 }
 

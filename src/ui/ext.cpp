@@ -93,24 +93,31 @@ static void extOptCallback(void *a)
     }
 }
 
-static void extOptResetExtData_t(void *a)
+static void extOptDeleteExtData_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    if(fs::openArchive(data::curData, ARCHIVE_EXTDATA, false))
-    {
-        t->status->setStatus("正在删除追加数据...");
-        fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
-        fs::commitData(fs::getSaveMode());
-        fs::closeSaveArch();
-    }
+    data::deleteExtData(data::curData);
     t->finished = true;
 }
 
-static void extOptResetExtData(void *a)
+static void extOptDeleteExtData(void *a)
 {
     data::titleData *t = &data::extDataTitles[extView->getSelected()];
     std::string q = "你确定要删除 " + util::toUtf8(t->getTitle()) + " 的追加数据吗?";
-    ui::confirm(q, extOptResetExtData_t, NULL, NULL);
+    ui::confirm(q, extOptDeleteExtData_t, NULL, NULL);
+}
+
+static void extOptAddtoBlackList_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    data::blacklistAdd(data::curData);
+    t->finished = true;
+}
+
+static void extOptAddtoBlackList(void *a)
+{
+    std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
+    ui::confirm(q, extOptAddtoBlackList_t, NULL, NULL);
 }
 
 void ui::extInit(void *a)
@@ -119,9 +126,11 @@ void ui::extInit(void *a)
     extView = new ui::titleview(data::extDataTitles, extViewCallback, NULL);
 
     extOpts = new ui::menu;
-    extOpts->addOpt("删除追加数据", 320);
     extOpts->setCallback(extOptCallback, NULL);
-    extOpts->addOptEvent(0, KEY_A, extOptResetExtData, NULL);
+    extOpts->addOpt("删除追加数据", 320);
+    extOpts->addOptEvent(0, KEY_A, extOptDeleteExtData, NULL);
+    extOpts->addOpt("添加到黑名单", 320);
+    extOpts->addOptEvent(1, KEY_A, extOptAddtoBlackList, NULL);
 
     t->finished = true;
 }
@@ -130,6 +139,13 @@ void ui::extExit()
 {
     delete extOpts;
     delete extView;
+}
+
+void ui::extOptBack()
+{
+    extOptsOpen = false;
+    extView->setSelected(0);
+    ui::extUpdate();
 }
 
 void ui::extUpdate()

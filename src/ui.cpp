@@ -277,7 +277,7 @@ static void messageDrawFunc(void *a)
     {
         ui::confArgs *in = (ui::confArgs *)t->argPtr;
         C2D_DrawRectSolid(24, 24, GFX_DEPTH_DEFAULT, 272, 200, 0xFFE7E7E7);
-        gfx::drawTextWrap(in->q, 32, 32, GFX_DEPTH_DEFAULT, 0.5f, 240, 0xFF000000);
+        gfx::drawTextWrap(in->q, 32, 32, GFX_DEPTH_DEFAULT, 0.5f, 256, 0xFF000000);
         ok->draw();
     }
 }
@@ -329,7 +329,7 @@ static void confirmDrawFunc(void *a)
     {
         ui::confArgs *in = (ui::confArgs *)t->argPtr;
         C2D_DrawRectSolid(24, 24, GFX_DEPTH_DEFAULT, 272, 200, 0xFFE7E7E7);
-        gfx::drawTextWrap(in->q, 32, 32, GFX_DEPTH_DEFAULT, 0.5f, 240, 0xFF000000);
+        gfx::drawTextWrap(in->q, 32, 32, GFX_DEPTH_DEFAULT, 0.5f, 256, 0xFF000000);
         yes->draw();
         no->draw();
     }

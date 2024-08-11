@@ -35,6 +35,12 @@ static void setMenuClearFavList(void *a)
     ui::newThread(data::clearFav, NULL, NULL);
 }
 
+static void setMenuClearBlackList(void *a)
+{
+    std::string q = "你确定要重置黑名单吗?\n这将会自动执行一次重载 Titles!";
+    ui::confirm(q, data::clearBlacklist, NULL, NULL);
+}
+
 static void setMenuReloadTitles(void *a)
 {
     remove("/JKSV/cache.bin");
@@ -90,6 +96,9 @@ void ui::setInit(void *a)
 
     setMenu.addOpt("重置收藏列表", 320);
     setMenu.addOptEvent(4, KEY_A, setMenuClearFavList, NULL);
+
+    setMenu.addOpt("重置黑名单", 320);
+    setMenu.addOptEvent(5, KEY_A, setMenuClearBlackList, NULL);
 
     t->finished = true;
 }

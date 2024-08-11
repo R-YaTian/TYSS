@@ -6,7 +6,8 @@
 #include "util.h"
 
 static ui::titleview *bossView;
-static bool fldOpen = false;
+static ui::menu *bossViewOpts;
+static bool fldOpen = false, bossViewOptsOpen = false;
 
 static void fldCallback(void *)
 {
@@ -46,6 +47,14 @@ static void bossViewCallback(void *a)
             }
             break;
 
+        case KEY_X:
+            {
+                data::titleData *t = &data::bossDataTitles[bossView->getSelected()];
+                data::curData = *t;
+                bossViewOptsOpen = true;
+            }
+            break;
+
         case KEY_Y:
             {
                 data::titleData *t = &data::bossDataTitles[bossView->getSelected()];
@@ -73,22 +82,62 @@ static void bossViewCallback(void *a)
     }
 }
 
+static void bossViewOptCallback(void *a)
+{
+    uint32_t down = ui::padKeysDown();
+    switch (down)
+    {
+        case KEY_B:
+            bossViewOptsOpen = false;
+            break;
+    }
+}
+
+static void bossViewOptAddtoBlackList_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    data::blacklistAdd(data::curData);
+    t->finished = true;
+}
+
+static void bossViewOptAddtoBlackList(void *a)
+{
+    std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
+    ui::confirm(q, bossViewOptAddtoBlackList_t, NULL, NULL);
+}
+
 void ui::bossViewInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     bossView = new ui::titleview(data::bossDataTitles, bossViewCallback, NULL);
+
+    bossViewOpts = new ui::menu;
+    bossViewOpts->setCallback(bossViewOptCallback, NULL);
+    bossViewOpts->addOpt("添加到黑名单", 320);
+    bossViewOpts->addOptEvent(0, KEY_A, bossViewOptAddtoBlackList, NULL);
+
     t->finished = true;
 }
 
 void ui::bossViewExit()
 {
     delete bossView;
+    delete bossViewOpts;
+}
+
+void ui::bossViewOptBack()
+{
+    bossViewOptsOpen = false;
+    bossView->setSelected(0);
+    ui::bossViewUpdate();
 }
 
 void ui::bossViewUpdate()
 {
     if(fldOpen)
         ui::fldUpdate();
+    else if(bossViewOptsOpen)
+        bossViewOpts->update();
     else
         bossView->update();
 }
@@ -111,10 +160,15 @@ void ui::bossViewDrawBot()
         ui::fldDraw();
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
     }
+    else if(bossViewOptsOpen)
+    {
+        bossViewOpts->draw(0, 2, 0xFFFFFFFF, 320, false);
+        ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
+    }
     else
     {
         if (!data::bossDataTitles.empty())
             data::bossDataTitles[bossView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

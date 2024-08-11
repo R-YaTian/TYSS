@@ -6,7 +6,8 @@
 #include "util.h"
 
 static ui::titleview *sysView;
-static bool fldOpen = false;
+static ui::menu *sysOpts;
+static bool fldOpen = false, sysOptsOpen = false;
 
 static void fldCallback(void *)
 {
@@ -46,6 +47,14 @@ static void sysViewCallback(void *a)
             }
             break;
 
+        case KEY_X:
+            {
+                data::titleData *t = &data::sysDataTitles[sysView->getSelected()];
+                data::curData = *t;
+                sysOptsOpen = true;
+            }
+            break;
+
         case KEY_Y:
             {
                 data::titleData *t = &data::sysDataTitles[sysView->getSelected()];
@@ -73,22 +82,62 @@ static void sysViewCallback(void *a)
     }
 }
 
+static void sysOptCallback(void *a)
+{
+    uint32_t down = ui::padKeysDown();
+    switch (down)
+    {
+        case KEY_B:
+            sysOptsOpen = false;
+            break;
+    }
+}
+
+static void sysOptAddtoBlackList_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    data::blacklistAdd(data::curData);
+    t->finished = true;
+}
+
+static void sysOptAddtoBlackList(void *a)
+{
+    std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
+    ui::confirm(q, sysOptAddtoBlackList_t, NULL, NULL);
+}
+
 void ui::sysInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     sysView = new ui::titleview(data::sysDataTitles, sysViewCallback, NULL);
+
+    sysOpts = new ui::menu;
+    sysOpts->setCallback(sysOptCallback, NULL);
+    sysOpts->addOpt("添加到黑名单", 320);
+    sysOpts->addOptEvent(0, KEY_A, sysOptAddtoBlackList, NULL);
+
     t->finished = true;
 }
 
 void ui::sysExit()
 {
     delete sysView;
+    delete sysOpts;
+}
+
+void ui::sysOptBack()
+{
+    sysOptsOpen = false;
+    sysView->setSelected(0);
+    ui::sysUpdate();
 }
 
 void ui::sysUpdate()
 {
     if(fldOpen)
         ui::fldUpdate();
+    else if(sysOptsOpen)
+        sysOpts->update();
     else
         sysView->update();
 }
@@ -111,10 +160,15 @@ void ui::sysDrawBot()
         ui::fldDraw();
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
     }
+    else if(sysOptsOpen)
+    {
+        sysOpts->draw(0, 2, 0xFFFFFFFF, 320, false);
+        ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
+    }
     else
     {
         if (!data::sysDataTitles.empty())
             data::sysDataTitles[sysView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }
