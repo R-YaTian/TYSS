@@ -924,7 +924,7 @@ void data::datDrawBot()
     ui::drawUIBar("", ui::SCREEN_BOT, false);
 }
 
-int data::findTitleNewIndex(std::vector<data::titleData>& _t, const uint64_t& tid)
+int data::findTitleNewIndex(std::vector<titleData>& _t, const uint64_t& tid)
 {
     if (!_t.empty())
     {

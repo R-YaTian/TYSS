@@ -41,7 +41,6 @@ static void ttlViewCallback(void *a)
 #endif
                 if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false))
                 {
-                    //util::createTitleDir(*t, ARCHIVE_USER_SAVEDATA);
                     std::u16string targetPath = util::createPath(*t, ARCHIVE_USER_SAVEDATA);
                     ui::fldInit(targetPath, uploadParent, fldCallback, NULL);
                     fldOpen = true;
@@ -127,6 +126,19 @@ static void ttlOptAddtoBlackList(void *a)
     ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
 
+static void ttlOptBackupAll_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    fs::backupTitles(data::usrSaveTitles, ARCHIVE_USER_SAVEDATA);
+    t->finished = true;
+}
+
+static void ttlOptBackupAll(void *a)
+{
+    std::string q = "你确定要备份此页所有的存档吗?\n这或许需要耗费一定时间, 视 Title 数量而定。\n请耐心等待!";
+    ui::confirm(q, ttlOptBackupAll_t, NULL, NULL);
+}
+
 void ui::ttlInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -139,6 +151,8 @@ void ui::ttlInit(void *a)
     ttlOpts->addOptEvent(0, KEY_A, ttlOptResetSaveData, NULL);
     ttlOpts->addOpt("添加到黑名单", 320);
     ttlOpts->addOptEvent(1, KEY_A, ttlOptAddtoBlackList, NULL);
+    ttlOpts->addOpt("备份所有的用户存档", 320);
+    ttlOpts->addOptEvent(2, KEY_A, ttlOptBackupAll, NULL);
 
     t->finished = true;
 }

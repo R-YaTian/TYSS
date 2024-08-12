@@ -109,7 +109,7 @@ namespace data
     void datDrawBot();
 
     //For fav feat
-    int findTitleNewIndex(std::vector<data::titleData>& _t, const uint64_t& tid);
+    int findTitleNewIndex(std::vector<titleData>& _t, const uint64_t& tid);
 }
 
 #endif // DATA_H

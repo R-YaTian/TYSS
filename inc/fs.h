@@ -42,7 +42,8 @@ namespace fs
     FS_Archive getSaveArch();
     FS_ArchiveID getSaveMode();
 
-    bool openArchive(data::titleData& dat, const uint32_t& arch, bool error);
+    bool openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_Archive& arch);
+    bool openArchive(data::titleData& dat, const uint32_t& mode, bool error);
     void closeSaveArch();
     void commitData(const uint32_t& mode);
     void deleteSv(const uint32_t& mode);
@@ -121,9 +122,6 @@ namespace fs
             std::vector<dirItem> entry;
     };
 
-    void backupArchive(const std::u16string& outpath);
-    void restoreToArchive(const std::u16string& inpath);
-
     void copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t);
     void copyFileThreaded(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit);
     void copyDirToDir(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t);
@@ -134,7 +132,7 @@ namespace fs
     void copyZipToArch(const FS_Archive& _arch, unzFile _unz, threadInfo *t);
     void copyZipToArchThreaded(const FS_Archive& _arch, const std::u16string& _src);
 
-    void backupAll();
+    void backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode);
 }
 
 #endif // FS_H

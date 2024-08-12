@@ -40,7 +40,6 @@ static void extViewCallback(void *a)
 #endif
                 if(fs::openArchive(*t, ARCHIVE_EXTDATA, false))
                 {
-                    //util::createTitleDir(*t, ARCHIVE_EXTDATA);
                     std::u16string targetPath = util::createPath(*t, ARCHIVE_EXTDATA);
                     ui::fldInit(targetPath, uploadParent, fldCallback, NULL);
                     fldOpen = true;

@@ -13,7 +13,7 @@ static fs::dirList fldList;
 static std::u16string targetDir;
 static std::string uploadParent;
 
-void fldMenuNew_t(void *a)
+static void fldMenuNew_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在准备...");
@@ -38,7 +38,6 @@ void fldMenuNew_t(void *a)
     else if(!newFolder.empty())
     {
         std::u16string fullOut = targetDir + newFolder;
-        std::u16string svRoot  = util::toUtf16("/");
 
         FS_Path crDir = fsMakePath(PATH_UTF16, fullOut.c_str());
         FSUSER_CreateDirectory(fs::getSDMCArch(), crDir, 0);

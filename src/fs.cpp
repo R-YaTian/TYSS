@@ -131,30 +131,29 @@ FS_ArchiveID fs::getSaveMode()
     return saveMode;
 }
 
-bool fs::openArchive(data::titleData& dat, const uint32_t& arch, bool error)
+bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_Archive& arch)
 {
     Result res = 0;
-    saveMode = (FS_ArchiveID)arch;
 
-    switch(arch)
+    switch(mode)
     {
         case ARCHIVE_USER_SAVEDATA:
             {
                 uint32_t path[3] = {dat.getMedia(), dat.getLow(), dat.getHigh()};
                 FS_Path binData = (FS_Path) {PATH_BINARY, 12, path};
-                res = FSUSER_OpenArchive(&saveArch, ARCHIVE_USER_SAVEDATA, binData);
+                res = FSUSER_OpenArchive(&arch, ARCHIVE_USER_SAVEDATA, binData);
             }
             break;
 
         case ARCHIVE_SAVEDATA:
-            res = FSUSER_OpenArchive(&saveArch, ARCHIVE_SAVEDATA, fsMakePath(PATH_EMPTY, ""));
+            res = FSUSER_OpenArchive(&arch, ARCHIVE_SAVEDATA, fsMakePath(PATH_EMPTY, ""));
             break;
 
         case ARCHIVE_EXTDATA:
             {
                 uint32_t path[] = {MEDIATYPE_SD, dat.getExtData(), 0};
                 FS_Path binData = (FS_Path) {PATH_BINARY, 12, path};
-                res = FSUSER_OpenArchive(&saveArch, ARCHIVE_EXTDATA, binData);
+                res = FSUSER_OpenArchive(&arch, ARCHIVE_EXTDATA, binData);
             }
             break;
 
@@ -162,7 +161,7 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& arch, bool error)
             {
                 uint32_t path[2] = {MEDIATYPE_NAND, (0x00020000 | dat.getUnique())};
                 FS_Path binData = {PATH_BINARY, 8, path};
-                res = FSUSER_OpenArchive(&saveArch, ARCHIVE_SYSTEM_SAVEDATA, binData);
+                res = FSUSER_OpenArchive(&arch, ARCHIVE_SYSTEM_SAVEDATA, binData);
             }
             break;
 
@@ -170,7 +169,7 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& arch, bool error)
             {
                 uint32_t path[3] = {MEDIATYPE_SD, dat.getExtData(), 0};
                 FS_Path binData = {PATH_BINARY, 12, path};
-                res = FSUSER_OpenArchive(&saveArch, ARCHIVE_BOSS_EXTDATA, binData);
+                res = FSUSER_OpenArchive(&arch, ARCHIVE_BOSS_EXTDATA, binData);
             }
             break;
 
@@ -178,7 +177,7 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& arch, bool error)
             {
                 uint32_t path[3] = {MEDIATYPE_NAND, dat.getExtData(), 0x00048000};
                 FS_Path binPath  = {PATH_BINARY, 0xC, path};
-                res = FSUSER_OpenArchive(&saveArch, ARCHIVE_SHARED_EXTDATA, binPath);
+                res = FSUSER_OpenArchive(&arch, ARCHIVE_SHARED_EXTDATA, binPath);
             }
             break;
     }
@@ -191,6 +190,11 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& arch, bool error)
     }
 
     return true;
+}
+
+bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error)
+{
+    return openArchive(dat, mode, error, saveArch);
 }
 
 void fs::commitData(const uint32_t& mode)
@@ -770,42 +774,37 @@ void fs::copyZipToArchThreaded(const FS_Archive& _arch, const std::u16string& _s
     ui::newThread(copyZipToArch_t, send, NULL, ZIP_THRD_STACK_SIZE);
 }
 
-void fs::backupAll()
+void fs::backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode)
 {
-    ui::progressBar prog(data::usrSaveTitles.size());
-    for(unsigned i = 0; i < data::usrSaveTitles.size(); i++)
+    ui::progressBar prog(vect.size());
+    for(unsigned i = 0; i < vect.size(); i++)
     {
-        std::string copyStr = "正在处理 '" + util::toUtf8(data::usrSaveTitles[i].getTitle()) + "'...";
+        std::string copyStr = "正在处理 '" + util::toUtf8(vect[i].getTitle()) + "'...";
         prog.update(i);
 
-        //Sue me
         gfx::frameBegin();
         gfx::frameStartBot();
         prog.draw(copyStr);
         gfx::frameEnd();
 
-        if(fs::openArchive(data::usrSaveTitles[i], ARCHIVE_USER_SAVEDATA, false))
+        FS_Archive _arch;
+        if(openArchive(vect[i], mode, true, _arch))
         {
-            util::createTitleDir(data::usrSaveTitles[i], ARCHIVE_USER_SAVEDATA);
+            util::createTitleDir(vect[i], mode);
+            std::u16string outpath = util::createPath(vect[i], mode) + util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
 
-            std::u16string outpath = util::createPath(data::usrSaveTitles[i], ARCHIVE_USER_SAVEDATA) + util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
-            FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, outpath.data()), 0);
-            outpath += util::toUtf16("/");
+            if(cfg::config["zip"])
+            {
+                std::u16string fullOut = outpath + util::toUtf16(".zip");
+                copyArchToZipThreaded(_arch, util::toUtf16("/"), fullOut);
+            }
+            else
+            {
+                FSUSER_CreateDirectory(getSDMCArch(), fsMakePath(PATH_UTF16, outpath.c_str()), 0);
+                outpath += util::toUtf16("/");
 
-            backupArchive(outpath);
-
-            closeSaveArch();
-        }
-
-        if(fs::openArchive(data::usrSaveTitles[i], ARCHIVE_EXTDATA, false))
-        {
-            util::createTitleDir(data::usrSaveTitles[i], ARCHIVE_EXTDATA);
-
-            std::u16string outpath = util::createPath(data::usrSaveTitles[i], ARCHIVE_EXTDATA) + util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
-            FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, outpath.data()), 0);
-            outpath += util::toUtf16("/");
-
-            backupArchive(outpath);
+                copyDirToDirThreaded(_arch, util::toUtf16("/"), getSDMCArch(), outpath, false);
+            }
 
             closeSaveArch();
         }

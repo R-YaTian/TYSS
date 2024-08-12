@@ -40,7 +40,6 @@ static void sysViewCallback(void *a)
 #endif
                 if(fs::openArchive(*t, ARCHIVE_SYSTEM_SAVEDATA, false))
                 {
-                    //util::createTitleDir(*t, ARCHIVE_SYSTEM_SAVEDATA);
                     std::u16string targetDir = util::createPath(*t, ARCHIVE_SYSTEM_SAVEDATA);
                     ui::fldInit(targetDir, uploadParent, fldCallback, NULL);
                     fldOpen = true;

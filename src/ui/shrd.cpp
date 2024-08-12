@@ -68,7 +68,6 @@ static void shrdViewCallback(void *)
 #endif
             if(fs::openArchive(*t, ARCHIVE_SHARED_EXTDATA, false))
             {
-                //util::createTitleDir(*t, ARCHIVE_SHARED_EXTDATA);
                 std::u16string targetDir = util::createPath(*t, ARCHIVE_SHARED_EXTDATA);
                 ui::fldInit(targetDir, uploadParent, fldCallback, NULL);
                 fldOpen = true;
