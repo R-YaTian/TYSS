@@ -12,7 +12,6 @@ static ui::menu fldMenu;
 static fs::dirList fldList;
 static std::u16string targetDir;
 static std::string uploadParent;
-std::vector<drive::gdItem *> gdList;
 
 void fldMenuNew_t(void *a)
 {
@@ -158,6 +157,9 @@ void fldMenuRestore(void *a)
     ui::confirm(q, fldMenuRestore_t, NULL, a);
 }
 
+#ifdef ENABLE_GD
+std::vector<drive::gdItem *> gdList;
+
 void fldMenuUpload_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -272,6 +274,7 @@ void fldMenuDriveRestore(void *a)
     drive::gdItem *in = (drive::gdItem *)a;
     ui::confirm("你确定要下载并恢复 " + in->name + "?", fldMenuDriveRestore_t, NULL, a);
 }
+#endif
 
 void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, funcPtr _func, void *_args)
 {
@@ -285,6 +288,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
+#ifdef ENABLE_GD
     if(fs::gDrive)
     {
         fs::gDrive->getListWithParent(uploadParent, gdList);
@@ -298,7 +302,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
             fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuDriveRestore, gdList[i]);
         }
     }
-
+#endif
     for(unsigned i = 0; i < fldList.getCount(); i++, fldInd++)
     {
         fldMenu.addOpt(util::toUtf8(fldList.getItem(i)), 320);
@@ -307,7 +311,9 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
         fldMenu.addOptEvent(fldInd, KEY_A, fldMenuOverwrite, di);
         fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDelete, di);
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
-        fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
+#ifdef ENABLE_GD
+        if (fs::gDrive) fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
+#endif
     }
 }
 
@@ -320,6 +326,7 @@ void ui::fldRefresh()
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
+#ifdef ENABLE_GD
     if(fs::gDrive)
     {
         fs::gDrive->getListWithParent(uploadParent, gdList);
@@ -333,7 +340,7 @@ void ui::fldRefresh()
             fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuDriveRestore, gdList[i]);
         }
     }
-
+#endif
     for(unsigned i = 0; i < fldList.getCount(); i++, fldInd++)
     {
         fldMenu.addOpt(util::toUtf8(fldList.getItem(i)), 320);
@@ -342,7 +349,9 @@ void ui::fldRefresh()
         fldMenu.addOptEvent(fldInd, KEY_A, fldMenuOverwrite, di);
         fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDelete, di);
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
-        fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
+#ifdef ENABLE_GD
+        if (fs::gDrive) fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
+#endif
     }
 
     fldMenu.setSelected(0);

@@ -32,7 +32,10 @@ enum states
 
 extern const std::string TITLE_TEXT;
 
-#define FLD_GUIDE_TEXT "\ue000 选择 \ue002 删除 \ue003 恢复 \ue005 上传 \ue001 关闭"
+#ifdef ENABLE_GD
+#define FLD_GUIDE_TEXT_GD "\ue000 选择 \ue002 删除 \ue003 恢复 \ue005 上传 \ue001 关闭"
+#endif
+#define FLD_GUIDE_TEXT "\ue000 选择 \ue002 删除 \ue003 恢复 \ue001 关闭"
 
 namespace ui
 {

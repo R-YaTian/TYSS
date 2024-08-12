@@ -47,6 +47,7 @@ static void setMenuReloadTitles(void *a)
     ui::newThread(data::loadTitles, NULL, NULL);
 }
 
+#ifdef ENABLE_GD
 static void setMenuReloadDriveList_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -60,6 +61,7 @@ static void setMenuReloadDriveList(void *a)
     if(fs::gDrive)
         ui::newThread(setMenuReloadDriveList_t, NULL, NULL);
 }
+#endif
 
 static void setMenuToggleZIP_t(void *a)
 {
@@ -85,20 +87,25 @@ void ui::setInit(void *a)
     setMenu.addOpt("重载 Titles", 320);
     setMenu.addOptEvent(0, KEY_A, setMenuReloadTitles, NULL);
 
-    setMenu.addOpt("重载 Google Drive 列表", 320);
-    setMenu.addOptEvent(1, KEY_A, setMenuReloadDriveList, NULL);
-
     setMenu.addOpt("导出到 ZIP", 320);
-    setMenu.addOptEvent(2, KEY_A, setMenuToggleZIP, &cfg::config["zip"]);
+    setMenu.addOptEvent(1, KEY_A, setMenuToggleZIP, &cfg::config["zip"]);
 
     setMenu.addOpt("修改 PlayCoin", 320);
-    setMenu.addOptEvent(3, KEY_A, setMenuHackPlayCoin, NULL);
+    setMenu.addOptEvent(2, KEY_A, setMenuHackPlayCoin, NULL);
 
     setMenu.addOpt("重置收藏列表", 320);
-    setMenu.addOptEvent(4, KEY_A, setMenuClearFavList, NULL);
+    setMenu.addOptEvent(3, KEY_A, setMenuClearFavList, NULL);
 
     setMenu.addOpt("重置黑名单", 320);
-    setMenu.addOptEvent(5, KEY_A, setMenuClearBlackList, NULL);
+    setMenu.addOptEvent(4, KEY_A, setMenuClearBlackList, NULL);
+
+#ifdef ENABLE_GD
+    if(fs::gDrive)
+    {
+        setMenu.addOpt("重载 Google Drive 列表", 320);
+        setMenu.addOptEvent(setMenu.getCount(), KEY_A, setMenuReloadDriveList, NULL);
+    }
+#endif
 
     t->finished = true;
 }
@@ -121,7 +128,7 @@ void ui::setUpdate()
             break;
     }
 
-    setMenu.editOpt(2, "导出到 ZIP: " + getBoolText(cfg::config["zip"]));
+    setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(cfg::config["zip"]));
 
     setMenu.update();
 }

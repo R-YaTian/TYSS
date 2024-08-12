@@ -56,6 +56,7 @@ static void shrdViewCallback(void *)
         {
             data::titleData *t = &shared[shrdView->getSelected()];
             std::string uploadParent;
+#ifdef ENABLE_GD
             if(fs::gDrive)
             {
                 std::string ttl = util::toUtf8(shared[shrdView->getSelected()].getTitle());
@@ -64,7 +65,7 @@ static void shrdViewCallback(void *)
 
                 uploadParent = fs::gDrive->getFolderID(ttl, fs::sharedExtID);
             }
-
+#endif
             if(fs::openArchive(*t, ARCHIVE_SHARED_EXTDATA, false))
             {
                 //util::createTitleDir(*t, ARCHIVE_SHARED_EXTDATA);
@@ -128,7 +129,11 @@ void ui::shrdDrawBot()
     if(fldOpen)
     {
         ui::fldDraw();
+#ifdef ENABLE_GD
+        ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_GD : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+#else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+#endif
     }
     else
     {

@@ -28,6 +28,7 @@ static void extViewCallback(void *a)
             {
                 data::titleData *t = &data::extDataTitles[extView->getSelected()];
                 std::string uploadParent;
+#ifdef ENABLE_GD
                 if(fs::gDrive)
                 {
                     std::string ttlUTF8 = t->getTitleUTF8();
@@ -36,7 +37,7 @@ static void extViewCallback(void *a)
 
                     uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::extDataDirID);
                 }
-
+#endif
                 if(fs::openArchive(*t, ARCHIVE_EXTDATA, false))
                 {
                     //util::createTitleDir(*t, ARCHIVE_EXTDATA);
@@ -93,31 +94,24 @@ static void extOptCallback(void *a)
     }
 }
 
-static void extOptDeleteExtData_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    data::deleteExtData(data::curData);
-    t->finished = true;
-}
-
 static void extOptDeleteExtData(void *a)
 {
     data::titleData *t = &data::extDataTitles[extView->getSelected()];
-    std::string q = "你确定要删除 " + util::toUtf8(t->getTitle()) + " 的追加数据吗?";
-    ui::confirm(q, extOptDeleteExtData_t, NULL, NULL);
-}
-
-static void extOptAddtoBlackList_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    data::blacklistAdd(data::curData);
-    t->finished = true;
+    std::string q = "你确定要删除 " + util::toUtf8(t->getTitle()) + " 的追加数据吗?\n删除后将重写缓存";
+    void *arg = &data::curData;
+    ui::confirm(q, data::deleteExtData, NULL, arg);
 }
 
 static void extOptAddtoBlackList(void *a)
 {
+    if(data::curData.getMedia() == MEDIATYPE_GAME_CARD)
+    {
+        ui::showMessage("为避免发生问题, 禁止将卡带游戏添加到黑名单!");
+        return;
+    }
     std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
-    ui::confirm(q, extOptAddtoBlackList_t, NULL, NULL);
+    void *arg = &data::curData;
+    ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
 
 void ui::extInit(void *a)
@@ -174,7 +168,11 @@ void ui::extDrawBot()
     if(fldOpen)
     {
         ui::fldDraw();
+#ifdef ENABLE_GD
+        ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_GD : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+#else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+#endif
     }
     else if(extOptsOpen)
     {

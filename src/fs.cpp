@@ -11,15 +11,11 @@
 #include "data.h"
 #include "type.h"
 #include "cfg.h"
-#include "gd.h"
 
 #define buff_size 0x8000
 
 static FS_Archive sdmcArch, saveArch;
 static FS_ArchiveID saveMode = (FS_ArchiveID)0;
-
-drive::gd *fs::gDrive = NULL;
-std::string fs::jksmDirID, fs::usrSaveDirID, fs::extDataDirID, fs::sysSaveDirID, fs::bossExtDirID, fs::sharedExtID;
 
 typedef struct 
 {
@@ -53,6 +49,10 @@ void fs::exit()
     FSUSER_CloseArchive(sdmcArch);
     FSUSER_CloseArchive(saveArch);
 }
+
+#ifdef ENABLE_GD
+drive::gd *fs::gDrive = NULL;
+std::string fs::jksmDirID, fs::usrSaveDirID, fs::extDataDirID, fs::sysSaveDirID, fs::bossExtDirID, fs::sharedExtID;
 
 void fs::driveInit(void *a)
 {
@@ -109,6 +109,7 @@ void fs::driveExit()
     if(fs::gDrive)
         delete fs::gDrive;
 }
+#endif
 
 FS_Archive fs::getSDMCArch()
 {

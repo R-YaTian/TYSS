@@ -29,8 +29,8 @@ static void ttlViewCallback(void *a)
             {
                 data::titleData *t = &data::usrSaveTitles[ttlView->getSelected()];
                 data::curData = *t;
-
                 std::string uploadParent;
+#ifdef ENABLE_GD
                 if(fs::gDrive)
                 {
                     if(!fs::gDrive->dirExists(t->getTitleUTF8(), fs::usrSaveDirID))
@@ -38,7 +38,7 @@ static void ttlViewCallback(void *a)
 
                     uploadParent = fs::gDrive->getFolderID(t->getTitleUTF8(), fs::usrSaveDirID);
                 }
-
+#endif
                 if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false))
                 {
                     //util::createTitleDir(*t, ARCHIVE_USER_SAVEDATA);
@@ -115,17 +115,16 @@ static void ttlOptResetSaveData(void *a)
     ui::confirm(q, ttlOptResetSaveData_t, NULL, NULL);
 }
 
-static void ttlOptAddtoBlackList_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    data::blacklistAdd(data::curData);
-    t->finished = true;
-}
-
 static void ttlOptAddtoBlackList(void *a)
 {
+    if(data::curData.getMedia() == MEDIATYPE_GAME_CARD)
+    {
+        ui::showMessage("为避免发生问题, 禁止将卡带游戏添加到黑名单!");
+        return;
+    }
     std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
-    ui::confirm(q, ttlOptAddtoBlackList_t, NULL, NULL);
+    void *arg = &data::curData;
+    ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
 
 void ui::ttlInit(void *a)
@@ -183,7 +182,11 @@ void ui::ttlDrawBot()
     if(fldOpen)
     {
         ui::fldDraw();
+#ifdef ENABLE_GD
+        ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_GD : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+#else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+#endif
     }
     else if(ttlOptsOpen)
     {

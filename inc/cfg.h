@@ -9,8 +9,11 @@ namespace cfg
 
     void load();
     void saveCommon();
-    void saveGD();
 
     extern std::unordered_map<std::string, bool> config;
+
+#ifdef ENABLE_GD
+    void saveGD();
     extern std::string driveClientID, driveClientSecret, driveAuthCode, driveRefreshToken;
+#endif
 }

@@ -522,7 +522,7 @@ void data::loadTitles(void *a)
     t->finished = true;
 }
 
-void data::deleteExtData_t(void *a)
+void data::deleteExtData(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     titleData *in = (titleData *)t->argPtr;
@@ -573,12 +573,6 @@ void data::deleteExtData_t(void *a)
     t->finished = true;
 }
 
-void data::deleteExtData(titleData& t)
-{
-    void *a = &t;
-    ui::newThread(deleteExtData_t, a, NULL);
-}
-
 void data::loadBlacklist()
 {
     blacklist.clear();
@@ -604,12 +598,13 @@ void data::saveBlacklist()
         bl.writef("0x%016llX\n", blacklist[i]);
 }
 
-void data::blacklistAdd_t(void *a)
+void data::blacklistAdd(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     titleData *in = (titleData *)t->argPtr;
     t->status->setStatus("正在保存黑名单...");
 
+    blacklist.push_back(in->getID());
     saveBlacklist();
 
     //Remove it
@@ -664,17 +659,6 @@ void data::blacklistAdd_t(void *a)
     t->argPtr = NULL;
     t->unlock();
     t->finished = true;
-}
-
-void data::blacklistAdd(titleData& t)
-{
-    if(t.getMedia() == MEDIATYPE_GAME_CARD)
-        return;
-
-    blacklist.push_back(t.getID());
-
-    void *a = &t;
-    ui::newThread(blacklistAdd_t, a, NULL);
 }
 
 void data::clearBlacklist(void *a)

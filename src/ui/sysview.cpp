@@ -28,6 +28,7 @@ static void sysViewCallback(void *a)
             {
                 data::titleData *t = &data::sysDataTitles[sysView->getSelected()];
                 std::string uploadParent;
+#ifdef ENABLE_GD
                 if(fs::gDrive)
                 {
                     std::string ttlUTF8 = t->getTitleUTF8();
@@ -36,7 +37,7 @@ static void sysViewCallback(void *a)
 
                     uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::sysSaveDirID);
                 }
-
+#endif
                 if(fs::openArchive(*t, ARCHIVE_SYSTEM_SAVEDATA, false))
                 {
                     //util::createTitleDir(*t, ARCHIVE_SYSTEM_SAVEDATA);
@@ -93,17 +94,11 @@ static void sysOptCallback(void *a)
     }
 }
 
-static void sysOptAddtoBlackList_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    data::blacklistAdd(data::curData);
-    t->finished = true;
-}
-
 static void sysOptAddtoBlackList(void *a)
 {
     std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
-    ui::confirm(q, sysOptAddtoBlackList_t, NULL, NULL);
+    void *arg = &data::curData;
+    ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
 
 void ui::sysInit(void *a)
@@ -158,7 +153,11 @@ void ui::sysDrawBot()
     if(fldOpen)
     {
         ui::fldDraw();
+#ifdef ENABLE_GD
+        ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_GD : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+#else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+#endif
     }
     else if(sysOptsOpen)
     {

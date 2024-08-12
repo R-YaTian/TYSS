@@ -28,6 +28,7 @@ static void bossViewCallback(void *a)
             {
                 data::titleData *t = &data::bossDataTitles[bossView->getSelected()];
                 std::string uploadParent;
+#ifdef ENABLE_GD
                 if(fs::gDrive)
                 {
                     std::string ttlUTF8 = t->getTitleUTF8();
@@ -36,7 +37,7 @@ static void bossViewCallback(void *a)
 
                     uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::bossExtDirID);
                 }
-
+#endif
                 if(fs::openArchive(*t, ARCHIVE_BOSS_EXTDATA, false))
                 {
                     //util::createTitleDir(*t, ARCHIVE_BOSS_EXTDATA);
@@ -93,17 +94,16 @@ static void bossViewOptCallback(void *a)
     }
 }
 
-static void bossViewOptAddtoBlackList_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    data::blacklistAdd(data::curData);
-    t->finished = true;
-}
-
 static void bossViewOptAddtoBlackList(void *a)
 {
+    if(data::curData.getMedia() == MEDIATYPE_GAME_CARD)
+    {
+        ui::showMessage("为避免发生问题, 禁止将卡带游戏添加到黑名单!");
+        return;
+    }
     std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
-    ui::confirm(q, bossViewOptAddtoBlackList_t, NULL, NULL);
+    void *arg = &data::curData;
+    ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
 
 void ui::bossViewInit(void *a)
@@ -158,7 +158,11 @@ void ui::bossViewDrawBot()
     if(fldOpen)
     {
         ui::fldDraw();
+#ifdef ENABLE_GD
+        ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_GD : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+#else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+#endif
     }
     else if(bossViewOptsOpen)
     {

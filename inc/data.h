@@ -84,14 +84,12 @@ namespace data
 
     smdh_s *loadSMDH(const uint32_t& low, const uint32_t& high, const uint8_t& media);
     void loadTitles(void *a);
-    void deleteExtData_t(void *a);
-    void deleteExtData(titleData& t);
+    void deleteExtData(void *a);
 
     void loadBlacklist();
     void saveBlacklist();
     void clearBlacklist(void *a);
-    void blacklistAdd_t(void *a);
-    void blacklistAdd(titleData& t);
+    void blacklistAdd(void *a);
 
     void loadFav();
     void saveFav();

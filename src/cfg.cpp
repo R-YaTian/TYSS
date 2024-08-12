@@ -1,12 +1,15 @@
 #include <string>
 #include <unordered_map>
-#include <json-c/json.h>
 
 #include "cfg.h"
 #include "fs.h"
 
-std::unordered_map<std::string, bool> cfg::config;
+#ifdef ENABLE_GD
+#include <json-c/json.h>
 std::string cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken;
+#endif
+
+std::unordered_map<std::string, bool> cfg::config;
 
 void cfg::initToDefault()
 {
@@ -25,6 +28,7 @@ void cfg::load()
         fclose(cfgIn);
     }
 
+#ifdef ENABLE_GD
     fs::fsfile drvCfg(fs::getSDMCArch(), "/JKSV/drive.json", FS_OPEN_READ);
     if(drvCfg.isOpen())
     {
@@ -52,6 +56,7 @@ void cfg::load()
         delete[] jsonBuff;
         json_object_put(parse);
     }
+#endif
 }
 
 void cfg::saveCommon()
@@ -64,6 +69,7 @@ void cfg::saveCommon()
     }
 }
 
+#ifdef ENABLE_GD
 void cfg::saveGD()
 {
     if(!cfg::driveRefreshToken.empty())
@@ -82,3 +88,4 @@ void cfg::saveGD()
         json_object_put(drvCfg);
     }
 }
+#endif

@@ -7,7 +7,10 @@
 #include <string>
 #include "data.h"
 #include "ui.h"
+
+#ifdef ENABLE_GD
 #include "gd.h"
+#endif
 
 #define DRIVE_JKSM_DIR "JKSM"
 #define DRIVE_USER_SAVE_DIR "Saves"
@@ -21,11 +24,12 @@ namespace fs
     void init();
     void exit();
 
+#ifdef ENABLE_GD
     void driveInit(void *a);
     void driveExit();
-
     extern drive::gd *gDrive;
     extern std::string jksmDirID, usrSaveDirID, extDataDirID, sysSaveDirID, bossExtDirID, sharedExtID;
+#endif
 
     enum fsSeek
     {
