@@ -36,7 +36,11 @@ void ui::menu::addOptEvent(unsigned ind, uint32_t _key, funcPtr _func, void *_ar
 void ui::menu::reset()
 {
     opt.clear();
+    clrSh = 0x88;
+    clrAdd = true;
     selected = 0;
+    fc = 0;
+    start = 0;
 }
 
 void ui::menu::adjust()

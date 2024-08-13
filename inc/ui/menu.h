@@ -42,7 +42,7 @@ namespace ui
 
         private:
             uint8_t clrSh = 0x88;
-            bool clrAdd = true, multi = false;
+            bool clrAdd = true;
             int selected = 0, start = 0;
             int fc = 0;
             funcPtr cb;

@@ -82,20 +82,23 @@ namespace ui
     {
         public:
             progressBar() = default;
-
             progressBar(const uint32_t& _max);
-            void setMax(const uint32_t& _max) { max = _max; }
+            void setMax(const uint32_t& _max) { max = _max; prog = 0; width = 0; }
+            void setText(const std::string& _text) { text = _text; }
             void update(const uint32_t& _prog);
-            void draw(const std::string& text);
+            void draw();
 
         private:
             float max, prog, width;
+            std::string text;
     };
 
+    void progressBarDrawFunc(void *a);
     void confirm(const std::string& mess, funcPtr _onConfirm, funcPtr _onCancel, void *args);
     void message(const std::string& mess, funcPtr _onConfirm, void *args);
     extern const std::string loadGlyphArray[];
     extern int state, prev;
+    extern progressBar *prog;
 }
 
 #endif // UI_H

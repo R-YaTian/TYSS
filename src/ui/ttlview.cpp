@@ -74,6 +74,8 @@ void ui::titleview::update()
             break;
     }
 
+    selected = tileTotal < 0 ? -1 : selected;
+
     if(callback)
         (*(callback))(cbArgs);
 }

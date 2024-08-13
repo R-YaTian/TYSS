@@ -22,7 +22,10 @@ static void fldCallback(void *)
 
 static void bossViewCallback(void *a)
 {
-    switch(ui::padKeysDown())
+    uint32_t down = ui::padKeysDown();
+    if (bossView->getSelected() == -1)
+        down = down & ~KEY_A & ~KEY_X & ~KEY_Y;
+    switch(down)
     {
         case KEY_A:
             {

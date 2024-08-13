@@ -352,9 +352,6 @@ void ui::fldRefresh()
         if (fs::gDrive) fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
 #endif
     }
-
-    fldMenu.setSelected(0);
-    fldUpdate();
 }
 
 void ui::fldUpdate()

@@ -23,7 +23,10 @@ static void fldCallback(void *)
 
 static void ttlViewCallback(void *a)
 {
-    switch(ui::padKeysDown())
+    uint32_t down = ui::padKeysDown();
+    if (ttlView->getSelected() == -1)
+        down = down & ~KEY_A & ~KEY_X & ~KEY_Y;
+    switch(down)
     {
         case KEY_A:
             {

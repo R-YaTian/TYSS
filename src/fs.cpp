@@ -27,6 +27,12 @@ typedef struct
     bool commit = false;  
 } cpyArgs;
 
+typedef struct
+{
+    std::vector<data::titleData>* vect = NULL;
+    uint32_t mode = 0;
+} bakArgs;
+
 void fs::createDir(const std::string& path)
 {
     FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_ASCII, path.c_str()), 0);
@@ -550,14 +556,6 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
     std::sort(entry.begin(), entry.end(), sortDirs);
 }
 
-// static std::u16string getItemFromPath(const std::u16string& path)
-// {
-//     size_t ls = path.find_last_of('/');
-//     if(ls != path.npos)
-//         return path.substr(ls + 1, path.npos);
-//     return (char16_t *)"";
-// }
-
 void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t)
 {
     if(t)
@@ -669,11 +667,12 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
                                  locTime->tm_mday, locTime->tm_mon, (1900 + locTime->tm_year), 0, 0, 0 };
 
             std::string filename = util::toUtf8(archList->getItem(i));
+            if(t)
+                t->status->setStatus("正在压缩 " + filename + "...");
             int openZip = zipOpenNewFileInZip64(_zip, filename.c_str(), &inf, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_DEFAULT_COMPRESSION, 0);
             if(openZip == 0)
             {
                 fs::fsfile readFile(_arch, _src + archList->getItem(i), FS_OPEN_READ);
-                ui::progressBar prog(readFile.getSize());
                 size_t readIn = 0;
                 uint8_t *buff = new uint8_t[buff_size];
                 while((readIn = readFile.read(buff, buff_size)))
@@ -727,6 +726,8 @@ void fs::copyZipToArch(const FS_Archive& arch, unzFile _unz, threadInfo *t)
         {
             memset(filename, 0, 0x301);
             unzGetCurrentFileInfo64(_unz, &info, filename, 0x300, NULL, 0, NULL, 0);
+            if(t)
+                t->status->setStatus("正在解压 " + std::string(filename) + "...");
             if(unzOpenCurrentFile(_unz) == UNZ_OK)
             {
                 std::u16string dstPathUTF16 = util::toUtf16(filename);
@@ -774,21 +775,21 @@ void fs::copyZipToArchThreaded(const FS_Archive& _arch, const std::u16string& _s
     ui::newThread(copyZipToArch_t, send, NULL, ZIP_THRD_STACK_SIZE);
 }
 
-void fs::backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode)
+void backupTitles_t(void *a)
 {
-    ui::progressBar prog(vect.size());
+    threadInfo *t = (threadInfo *)a;
+    bakArgs *args = (bakArgs *)t->argPtr;
+    std::vector<data::titleData>& vect = *args->vect;
+    uint32_t mode = args->mode;
+
     for(unsigned i = 0; i < vect.size(); i++)
     {
         std::string copyStr = "正在处理 '" + util::toUtf8(vect[i].getTitle()) + "'...";
-        prog.update(i);
-
-        gfx::frameBegin();
-        gfx::frameStartBot();
-        prog.draw(copyStr);
-        gfx::frameEnd();
+        ui::prog->setText(copyStr);
+        ui::prog->update(i);
 
         FS_Archive _arch;
-        if(openArchive(vect[i], mode, true, _arch))
+        if(fs::openArchive(vect[i], mode, true, _arch))
         {
             util::createTitleDir(vect[i], mode);
             std::u16string outpath = util::createPath(vect[i], mode) + util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
@@ -796,17 +797,36 @@ void fs::backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode)
             if(cfg::config["zip"])
             {
                 std::u16string fullOut = outpath + util::toUtf16(".zip");
-                copyArchToZipThreaded(_arch, util::toUtf16("/"), fullOut);
+
+                zipFile zip = zipOpen64("/tmp.zip", 0);
+                fs::copyArchToZip(_arch, util::toUtf16("/"), zip, NULL);
+                zipClose(zip, NULL);
+
+                FS_Path srcPath = fsMakePath(PATH_ASCII, "/tmp.zip");
+                FS_Path dstPath = fsMakePath(PATH_UTF16, fullOut.c_str());
+                FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), dstPath);
             }
             else
             {
-                FSUSER_CreateDirectory(getSDMCArch(), fsMakePath(PATH_UTF16, outpath.c_str()), 0);
+                FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, outpath.c_str()), 0);
                 outpath += util::toUtf16("/");
-
-                copyDirToDirThreaded(_arch, util::toUtf16("/"), getSDMCArch(), outpath, false);
+                fs::copyDirToDir(_arch, util::toUtf16("/"), fs::getSDMCArch(), outpath, false, NULL);
             }
 
-            closeSaveArch();
+            FSUSER_CloseArchive(_arch);
         }
     }
+
+    t->argPtr = NULL;
+    t->drawFunc = NULL;
+    t->finished = true;
+}
+
+void fs::backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode)
+{
+    ui::prog->setMax(vect.size());
+    bakArgs *send = new bakArgs;
+    send->vect = &vect;
+    send->mode = mode;
+    ui::newThread(backupTitles_t, send, ui::progressBarDrawFunc, ZIP_THRD_STACK_SIZE);
 }

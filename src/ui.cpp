@@ -28,7 +28,7 @@ const std::string ui::loadGlyphArray[] =
 };
 
 int ui::state = DAT, ui::prev = DAT;
-
+ui::progressBar *ui::prog;
 static ui::threadProcMngr *thrdMgr;
 static ui::button *ok, *yes, *no;
 
@@ -43,6 +43,7 @@ void ui::init()
     ok = new ui::button("好 \ue000", 96, 184, 128, 32);
     yes = new ui::button("是 \ue000", 32, 184, 120, 32);
     no  = new ui::button("否 \ue001", 168, 184, 120, 32);
+    prog = new ui::progressBar(100);
 }
 
 void ui::exit()
@@ -73,8 +74,8 @@ void ui::drawUIBar(const std::string& txt, int screen, bool center)
 
         case ui::SCREEN_BOT://bottom
             botX = 160 - (gfx::getTextWidth(txt) / 2);
-            C2D_DrawRectSolid(0, 224, GFX_DEPTH_DEFAULT, 400, 16, 0xFF505050);
-            C2D_DrawRectSolid(0, 223, GFX_DEPTH_DEFAULT, 400, 1, 0x881D1D1D);
+            C2D_DrawRectSolid(0, 224, GFX_DEPTH_DEFAULT, 320, 16, 0xFF505050);
+            C2D_DrawRectSolid(0, 223, GFX_DEPTH_DEFAULT, 320, 1, 0x881D1D1D);
             gfx::drawText(txt, botX, 224, GFX_DEPTH_DEFAULT, 0.5f, 0xFFFFFFFF);
             break;
     }
@@ -228,6 +229,8 @@ void ui::newThread(ThreadFunc _thrdFunc, void *_args, funcPtr _drawFunc, size_t 
 ui::progressBar::progressBar(const uint32_t& _max)
 {
     max = (float)_max;
+    prog = 0;
+    width = 0;
 }
 
 void ui::progressBar::update(const uint32_t& _prog)
@@ -235,15 +238,20 @@ void ui::progressBar::update(const uint32_t& _prog)
     prog = (float)_prog;
 
     float percent = (float)(prog / max) * 100;
-    width  = (float)(percent * 288) / 100;
+    width  = (float)(percent * 320) / 100;
 }
 
-void ui::progressBar::draw(const std::string& text)
+void ui::progressBar::draw()
 {
-    C2D_DrawRectSolid(8, 8, GFX_DEPTH_DEFAULT, 304, 224, 0xFFF4F4F4);
-    gfx::drawTextWrap(text, 16, 16, GFX_DEPTH_DEFAULT, 0.5f, 240, 0xFF000000);
-    C2D_DrawRectSolid(16, 200, GFX_DEPTH_DEFAULT, 288, 16, 0xFF000000);
-    C2D_DrawRectSolid(16, 200, GFX_DEPTH_DEFAULT, width, 16, 0xFF00FF00);
+    if (!text.empty()) gfx::drawTextWrap(text, 16, 96, GFX_DEPTH_DEFAULT, 0.5f, 288, 0xFFFFFFFF);
+    C2D_DrawRectSolid(0, 208, GFX_DEPTH_DEFAULT, 320, 16, 0xFF000000);
+    C2D_DrawRectSolid(0, 208, GFX_DEPTH_DEFAULT, width, 16, 0xFF00FF00);
+}
+
+void ui::progressBarDrawFunc(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    if(t->argPtr && t->running) prog->draw();
 }
 
 void message_t(void *a)
