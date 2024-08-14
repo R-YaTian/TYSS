@@ -108,6 +108,19 @@ static void bossViewOptAddtoBlackList(void *a)
     ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
 
+static void bossViewOptBackupAll_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    fs::backupTitles(data::bossDataTitles, ARCHIVE_BOSS_EXTDATA);
+    t->finished = true;
+}
+
+static void bossViewOptBackupAll(void *a)
+{
+    std::string q = "你确定要备份此页所有的数据吗?\n这或许需要耗费一定时间, 视 Title 数量而定。\n请耐心等待!";
+    ui::confirm(q, bossViewOptBackupAll_t, NULL, NULL);
+}
+
 void ui::bossViewInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -117,6 +130,8 @@ void ui::bossViewInit(void *a)
     bossViewOpts->setCallback(bossViewOptCallback, NULL);
     bossViewOpts->addOpt("添加到黑名单", 320);
     bossViewOpts->addOptEvent(0, KEY_A, bossViewOptAddtoBlackList, NULL);
+    bossViewOpts->addOpt("备份所有的 BOSS 追加数据", 320);
+    bossViewOpts->addOptEvent(1, KEY_A, bossViewOptBackupAll, NULL);
 
     t->finished = true;
 }

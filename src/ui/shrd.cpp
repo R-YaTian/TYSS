@@ -48,6 +48,13 @@ static void fldCallback(void *)
     }
 }
 
+static void shrdViewBackupAll(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    fs::backupTitles(shared, ARCHIVE_SHARED_EXTDATA);
+    t->finished = true;
+}
+
 static void shrdViewCallback(void *)
 {
     switch(ui::padKeysDown())
@@ -74,6 +81,13 @@ static void shrdViewCallback(void *)
             }
         }
         break;
+
+        case KEY_X:
+            {
+                std::string q = "你确定要备份所有的共享追加数据吗?\n这或许需要耗费一定时间, 请耐心等待!";
+                ui::confirm(q, shrdViewBackupAll, NULL, NULL);
+            }
+            break;
 
         case KEY_CPAD_LEFT:
             ui::state = BOS;
@@ -137,6 +151,6 @@ void ui::shrdDrawBot()
     else
     {
         gfx::drawTextWrap("3DBREW: " + sharedDesc[shrdView->getSelected()], 8, 8, GFX_DEPTH_DEFAULT, 0.5f, 304, 0xFFFFFFFF);
-        ui::drawUIBar("\ue000 打开 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue002 备份所有 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
     }
 }

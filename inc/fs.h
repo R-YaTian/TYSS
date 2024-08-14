@@ -47,7 +47,8 @@ namespace fs
     void closeSaveArch();
     void commitData(const uint32_t& mode);
     void deleteSv(const uint32_t& mode);
-    void getTimestamp(const std::u16string& _path, u64* _timeStamp);
+    void exportSv(const uint32_t& mode, const std::u16string& _dst, const data::titleData& dat);
+    void importSv(const uint32_t& mode, const std::u16string& _src, const data::titleData& dat);
 
     bool fsfexists(const FS_Archive& _arch, const std::string& _path);
     bool fsfexists(const FS_Archive& _arch, const std::u16string& _path);
@@ -127,7 +128,7 @@ namespace fs
     void copyDirToDir(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t);
     void copyDirToDirThreaded(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit);
 
-    void copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipFile _zip, threadInfo *t);
+    void copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipFile _zip, const std::u16string* _dir, threadInfo *t);
     void copyArchToZipThreaded(const FS_Archive& _arch, const std::u16string& _src, const std::u16string& _dst);
     void copyZipToArch(const FS_Archive& _arch, unzFile _unz, threadInfo *t);
     void copyZipToArchThreaded(const FS_Archive& _arch, const std::u16string& _src);

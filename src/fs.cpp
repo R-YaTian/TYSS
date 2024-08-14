@@ -213,22 +213,9 @@ void fs::commitData(const uint32_t& mode)
     }
 }
 
-void fs::getTimestamp(const std::u16string& _path, u64* _timeStamp)
-{
-    FS_Path fs_path = fsMakePath(PATH_UTF16, _path.c_str());
-    Result res = FSUSER_ControlArchive(fs::getSaveArch(), ARCHIVE_ACTION_GET_TIMESTAMP, (void*) fs_path.data, fs_path.size, _timeStamp, sizeof(*_timeStamp));
-    if(R_FAILED(res))
-        ui::showMessage("获取文件修改日期失败.\n错误: 0x%08X", (unsigned) res);
-    else {
-        *_timeStamp /= 1000;
-        /* convert from 2000-based timestamp to UNIX timestamp */
-        *_timeStamp += 946684800;
-    }
-}
-
 void fs::deleteSv(const uint32_t& mode)
 {
-    if(mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
+    if(data::curData.getMedia() != MEDIATYPE_GAME_CARD && mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
     {
         Result res = 0;
         u64 in = ((u64)SECUREVALUE_SLOT_SD << 32) | (data::curData.getUnique() << 8);
@@ -237,6 +224,44 @@ void fs::deleteSv(const uint32_t& mode)
         res = FSUSER_ControlSecureSave(SECURESAVE_ACTION_DELETE, &in, 8, &out, 1);
         if(R_FAILED(res))
             ui::showMessage("删除安全值失败.\n错误: 0x%08X", (unsigned)res);
+    }
+}
+
+void fs::exportSv(const uint32_t& mode, const std::u16string& _dst, const data::titleData& dat)
+{
+    if(dat.getMedia() != MEDIATYPE_GAME_CARD && mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
+    {
+        Result res = 0;
+        bool exists = false;
+        u64 value = 0;
+        res = FSUSER_GetSaveDataSecureValue(&exists, &value, SECUREVALUE_SLOT_SD, dat.getUnique(), (u8) (dat.getLow() & 0xFF));
+        if(R_SUCCEEDED(res)) {
+            if(!exists) return;
+            fs::fsfile dst(getSDMCArch(), _dst, FS_OPEN_WRITE, sizeof(u64));
+            dst.write(&value, sizeof(u64));
+            dst.close();
+        }
+
+        if(R_FAILED(res))
+            ui::showMessage("获取安全值失败.\n错误: 0x%08X", (unsigned)res);
+    }
+}
+
+void fs::importSv(const uint32_t& mode, const std::u16string& _src, const data::titleData& dat)
+{
+    if(dat.getMedia() != MEDIATYPE_GAME_CARD && mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
+    {
+        if (!fsfexists(getSDMCArch(), _src)) return; // do nothing if not found
+        fs::fsfile src(getSDMCArch(), _src, FS_OPEN_READ);
+        u64 value = 0;
+        src.read(&value, sizeof(u64));
+        src.close();
+
+        Result res = 0;
+        res = FSUSER_SetSaveDataSecureValue(value, SECUREVALUE_SLOT_SD, dat.getUnique(), (u8) (dat.getLow() & 0xFF));
+
+        if(R_FAILED(res))
+            ui::showMessage("导入安全值失败.\n错误: 0x%08X", (unsigned)res);
     }
 }
 
@@ -502,6 +527,10 @@ fs::dirList::~dirList()
     entry.clear();
 }
 
+static bool endsWith(const std::string& str, const std::string& suffix) {
+    return str.size() >= suffix.size() && str.rfind(suffix) == (str.size() - suffix.size());
+}
+
 void fs::dirList::rescan()
 {
     entry.clear();
@@ -518,7 +547,8 @@ void fs::dirList::rescan()
             fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
                                     util::toUtf8(std::u16string((char16_t *)ent.name)),
                                     ent.attributes == FS_ATTRIBUTE_DIRECTORY};
-            entry.push_back(newEntry);
+            if (newEntry.isDir || endsWith(newEntry.nameUTF8, ".zip"))
+                entry.push_back(newEntry);
         }
     }
     while(read > 0);
@@ -546,7 +576,8 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
             fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
                                     util::toUtf8(std::u16string((char16_t *)ent.name)),
                                     ent.attributes == FS_ATTRIBUTE_DIRECTORY};
-            entry.push_back(newEntry);
+            if (newEntry.isDir || endsWith(newEntry.nameUTF8, ".zip"))
+                entry.push_back(newEntry);
         }
     }
     while(read > 0);
@@ -648,7 +679,7 @@ void fs::copyDirToDirThreaded(const FS_Archive& _srcArch, const std::u16string& 
     ui::newThread(copyDirToDir_t, send, NULL);
 }
 
-void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipFile _zip, threadInfo *t)
+void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipFile _zip, const std::u16string* _dir, threadInfo *t)
 {
     fs::dirList *archList = new fs::dirList(_arch, _src);
     for(unsigned i = 0; i < archList->getCount(); i++)
@@ -656,7 +687,11 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
         if(archList->isDir(i))
         {
             std::u16string newSrc = _src + archList->getItem(i) + util::toUtf16("/");
-            fs::copyArchToZip(_arch, newSrc, _zip, t);
+            std::u16string newDir = archList->getItem(i) + util::toUtf16("/");
+            if (_dir) newDir = *_dir + newDir; // Join existing path
+            std::string dirname = util::toUtf8(newDir); // We should add the folder to zip first
+            zipOpenNewFileInZip64(_zip, dirname.c_str(), NULL, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_DEFAULT_COMPRESSION, 0);
+            fs::copyArchToZip(_arch, newSrc, _zip, &newDir, t);
         }
         else
         {
@@ -667,8 +702,8 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
                                  locTime->tm_mday, locTime->tm_mon, (1900 + locTime->tm_year), 0, 0, 0 };
 
             std::string filename = util::toUtf8(archList->getItem(i));
-            if(t)
-                t->status->setStatus("正在压缩 " + filename + "...");
+            if (_dir) filename = util::toUtf8(*_dir) + filename; // Join dirname if exists
+            if(t) t->status->setStatus("正在压缩 " + filename + "...");
             int openZip = zipOpenNewFileInZip64(_zip, filename.c_str(), &inf, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_DEFAULT_COMPRESSION, 0);
             if(openZip == 0)
             {
@@ -693,7 +728,7 @@ void copyArchToZip_t(void *a)
     t->status->setStatus("正在压缩存档位到 zip 文件...");
 
     zipFile zip = zipOpen64("/tmp.zip", 0);
-    fs::copyArchToZip(cpy->srcArch, util::toUtf16("/"), zip, t);
+    fs::copyArchToZip(cpy->srcArch, util::toUtf16("/"), zip, NULL, t);
     zipClose(zip, NULL);
 
     FS_Path srcPath = fsMakePath(PATH_ASCII, "/tmp.zip");
@@ -726,8 +761,7 @@ void fs::copyZipToArch(const FS_Archive& arch, unzFile _unz, threadInfo *t)
         {
             memset(filename, 0, 0x301);
             unzGetCurrentFileInfo64(_unz, &info, filename, 0x300, NULL, 0, NULL, 0);
-            if(t)
-                t->status->setStatus("正在解压 " + std::string(filename) + "...");
+            if(t) t->status->setStatus("正在解压 " + std::string(filename) + "...");
             if(unzOpenCurrentFile(_unz) == UNZ_OK)
             {
                 std::u16string dstPathUTF16 = util::toUtf16(filename);
@@ -737,7 +771,7 @@ void fs::copyZipToArch(const FS_Archive& arch, unzFile _unz, threadInfo *t)
                 uint8_t *buff = new uint8_t[buff_size];
                 while((readIn = unzReadCurrentFile(_unz, buff, buff_size)) > 0)
                     writeFile.write(buff, readIn);
-                
+
                 delete[] buff;
             }
         } while (unzGoToNextFile(_unz) != UNZ_END_OF_LIST_OF_FILE);
@@ -797,9 +831,11 @@ void backupTitles_t(void *a)
             if(cfg::config["zip"])
             {
                 std::u16string fullOut = outpath + util::toUtf16(".zip");
+                std::u16string svOut = fullOut + util::toUtf16(".sv");
+                fs::exportSv(mode, svOut, vect[i]); // export secure value if found
 
                 zipFile zip = zipOpen64("/tmp.zip", 0);
-                fs::copyArchToZip(_arch, util::toUtf16("/"), zip, NULL);
+                fs::copyArchToZip(_arch, util::toUtf16("/"), zip, NULL, NULL);
                 zipClose(zip, NULL);
 
                 FS_Path srcPath = fsMakePath(PATH_ASCII, "/tmp.zip");
@@ -808,6 +844,9 @@ void backupTitles_t(void *a)
             }
             else
             {
+                std::u16string svOut = outpath + util::toUtf16(".sv");
+                fs::exportSv(mode, svOut, vect[i]); // export secure value if found
+
                 FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, outpath.c_str()), 0);
                 outpath += util::toUtf16("/");
                 fs::copyDirToDir(_arch, util::toUtf16("/"), fs::getSDMCArch(), outpath, false, NULL);

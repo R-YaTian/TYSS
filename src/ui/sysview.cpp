@@ -103,6 +103,19 @@ static void sysOptAddtoBlackList(void *a)
     ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
 
+static void sysOptBackupAll_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    fs::backupTitles(data::sysDataTitles, ARCHIVE_SYSTEM_SAVEDATA);
+    t->finished = true;
+}
+
+static void sysOptBackupAll(void *a)
+{
+    std::string q = "你确定要备份此页所有的存档吗?\n这或许需要耗费一定时间, 视 Title 数量而定。\n请耐心等待!";
+    ui::confirm(q, sysOptBackupAll_t, NULL, NULL);
+}
+
 void ui::sysInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -112,6 +125,8 @@ void ui::sysInit(void *a)
     sysOpts->setCallback(sysOptCallback, NULL);
     sysOpts->addOpt("添加到黑名单", 320);
     sysOpts->addOptEvent(0, KEY_A, sysOptAddtoBlackList, NULL);
+    sysOpts->addOpt("备份所有的系统存档", 320);
+    sysOpts->addOptEvent(1, KEY_A, sysOptBackupAll, NULL);
 
     t->finished = true;
 }

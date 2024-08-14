@@ -28,16 +28,20 @@ static void fldMenuNew_t(void *a)
     else if(held & KEY_R)
         newFolder = util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
     else
-        newFolder = util::safeString(util::toUtf16(util::getString("输入新文件夹名称", true)));
+        newFolder = util::safeString(util::toUtf16(util::getString("输入新备份名称", true)));
 
     if(!newFolder.empty() && cfg::config["zip"])
     {
         std::u16string fullOut = targetDir + newFolder + util::toUtf16(".zip");
+        std::u16string svOut = fullOut + util::toUtf16(".sv");
+        fs::exportSv(fs::getSaveMode(), svOut, data::curData); // export secure value if found
         fs::copyArchToZipThreaded(fs::getSaveArch(), util::toUtf16("/"), fullOut);
     }
     else if(!newFolder.empty())
     {
         std::u16string fullOut = targetDir + newFolder;
+        std::u16string svOut = fullOut + util::toUtf16(".sv");
+        fs::exportSv(fs::getSaveMode(), svOut, data::curData); // export secure value if found
 
         FS_Path crDir = fsMakePath(PATH_UTF16, fullOut.c_str());
         FSUSER_CreateDirectory(fs::getSDMCArch(), crDir, 0);
@@ -62,6 +66,9 @@ void fldMenuOverwrite_t(void *a)
     if(in->isDir)
     {
         std::u16string overwrite = targetDir + in->name;
+        std::u16string svOut = overwrite + util::toUtf16(".sv");
+        fs::exportSv(fs::getSaveMode(), svOut, data::curData); // export secure value if found
+
         FS_Path delPath = fsMakePath(PATH_UTF16, overwrite.c_str());
         FSUSER_DeleteDirectoryRecursively(fs::getSDMCArch(), delPath);
         FSUSER_CreateDirectory(fs::getSDMCArch(), delPath, 0);
@@ -71,15 +78,17 @@ void fldMenuOverwrite_t(void *a)
     else
     {
         std::u16string overwrite = targetDir + in->name;
+        std::u16string svOut = overwrite + util::toUtf16(".sv");
+        fs::exportSv(fs::getSaveMode(), svOut, data::curData); // export secure value if found
+
         FS_Path targetPath = fsMakePath(PATH_UTF16, overwrite.c_str());
-        FS_Path tmpPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
-        
         FSUSER_DeleteFile(fs::getSDMCArch(), targetPath);
 
         zipFile zip = zipOpen64("/JKSV/tmp.zip", 0);
-        fs::copyArchToZip(fs::getSaveArch(), util::toUtf16("/"), zip, NULL);
+        fs::copyArchToZip(fs::getSaveArch(), util::toUtf16("/"), zip, NULL, NULL);
         zipClose(zip, NULL);
 
+        FS_Path tmpPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
         FSUSER_RenameFile(fs::getSDMCArch(), tmpPath, fs::getSDMCArch(), targetPath);
     }
     t->finished = true;
@@ -127,6 +136,10 @@ void fldMenuRestore_t(void *a)
         fs::commitData(fs::getSaveMode());
         t->status->setStatus("正在恢复数据到存档位...");
         fs::copyDirToDir(fs::getSDMCArch(), rest, fs::getSaveArch(), util::toUtf16("/"), true, NULL);
+
+        // Try to import secure value if exists
+        std::u16string svIn = targetDir + in->name + util::toUtf16(".sv");
+        fs::importSv(fs::getSaveMode(), svIn, data::curData);
     }
     else
     {
@@ -142,8 +155,11 @@ void fldMenuRestore_t(void *a)
         unzFile unz = unzOpen64("/JKSV/tmp.zip");
         fs::copyZipToArch(fs::getSaveArch(), unz, t);
         unzClose(unz);
-
         FSUSER_RenameFile(fs::getSDMCArch(), tmpPath, fs::getSDMCArch(), srcPath);
+
+        // Try to import secure value if exists
+        std::u16string svIn = rest + util::toUtf16(".sv");
+        fs::importSv(fs::getSaveMode(), svIn, data::curData);
     }
     t->finished = true;
 }

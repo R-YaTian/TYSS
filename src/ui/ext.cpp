@@ -116,6 +116,19 @@ static void extOptAddtoBlackList(void *a)
     ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
 
+static void extOptBackupAll_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    fs::backupTitles(data::extDataTitles, ARCHIVE_EXTDATA);
+    t->finished = true;
+}
+
+static void extOptBackupAll(void *a)
+{
+    std::string q = "你确定要备份此页所有的数据吗?\n这或许需要耗费一定时间, 视 Title 数量而定。\n请耐心等待!";
+    ui::confirm(q, extOptBackupAll_t, NULL, NULL);
+}
+
 void ui::extInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -127,6 +140,8 @@ void ui::extInit(void *a)
     extOpts->addOptEvent(0, KEY_A, extOptDeleteExtData, NULL);
     extOpts->addOpt("添加到黑名单", 320);
     extOpts->addOptEvent(1, KEY_A, extOptAddtoBlackList, NULL);
+    extOpts->addOpt("备份所有的追加数据", 320);
+    extOpts->addOptEvent(2, KEY_A, extOptBackupAll, NULL);
 
     t->finished = true;
 }

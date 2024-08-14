@@ -65,8 +65,12 @@ static uint32_t extdataRedirect(const uint32_t& low)
             return 0x000012DC;
             break;
 
+        // Face Raider JP
+        // case 0x20020D00:
+            // return 0x0000020D;
+
         default:
-            return low >> 8;
+            return (low >> 8) & 0xFFFFF;
             break;
     }
 }
@@ -161,7 +165,7 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt)
 
     low = (uint32_t)id;
     high = (uint32_t)(id >> 32);
-    unique = (low >> 8);
+    unique = (low >> 8) & 0xFFFFF;
     extdata = extdataRedirect(low);
 
     char tid[32];
@@ -213,7 +217,7 @@ bool data::titleData::initFromCache(const uint64_t& _id, const std::u16string& _
     id = _id;
     low = (uint32_t)id;
     high = (uint32_t)(id >> 32);
-    unique = (low >> 8);
+    unique = (low >> 8) & 0xFFFFF;
     extdata = extdataRedirect(low);
     m = (FS_MediaType)mt;
     if(isFavorite(id))
