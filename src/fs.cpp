@@ -140,6 +140,7 @@ FS_ArchiveID fs::getSaveMode()
 bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_Archive& arch)
 {
     Result res = 0;
+    saveMode = (FS_ArchiveID) mode;
 
     switch(mode)
     {
@@ -398,7 +399,7 @@ size_t fs::fsfile::read(void *buf, const uint32_t& max)
         if(readOut > max)
             readOut = max;
 
-        std::memset(buf, 0x00, max);
+        //std::memset(buf, 0x00, max);
     }
     offset += readOut;
     return (size_t)readOut;
@@ -598,8 +599,10 @@ void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const 
         return;
 
     size_t readIn = 0;
-    uint8_t *buffer = new uint8_t[buff_size];
-    while((readIn = src.read(buffer, buff_size)))
+    uint32_t size = 0;
+    size = src.getSize() > buff_size ? buff_size : src.getSize();
+    uint8_t *buffer = new uint8_t[size];
+    while((readIn = src.read(buffer, size)))
         dst.write(buffer, readIn);
 
     delete[] buffer;
@@ -709,8 +712,10 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
             {
                 fs::fsfile readFile(_arch, _src + archList->getItem(i), FS_OPEN_READ);
                 size_t readIn = 0;
-                uint8_t *buff = new uint8_t[buff_size];
-                while((readIn = readFile.read(buff, buff_size)))
+                uint32_t size = 0;
+                size = readFile.getSize() > buff_size ? buff_size : readFile.getSize();
+                uint8_t *buff = new uint8_t[size];
+                while((readIn = readFile.read(buff, size)))
                     zipWriteInFileInZip(_zip, buff, readIn);
 
                 delete[] buff;
@@ -774,8 +779,10 @@ void fs::copyZipToArch(const FS_Archive& arch, unzFile _unz, threadInfo *t)
                 }
                 fs::fsfile writeFile(arch, dstPathUTF16, FS_OPEN_WRITE, info.uncompressed_size);
                 int readIn = 0;
-                uint8_t *buff = new uint8_t[buff_size];
-                while((readIn = unzReadCurrentFile(_unz, buff, buff_size)) > 0)
+                uint32_t size = 0;
+                size = writeFile.getSize() > buff_size ? buff_size : writeFile.getSize();
+                uint8_t *buff = new uint8_t[size];
+                while((readIn = unzReadCurrentFile(_unz, buff, size)) > 0)
                     writeFile.write(buff, readIn);
 
                 delete[] buff;
@@ -807,7 +814,9 @@ void copyZipToArch_t(void *a)
     fs::importSv(fs::getSaveMode(), svIn, data::curData);
 
     delete cpy;
-
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
     t->finished = true;
 }
 
