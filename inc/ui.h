@@ -72,10 +72,6 @@ namespace ui
     void newThread(ThreadFunc _thrdFunc, void *_args, funcPtr _drawFunc, size_t stackSize = THRD_STACK_SIZE);
     bool runApp();
 
-    std::u16string getFolder(const data::titleData& dat, const uint32_t& mode, const FS_Archive& arch, const bool& newFolder);
-
-    void advModePrep();
-    void stateAdvMode(const uint64_t& down, const uint64_t& held);
     void drawUIBar(const std::string& txt, int screen, bool center);
 
     class progressBar
@@ -94,7 +90,7 @@ namespace ui
     };
 
     void progressBarDrawFunc(void *a);
-    void confirm(const std::string& mess, funcPtr _onConfirm, funcPtr _onCancel, void *args);
+    void confirm(const std::string& mess, funcPtr _onConfirm, funcPtr _onCancel, void *args, size_t stackSize = THRD_STACK_SIZE);
     void message(const std::string& mess, funcPtr _onConfirm, void *args);
     extern const std::string loadGlyphArray[];
     extern int state, prev;

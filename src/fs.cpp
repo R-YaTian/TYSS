@@ -237,7 +237,7 @@ void fs::exportSv(const uint32_t& mode, const std::u16string& _dst, const data::
         res = FSUSER_GetSaveDataSecureValue(&exists, &value, SECUREVALUE_SLOT_SD, dat.getUnique(), (u8) (dat.getLow() & 0xFF));
         if(R_SUCCEEDED(res)) {
             if(!exists) return;
-            fs::fsfile dst(getSDMCArch(), _dst, FS_OPEN_WRITE, sizeof(u64));
+            fs::fsfile dst(getSDMCArch(), _dst, FS_OPEN_WRITE | FS_OPEN_CREATE, sizeof(u64));
             dst.write(&value, sizeof(u64));
             dst.close();
         }
@@ -727,11 +727,11 @@ void copyArchToZip_t(void *a)
     cpyArgs *cpy = (cpyArgs *)t->argPtr;
     t->status->setStatus("正在压缩存档位到 zip 文件...");
 
-    zipFile zip = zipOpen64("/tmp.zip", 0);
+    zipFile zip = zipOpen64("/JKSV/tmp.zip", 0);
     fs::copyArchToZip(cpy->srcArch, util::toUtf16("/"), zip, NULL, t);
     zipClose(zip, NULL);
 
-    FS_Path srcPath = fsMakePath(PATH_ASCII, "/tmp.zip");
+    FS_Path srcPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
     FS_Path dstPath = fsMakePath(PATH_UTF16, cpy->dst.c_str());
     FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), dstPath);
 
@@ -764,9 +764,15 @@ void fs::copyZipToArch(const FS_Archive& arch, unzFile _unz, threadInfo *t)
             if(t) t->status->setStatus("正在解压 " + std::string(filename) + "...");
             if(unzOpenCurrentFile(_unz) == UNZ_OK)
             {
-                std::u16string dstPathUTF16 = util::toUtf16(filename);
-                fs::createDirRec(arch, dstPathUTF16.substr(0, dstPathUTF16.find_last_of(L'/') + 1));
-                fs::fsfile writeFile(arch, dstPathUTF16, FS_OPEN_WRITE | FS_OPEN_CREATE);
+                std::u16string nameUTF16 = util::toUtf16(filename);
+                std::u16string dstPathUTF16 = util::toUtf16("/") + nameUTF16;
+                size_t pos = nameUTF16.find_last_of(L'/');
+                if (pos != std::u16string::npos)
+                {
+                    fs::createDirRec(arch, dstPathUTF16.substr(0, dstPathUTF16.find_last_of(L'/') + 1));
+                    if (pos == dstPathUTF16.length() - 1) continue; // if filename is a directory, skip write
+                }
+                fs::fsfile writeFile(arch, dstPathUTF16, FS_OPEN_WRITE, info.uncompressed_size);
                 int readIn = 0;
                 uint8_t *buff = new uint8_t[buff_size];
                 while((readIn = unzReadCurrentFile(_unz, buff, buff_size)) > 0)
@@ -783,21 +789,25 @@ void copyZipToArch_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     cpyArgs *cpy = (cpyArgs *)t->argPtr;
-    t->status->setStatus("正在解压存档到存档位...");
+    t->status->setStatus("正在解压数据到存档位...");
 
     FS_Path srcPath = fsMakePath(PATH_UTF16, cpy->src.c_str());
-    FS_Path dstPath = fsMakePath(PATH_ASCII, "/tmp.zip");
+    FS_Path dstPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
 
     FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), dstPath);
 
-    unzFile unz = unzOpen64("/tmp.zip");
+    unzFile unz = unzOpen64("/JKSV/tmp.zip");
     fs::copyZipToArch(cpy->dstArch, unz, t);
     unzClose(unz);
 
     FSUSER_RenameFile(fs::getSDMCArch(), dstPath, fs::getSDMCArch(), srcPath);
 
+    // Try to import secure value if exists
+    std::u16string svIn = cpy->src.c_str() + util::toUtf16(".sv");
+    fs::importSv(fs::getSaveMode(), svIn, data::curData);
+
     delete cpy;
-    
+
     t->finished = true;
 }
 
@@ -834,11 +844,11 @@ void backupTitles_t(void *a)
                 std::u16string svOut = fullOut + util::toUtf16(".sv");
                 fs::exportSv(mode, svOut, vect[i]); // export secure value if found
 
-                zipFile zip = zipOpen64("/tmp.zip", 0);
+                zipFile zip = zipOpen64("/JKSV/tmp.zip", 0);
                 fs::copyArchToZip(_arch, util::toUtf16("/"), zip, NULL, NULL);
                 zipClose(zip, NULL);
 
-                FS_Path srcPath = fsMakePath(PATH_ASCII, "/tmp.zip");
+                FS_Path srcPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
                 FS_Path dstPath = fsMakePath(PATH_UTF16, fullOut.c_str());
                 FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), dstPath);
             }

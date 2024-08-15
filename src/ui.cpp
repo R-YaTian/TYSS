@@ -32,7 +32,7 @@ ui::progressBar *ui::prog;
 static ui::threadProcMngr *thrdMgr;
 static ui::button *ok, *yes, *no;
 
-const std::string TITLE_TEXT = "JKSM 简中加强版 - 08.14.2024 ";
+const std::string TITLE_TEXT = "JKSM 简中加强版 - 08.15.2024 ";
 
 uint32_t ui::down = 0, ui::held = 0;
 touchPosition ui::p;
@@ -343,12 +343,12 @@ static void confirmDrawFunc(void *a)
     }
 }
 
-void ui::confirm(const std::string& mess, funcPtr _onConfirm, funcPtr _onCancel, void *args)
+void ui::confirm(const std::string& mess, funcPtr _onConfirm, funcPtr _onCancel, void *args, size_t stackSize)
 {
     confArgs *send = new confArgs;
     send->q = mess;
     send->onConfirm = _onConfirm;
     send->onCancel = _onCancel;
     send->args = args;
-    ui::newThread(confirm_t, send, confirmDrawFunc);
+    ui::newThread(confirm_t, send, confirmDrawFunc, stackSize);
 }

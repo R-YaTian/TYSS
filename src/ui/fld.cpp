@@ -84,12 +84,7 @@ void fldMenuOverwrite_t(void *a)
         FS_Path targetPath = fsMakePath(PATH_UTF16, overwrite.c_str());
         FSUSER_DeleteFile(fs::getSDMCArch(), targetPath);
 
-        zipFile zip = zipOpen64("/JKSV/tmp.zip", 0);
-        fs::copyArchToZip(fs::getSaveArch(), util::toUtf16("/"), zip, NULL, NULL);
-        zipClose(zip, NULL);
-
-        FS_Path tmpPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
-        FSUSER_RenameFile(fs::getSDMCArch(), tmpPath, fs::getSDMCArch(), targetPath);
+        fs::copyArchToZipThreaded(fs::getSaveArch(), util::toUtf16("/"), overwrite);
     }
     t->finished = true;
 }
@@ -97,7 +92,7 @@ void fldMenuOverwrite_t(void *a)
 void fldMenuOverwrite(void *a)
 {
     fs::dirItem *in = (fs::dirItem *)a;
-    std::string q = "是否覆盖 " + util::toUtf8(in->name) + "?";
+    std::string q = "是否覆盖 " + in->nameUTF8 + "?";
     ui::confirm(q, fldMenuOverwrite_t, NULL, a);
 }
 
@@ -120,7 +115,7 @@ void fldMenuDelete_t(void *a)
 void fldMenuDelete(void *a)
 {
     fs::dirItem *in = (fs::dirItem *)a;
-    std::string q = "你确定要删除 " + util::toUtf8(in->name) + "?";
+    std::string q = "你确定要删除 " + in->nameUTF8 + "?";
     ui::confirm(q, fldMenuDelete_t, NULL, a);
 }
 
@@ -143,23 +138,11 @@ void fldMenuRestore_t(void *a)
     }
     else
     {
-        std::u16string rest = targetDir + in->name;
-        FS_Path srcPath = fsMakePath(PATH_UTF16, rest.c_str());
-        FS_Path tmpPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
-        FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), tmpPath);
-
         fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
         fs::commitData(fs::getSaveMode());
 
-        t->status->setStatus("正在解压数据到存档位...");
-        unzFile unz = unzOpen64("/JKSV/tmp.zip");
-        fs::copyZipToArch(fs::getSaveArch(), unz, t);
-        unzClose(unz);
-        FSUSER_RenameFile(fs::getSDMCArch(), tmpPath, fs::getSDMCArch(), srcPath);
-
-        // Try to import secure value if exists
-        std::u16string svIn = rest + util::toUtf16(".sv");
-        fs::importSv(fs::getSaveMode(), svIn, data::curData);
+        std::u16string rest = targetDir + in->name;
+        fs::copyZipToArchThreaded(fs::getSaveArch(), rest);
     }
     t->finished = true;
 }
@@ -168,7 +151,7 @@ void fldMenuRestore_t(void *a)
 void fldMenuRestore(void *a)
 {
     fs::dirItem *in = (fs::dirItem *)a;
-    std::string q = "你确定要恢复 " + util::toUtf8(in->name) + "?";
+    std::string q = "你确定要恢复 " + in->nameUTF8 + "?";
     ui::confirm(q, fldMenuRestore_t, NULL, a);
 }
 
@@ -180,7 +163,7 @@ void fldMenuUpload_t(void *a)
     threadInfo *t = (threadInfo *)a;
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
     std::u16string src = targetDir + in->name;
-    t->status->setStatus("正在上传 " + util::toUtf8(in->name) + "...");
+    t->status->setStatus("正在上传 " + in->nameUTF8 + "...");
 
     //For now
     FS_Path srcPath = fsMakePath(PATH_UTF16, src.c_str());
@@ -188,7 +171,7 @@ void fldMenuUpload_t(void *a)
     FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), tmpPath);
 
     FILE *upload = fopen("/JKSV/tmp.zip", "rb");
-    std::string utf8Name = util::toUtf8(in->name);
+    std::string utf8Name = in->nameUTF8;
     if(fs::gDrive->fileExists(utf8Name, uploadParent))
     {
         std::string fileID = fs::gDrive->getFileID(utf8Name, uploadParent);
