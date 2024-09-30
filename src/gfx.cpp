@@ -30,12 +30,12 @@ void gfx::init()
     spritesheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
     top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
     bot = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-    //font = C2D_FontLoadSystem(CFG_REGION_CHN);
+    font = C2D_FontLoad("romfs:/cbf_std.bcfnt");
 }
 
 void gfx::exit()
 {
-    //C2D_FontFree(font);
+    C2D_FontFree(font);
     C2D_SpriteSheetFree(spritesheet);
     C2D_Fini();
     C3D_Fini();
@@ -155,10 +155,7 @@ size_t gfx::getTextWidth(const std::string& str)
     C2D_Text tmpTxt;
     C2D_TextBuf tmpBuf = C2D_TextBufNew(512);
 
-    if (font)
-        C2D_TextFontParse(&tmpTxt, font, tmpBuf, str.c_str());
-    else
-        C2D_TextParse(&tmpTxt, tmpBuf, str.c_str());
+    C2D_TextParse(&tmpTxt, tmpBuf, str.c_str());
     C2D_TextOptimize(&tmpTxt);
 
     C2D_TextGetDimensions(&tmpTxt, 0.5f, 0.5f, &ret, NULL);
