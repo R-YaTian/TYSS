@@ -10,7 +10,19 @@ namespace misc
 {
     void setPC();
 
-    void PTMSYSM_ClearStepHistory(void *a);
+    void clearStepHistory(void *a);
+
+    void clearSoftwareLibraryAndPlayHistory(void *a);
+
+    void clearSharedIconCache(void *a);
+
+    void clearHomeMenuIconCache(void *a);
+
+    void resetDemoPlayCount(void *a);
+
+    void clearGameNotes(void *a);
+
+    void removeSoftwareUpdateNag(void *a);
 }
 
 #endif

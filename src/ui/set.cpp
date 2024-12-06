@@ -49,7 +49,43 @@ static std::string getDeflateLevelText(const int& g)
 static void setMenuClearStepHistory(void *a)
 {
     std::string q = "你确定要清除步数历史记录吗?\n这将清除回忆记录册中的总步数记录!\n该操作无法撤销!";
-    ui::confirm(q, misc::PTMSYSM_ClearStepHistory, NULL, NULL);
+    ui::confirm(q, misc::clearStepHistory, NULL, NULL);
+}
+
+static void setMenuClearSoftwareLibraryAndPlayHistory(void *a)
+{
+    std::string q = "你确定要清除游玩时间历史记录及软件图鉴\n吗?这将清除回忆记录册中的软件图鉴记录\n以及所有游玩时间历史记录!\n该操作无法撤销!执行此操作前强烈建议备份\n系统存档页的回忆记录册数据!";
+    ui::confirm(q, misc::clearSoftwareLibraryAndPlayHistory, NULL, NULL);
+}
+
+static void setMenuClearSharedIconCache(void *a)
+{
+    std::string q = "你确定要清除共享图标缓存数据吗?\n该操作无法撤销!执行此操作前强烈建议备份\n共享追加数据页的FB记录!";
+    ui::confirm(q, misc::clearSharedIconCache, NULL, NULL);
+}
+
+static void setMenuClearHomeMenuIconCache(void *a)
+{
+    std::string q = "你确定要清除主菜单图标缓存数据吗?\n该操作无法撤销!执行此操作前强烈建议备份\n追加数据页的主菜单(CTR-N-HMM*)记录!";
+    ui::confirm(q, misc::clearHomeMenuIconCache, NULL, NULL);
+}
+
+static void setMenuResetDemoPlayCount(void *a)
+{
+    std::string q = "你确定要重置试玩版游戏的游玩计数吗?\n该操作无法撤销!";
+    ui::confirm(q, misc::resetDemoPlayCount, NULL, NULL);
+}
+
+static void setMenuClearGameNotes(void *a)
+{
+    std::string q = "你确定要清除所有的游戏笔记吗?\n该操作无法撤销!执行此操作前强烈建议备份\n系统存档页的游戏笔记数据!";
+    ui::confirm(q, misc::clearGameNotes, NULL, NULL);
+}
+
+static void setMenuRemoveSoftwareUpdateNag(void *a)
+{
+    std::string q = "你确定要清除所有的软件更新通知吗?\n这将移除所有已安装程序启动前的更新提示\n(直到主菜单再次联网下载软件版本数据库)\n注意!这对某些游戏内置的版本检查无效!\n该操作无法撤销!执行此操作前强烈建议备份\n共享追加数据页的FE记录!";
+    ui::confirm(q, misc::removeSoftwareUpdateNag, NULL, NULL);
 }
 
 static void setMenuHackPlayCoin(void *a)
@@ -149,6 +185,24 @@ void ui::setInit(void *a)
 
     setMenu.addOpt("清除步数历史记录", 320);
     setMenu.addOptEvent(6, KEY_A, setMenuClearStepHistory, NULL);
+
+    setMenu.addOpt("清除游玩时间历史记录以及软件图鉴", 320);
+    setMenu.addOptEvent(7, KEY_A, setMenuClearSoftwareLibraryAndPlayHistory, NULL);
+
+    setMenu.addOpt("清除共享图标缓存", 320);
+    setMenu.addOptEvent(8, KEY_A, setMenuClearSharedIconCache, NULL);
+
+    setMenu.addOpt("清除主菜单图标缓存", 320);
+    setMenu.addOptEvent(9, KEY_A, setMenuClearHomeMenuIconCache, NULL);
+
+    setMenu.addOpt("重置试玩版游戏游玩计数", 320);
+    setMenu.addOptEvent(10, KEY_A, setMenuResetDemoPlayCount, NULL);
+
+    setMenu.addOpt("清除游戏笔记", 320);
+    setMenu.addOptEvent(11, KEY_A, setMenuClearGameNotes, NULL);
+
+    setMenu.addOpt("清除软件更新通知", 320);
+    setMenu.addOptEvent(12, KEY_A, setMenuRemoveSoftwareUpdateNag, NULL);
 
 #ifdef ENABLE_GD
     if(fs::gDrive)

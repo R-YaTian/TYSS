@@ -42,6 +42,7 @@ namespace data
 
             void setIconFlag(bool _haveIcon) { bhaveIcon = _haveIcon; }
             void setFav(bool _set) { fav = _set; }
+            void setUnique(const uint32_t& id) { unique = id; }
             void setExtdata(const uint32_t& ex) { extdata = ex; }
             void setTitle(const std::u16string& _t);
 
