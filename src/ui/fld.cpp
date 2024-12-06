@@ -30,7 +30,7 @@ static void fldMenuNew_t(void *a)
     else
         newFolder = util::safeString(util::toUtf16(util::getString("输入新备份名称", true)));
 
-    if(!newFolder.empty() && cfg::config["zip"])
+    if(!newFolder.empty() && std::get<bool>(cfg::config["zip"]))
     {
         std::u16string fullOut = targetDir + newFolder + util::toUtf16(".zip");
         std::u16string svOut = fullOut + util::toUtf16(".sv");

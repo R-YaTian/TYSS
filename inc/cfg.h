@@ -1,7 +1,10 @@
 #pragma once
 
 #include <string>
+#include <variant>
 #include <unordered_map>
+
+using CFGVarType = std::variant<bool, int>;
 
 namespace cfg
 {
@@ -10,7 +13,7 @@ namespace cfg
     void load();
     void saveCommon();
 
-    extern std::unordered_map<std::string, bool> config;
+    extern std::unordered_map<std::string, CFGVarType> config;
 
 #ifdef ENABLE_GD
     void saveGD();

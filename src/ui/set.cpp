@@ -4,6 +4,7 @@
 #include "cfg.h"
 #include "fs.h"
 #include "util.h"
+#include "misc.h"
 
 static ui::menu setMenu;
 
@@ -16,17 +17,44 @@ static void toggleBool(void *b)
         *in = true;
 }
 
+static void toggleDeflateLevel(void *b)
+{
+    int *in = (int *)b;
+    *in = (*in + 1) % 10; 
+}
+
 static std::string getBoolText(const bool& g)
 {
-    if(g)
-        return "开";
-    
-    return "关";
+    return g ? "开" : "关";
+}
+
+static std::string getDeflateLevelText(const int& g)
+{
+    std::string s = "ZIP 压缩等级: ";
+
+    s += std::to_string(g);
+
+    if (g == 0)
+        s += " (仅存储)";
+    else if (g == 1)
+        s += " (最快速度)";
+    else if (g == 6)
+        s += " (标准压缩)";
+    else if (g == 9)
+        s += " (极限压缩)";
+
+    return s;
+}
+
+static void setMenuClearStepHistory(void *a)
+{
+    std::string q = "你确定要清除步数历史记录吗?\n这将清除回忆记录册中的总步数记录!\n该操作无法撤销!";
+    ui::confirm(q, misc::PTMSYSM_ClearStepHistory, NULL, NULL);
 }
 
 static void setMenuHackPlayCoin(void *a)
 {
-    util::setPC();
+    misc::setPC();
 }
 
 static void setMenuClearFavList(void *a)
@@ -80,6 +108,23 @@ static void setMenuToggleZIP(void *a)
     ui::newThread(setMenuToggleZIP_t, a, NULL);
 }
 
+static void setMenuToggleDeflateLevel_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在保存设置...");
+    toggleDeflateLevel(t->argPtr);
+    cfg::saveCommon();
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+static void setMenuToggleDeflateLevel(void *a)
+{
+    ui::newThread(setMenuToggleDeflateLevel_t, a, NULL);
+}
+
 void ui::setInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -88,16 +133,22 @@ void ui::setInit(void *a)
     setMenu.addOptEvent(0, KEY_A, setMenuReloadTitles, NULL);
 
     setMenu.addOpt("导出到 ZIP", 320);
-    setMenu.addOptEvent(1, KEY_A, setMenuToggleZIP, &cfg::config["zip"]);
+    setMenu.addOptEvent(1, KEY_A, setMenuToggleZIP, &std::get<bool>(cfg::config["zip"]));
 
-    setMenu.addOpt("修改 PlayCoin", 320);
-    setMenu.addOptEvent(2, KEY_A, setMenuHackPlayCoin, NULL);
+    setMenu.addOpt("ZIP 压缩等级", 320);
+    setMenu.addOptEvent(2, KEY_A, setMenuToggleDeflateLevel, &std::get<int>(cfg::config["deflateLevel"]));
 
     setMenu.addOpt("重置收藏列表", 320);
     setMenu.addOptEvent(3, KEY_A, setMenuClearFavList, NULL);
 
     setMenu.addOpt("重置黑名单", 320);
     setMenu.addOptEvent(4, KEY_A, setMenuClearBlackList, NULL);
+
+    setMenu.addOpt("修改 PlayCoin", 320);
+    setMenu.addOptEvent(5, KEY_A, setMenuHackPlayCoin, NULL);
+
+    setMenu.addOpt("清除步数历史记录", 320);
+    setMenu.addOptEvent(6, KEY_A, setMenuClearStepHistory, NULL);
 
 #ifdef ENABLE_GD
     if(fs::gDrive)
@@ -128,7 +179,8 @@ void ui::setUpdate()
             break;
     }
 
-    setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(cfg::config["zip"]));
+    setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(std::get<bool>(cfg::config["zip"])));
+    setMenu.editOpt(2, getDeflateLevelText(std::get<int>(cfg::config["deflateLevel"])));
 
     setMenu.update();
 }
@@ -136,7 +188,7 @@ void ui::setUpdate()
 void ui::setDrawTop()
 {
     setMenu.draw(0, 22, 0xFFFFFFFF, 400, false);
-    ui::drawUIBar(TITLE_TEXT + "- 设置", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + "- 设置与杂项", ui::SCREEN_TOP, true);
 }
 
 void ui::setDrawBottom()

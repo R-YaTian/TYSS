@@ -100,9 +100,10 @@ void ui::threadProcMngr::drawBot()
         {
             std::string thrdstatus;
             t->status->getStatus(thrdstatus);
-            int txtX = 160 - (gfx::getTextWidth(thrdstatus) / 2);
+            int textWidth = gfx::getTextWidth(thrdstatus);
+            int txtX = textWidth > 256 ? 32 : 160 - (gfx::getTextWidth(thrdstatus) / 2);
 
-            gfx::drawText(thrdstatus, txtX, 114, GFX_DEPTH_DEFAULT, 0.5f, 0xFFFFFFFF);
+            gfx::drawTextWrap(thrdstatus, txtX, 114, GFX_DEPTH_DEFAULT, 0.5f, textWidth > 256 ? 256 : textWidth, 0xFFFFFFFF);
         }
     }
     t->unlock();

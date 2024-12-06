@@ -158,7 +158,7 @@ size_t gfx::getTextWidth(const std::string& str)
     C2D_TextParse(&tmpTxt, tmpBuf, str.c_str());
     C2D_TextOptimize(&tmpTxt);
 
-    C2D_TextGetDimensions(&tmpTxt, 0.5f, 0.5f, &ret, NULL);
+    C2D_TextGetDimensions(&tmpTxt, font ? 0.55f : 0.5f, 0.5f, &ret, NULL);
     C2D_TextBufDelete(tmpBuf);
 
     return (size_t)ret;

@@ -29,8 +29,6 @@ namespace util
 
     void copyDirlistToMenu(fs::dirList& d, ui::menu& m);
 
-    void setPC();
-
     bool touchPressed(const touchPosition& p);
 
     bool fexists(const std::string& path);

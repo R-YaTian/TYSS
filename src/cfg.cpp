@@ -9,11 +9,12 @@
 std::string cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken;
 #endif
 
-std::unordered_map<std::string, bool> cfg::config;
+std::unordered_map<std::string, CFGVarType> cfg::config;
 
 void cfg::initToDefault()
 {
     cfg::config["zip"] = false;
+    cfg::config["deflateLevel"] = 0;
 }
 
 void cfg::load()
@@ -24,6 +25,10 @@ void cfg::load()
         bool getBool = false;
         fread(&getBool, sizeof(bool), 1, cfgIn);
         cfg::config["zip"] = getBool;
+
+        int getInt = 0;
+        fread(&getInt, sizeof(int), 1, cfgIn);
+        cfg::config["deflateLevel"] = getInt;
 
         fclose(cfgIn);
     }
@@ -64,7 +69,8 @@ void cfg::saveCommon()
     FILE *cfgOut = fopen("/JKSV/cfg.bin", "wb");
     if(cfgOut)
     {
-        fwrite(&cfg::config["zip"], sizeof(bool), 1, cfgOut);
+        fwrite(&std::get<bool>(cfg::config["zip"]), sizeof(bool), 1, cfgOut);
+        fwrite(&std::get<int>(cfg::config["deflateLevel"]), sizeof(int), 1, cfgOut);
         fclose(cfgOut);
     }
 }

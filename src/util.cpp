@@ -225,30 +225,6 @@ void util::copyDirlistToMenu(fs::dirList &d, ui::menu &m)
     m.adjust();
 }
 
-void util::setPC()
-{
-    data::titleData tmp;
-    tmp.setExtdata(0xF000000B);
-    if (fs::openArchive(tmp, ARCHIVE_SHARED_EXTDATA, true))
-    {
-        fs::fsfile playCoin(fs::getSaveArch(), "/gamecoin.dat", FS_OPEN_READ | FS_OPEN_WRITE);
-
-        int coinAmount = 0;
-        playCoin.seek(0x4, fs::seek_beg);
-        coinAmount = playCoin.getByte() | playCoin.getByte() << 8;
-
-        coinAmount = getInt("输入 0-300 之间的数值", coinAmount, 300);
-        if (coinAmount != -1)
-        {
-            playCoin.seek(-2, fs::seek_cur);
-            playCoin.putByte(coinAmount);
-            playCoin.putByte(coinAmount >> 8);
-        }
-
-        fs::closeSaveArch();
-    }
-}
-
 bool util::touchPressed(const touchPosition &p)
 {
     return p.px != 0 && p.py != 0;
