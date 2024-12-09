@@ -8,6 +8,7 @@
 #include "data.h"
 #include "sys.h"
 #include "cfg.h"
+#include "cheatmanager.h"
 
 extern int state;
 
@@ -32,6 +33,8 @@ int main(int argc, const char *argv[])
 
     curl_global_init(CURL_GLOBAL_ALL);
 #endif
+
+    CheatManager::getInstance(); // Initialize the cheats db
 
     ui::newThread(data::loadTitles, NULL, NULL);
     ui::newThread(ui::ttlInit, NULL, NULL);

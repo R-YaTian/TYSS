@@ -1,6 +1,7 @@
 .vscode/
 build/
 romfs/gfx
+romfs/cheats
 *.cbp
 *.layout
 *.elf

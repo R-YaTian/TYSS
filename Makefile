@@ -50,6 +50,7 @@ ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
 CFLAGS	:=	-g -Wall -O2 -mword-relocations -flto=auto \
 			-fomit-frame-pointer -ffunction-sections \
+			-DCHEAT_SIZE_DECOMPRESSED=${CHEAT_SIZE_DECOMPRESSED} \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__ $(WITH)
@@ -59,7 +60,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -Wno-psabi -std=gnu++23
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lcitro2d -lcitro3d -ljson-c -lcurl -lmbedtls -lmbedcrypto -lmbedx509 -lminizip -lctru -lz -lm
+LIBS	:= -lbz2 -lcitro2d -lcitro3d -ljson-c -lcurl -lmbedtls -lmbedcrypto -lmbedx509 -lminizip -lctru -lz -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -156,16 +157,25 @@ ifneq ($(ROMFS),)
 	export _3DSXFLAGS += --romfs=$(CURDIR)/$(ROMFS)
 endif
 
-.PHONY: all clean
+.PHONY: all clean cheats
 
 #---------------------------------------------------------------------------------
-all: $(ROMFS_T3XFILES) $(T3XHFILES)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+all: cheats $(ROMFS_T3XFILES) $(T3XHFILES)
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile CHEAT_SIZE_DECOMPRESSED=$(shell stat -t "sharkive/build/3ds.json" | awk '{print $$2}')
 
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(GFXBUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET)-strip.elf $(TARGET).cia
+	@rm -fr $(BUILD) $(GFXBUILD) $(ROMFS)/cheats $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET)-strip.elf $(TARGET).cia
+
+cheats:
+	@mkdir -p $(BUILD) $(ROMFS)/cheats
+ifeq ($(OS),Windows_NT)
+	@cd Sharkive && py -3 joiner.py 3ds
+else
+	@cd Sharkive && python3 joiner.py 3ds
+endif
+	@cd Sharkive/$(BUILD) && mv 3ds.json.bz2 ../../$(ROMFS)/cheats/cheats.json.bz2
 
 $(TARGET)-strip.elf: $(BUILD)
 	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf

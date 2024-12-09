@@ -5,6 +5,7 @@
 #include "gfx.h"
 #include "fs.h"
 #include "util.h"
+#include "cheatmanager.h"
 
 static ui::titleview *ttlView;
 static ui::menu *ttlOpts;
@@ -117,6 +118,47 @@ static void ttlOptResetSaveData(void *a)
     ui::confirm(q, ttlOptResetSaveData_t, NULL, NULL);
 }
 
+static void ttlOptInstallCheats_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在安装金手指文件...");
+
+    std::string key = data::curData.getIDStr();
+    if (CheatManager::getInstance().install(key))
+        ui::showMessage("金手指文件安装成功!");
+    else
+        ui::showMessage("金手指文件安装失败!");
+
+    t->finished = true;
+}
+
+static void ttlOptDeleteCheats_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+
+    std::string key = data::curData.getIDStr();
+    fs::fdelete("/cheats/" + key + ".txt");
+    ui::showMessage("金手指文件已删除!");
+
+    t->finished = true;
+}
+
+static void ttlOptManageCheats(void *a)
+{
+    data::titleData *title = &data::usrSaveTitles[ttlView->getSelected()];
+    std::string key = title->getIDStr();
+
+    if (util::fexists("/cheats/" + key + ".txt")) {
+        std::string q = "该应用的 Luma 金手指文件已安装, 是否删除?";
+        ui::confirm(q, ttlOptDeleteCheats_t, NULL, NULL);
+    } else if (CheatManager::getInstance().cheats() != nullptr && CheatManager::getInstance().areCheatsAvailable(key)) {
+        std::string q = "你确定要为 " + util::toUtf8(title->getTitle()) + " 安装 Luma 金手指文件?";
+        ui::confirm(q, ttlOptInstallCheats_t, NULL, NULL);
+    } else {
+        ui::showMessage("数据库中未找到该应用可用的金手指.");
+    }
+}
+
 static void ttlOptAddtoBlackList(void *a)
 {
     if(data::curData.getMedia() == MEDIATYPE_GAME_CARD)
@@ -150,12 +192,14 @@ void ui::ttlInit(void *a)
 
     ttlOpts = new ui::menu;
     ttlOpts->setCallback(ttlOptCallback, NULL);
+    ttlOpts->addOpt("安装或删除该应用的 Luma 金手指", 320);
+    ttlOpts->addOptEvent(0, KEY_A, ttlOptManageCheats, NULL);
     ttlOpts->addOpt("重置存档数据", 320);
-    ttlOpts->addOptEvent(0, KEY_A, ttlOptResetSaveData, NULL);
+    ttlOpts->addOptEvent(1, KEY_A, ttlOptResetSaveData, NULL);
     ttlOpts->addOpt("添加到黑名单", 320);
-    ttlOpts->addOptEvent(1, KEY_A, ttlOptAddtoBlackList, NULL);
+    ttlOpts->addOptEvent(2, KEY_A, ttlOptAddtoBlackList, NULL);
     ttlOpts->addOpt("备份所有的用户存档", 320);
-    ttlOpts->addOptEvent(2, KEY_A, ttlOptBackupAll, NULL);
+    ttlOpts->addOptEvent(3, KEY_A, ttlOptBackupAll, NULL);
 
     t->finished = true;
 }
