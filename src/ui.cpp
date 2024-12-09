@@ -32,7 +32,7 @@ ui::progressBar *ui::prog;
 static ui::threadProcMngr *thrdMgr;
 static ui::button *ok, *yes, *no;
 
-const std::string TITLE_TEXT = "JKSM 简中加强版 - 09.30.2024 ";
+const std::string TITLE_TEXT = "JKSM 简中加强版 - 12.10.2024 ";
 
 uint32_t ui::down = 0, ui::held = 0;
 touchPosition ui::p;

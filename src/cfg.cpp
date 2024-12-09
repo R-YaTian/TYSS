@@ -14,7 +14,7 @@ std::unordered_map<std::string, CFGVarType> cfg::config;
 void cfg::initToDefault()
 {
     cfg::config["zip"] = false;
-    cfg::config["deflateLevel"] = 0;
+    cfg::config["deflateLevel"] = 1;
 }
 
 void cfg::load()

@@ -155,10 +155,19 @@ size_t gfx::getTextWidth(const std::string& str)
     C2D_Text tmpTxt;
     C2D_TextBuf tmpBuf = C2D_TextBufNew(512);
 
-    C2D_TextParse(&tmpTxt, tmpBuf, str.c_str());
+#define BUILD_CITRA 0
+
+    if (font)
+        C2D_TextFontParse(&tmpTxt, font, tmpBuf, str.c_str());
+    else
+        C2D_TextParse(&tmpTxt, tmpBuf, str.c_str());
     C2D_TextOptimize(&tmpTxt);
 
-    C2D_TextGetDimensions(&tmpTxt, font ? 0.55f : 0.5f, 0.5f, &ret, NULL);
+#if BUILD_CITRA
+    C2D_TextGetDimensions(&tmpTxt, 0.63f, 0.5f, &ret, NULL);
+#else
+    C2D_TextGetDimensions(&tmpTxt, 0.5f, 0.5f, &ret, NULL);
+#endif
     C2D_TextBufDelete(tmpBuf);
 
     return (size_t)ret;

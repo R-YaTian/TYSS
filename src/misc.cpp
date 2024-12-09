@@ -226,7 +226,7 @@ void misc::removeSoftwareUpdateNag(void *a)
 
     if (fs::openArchive(tmp, ARCHIVE_SHARED_EXTDATA, true))
     {
-        res = FSUSER_DeleteFile(fs::getSaveArch(), (FS_Path) fsMakePath(PATH_ASCII, "/versionlist.dat"));
+        res = FSUSER_DeleteFile(fs::getSaveArch(), (FS_Path) fsMakePath(PATH_ASCII, "/versionList.dat"));
         fs::closeSaveArch();
 
         if (R_FAILED(res))

@@ -21,6 +21,9 @@ static void toggleDeflateLevel(void *b)
 {
     int *in = (int *)b;
     *in = (*in + 1) % 10; 
+
+    if (*in == 0)
+        *in = 1;
 }
 
 static std::string getBoolText(const bool& g)
@@ -34,9 +37,7 @@ static std::string getDeflateLevelText(const int& g)
 
     s += std::to_string(g);
 
-    if (g == 0)
-        s += " (仅存储)";
-    else if (g == 1)
+    if (g == 1)
         s += " (最快速度)";
     else if (g == 6)
         s += " (标准压缩)";
@@ -60,7 +61,7 @@ static void setMenuClearSoftwareLibraryAndPlayHistory(void *a)
 
 static void setMenuClearSharedIconCache(void *a)
 {
-    std::string q = "你确定要清除共享图标缓存数据吗?\n该操作无法撤销!执行此操作前强烈建议备份\n共享追加数据页的FB记录!";
+    std::string q = "你确定要清除共享图标缓存数据吗?\n将使得回忆记录册中的软件图鉴列表被清空\n该操作无法撤销!执行此操作前强烈建议备份\n共享追加数据页的FB记录以及系统存档页的\n回忆记录册数据!\n恢复备份时需要同时恢复上述两项记录!";
     ui::confirm(q, misc::clearSharedIconCache, NULL, NULL);
 }
 
