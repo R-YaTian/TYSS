@@ -34,7 +34,7 @@ CheatManager::CheatManager(void)
         const std::string path = "/JKSV/cheats.json";
         FILE* in               = fopen(path.c_str(), "rt");
         if (in != NULL) {
-            mCheats = std::make_shared<nlohmann::json>(nlohmann::json::parse(in, nullptr, false));
+            mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(in, nullptr, false));
             fclose(in);
         }
     } else {
@@ -52,7 +52,7 @@ CheatManager::CheatManager(void)
 
             int r = BZ2_bzBuffToBuffDecompress(d, &destLen, s, size, 0, 0);
             if (r == BZ_OK) {
-                mCheats = std::make_shared<nlohmann::json>(nlohmann::json::parse(d));
+                mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(d));
             }
 
             delete[] s;
@@ -71,13 +71,18 @@ bool CheatManager::install(const std::string& key)
 {
     std::string cheatFile = "";
     auto cheats           = *CheatManager::getInstance().cheats().get();
+    bool first            = true;
     for (auto it = cheats[key].begin(); it != cheats[key].end(); ++it) {
         std::string value = it.key();
+        if (!first)
+            cheatFile += "\n";
         cheatFile += "[" + value + "]\n";
         for (auto& code : cheats[key][value]) {
             cheatFile += code.get<std::string>() + "\n";
         }
-        cheatFile += "\n";
+
+        if (first)
+            first = false;
     }
 
     const std::string outPath = "/cheats/" + key + ".txt";

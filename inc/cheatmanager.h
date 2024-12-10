@@ -46,7 +46,7 @@ public:
     bool areCheatsAvailable(const std::string& key);
     bool install(const std::string& key);
 
-    std::shared_ptr<nlohmann::json> cheats(void) { return mCheats; }
+    std::shared_ptr<nlohmann::ordered_json> cheats(void) { return mCheats; }
 
 private:
     CheatManager(void);
@@ -55,7 +55,7 @@ private:
     CheatManager(CheatManager const&) = delete;
     void operator=(CheatManager const&) = delete;
 
-    std::shared_ptr<nlohmann::json> mCheats;
+    std::shared_ptr<nlohmann::ordered_json> mCheats;
 };
 
 #endif
