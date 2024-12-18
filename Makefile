@@ -166,7 +166,7 @@ all: cheats $(ROMFS_T3XFILES) $(T3XHFILES)
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(GFXBUILD) $(ROMFS)/cheats $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET)-strip.elf $(TARGET).cia
+	@rm -fr $(BUILD) $(GFXBUILD) $(ROMFS)/cheats $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET)-strip.elf $(TARGET).cia $(TARGET)_mode3.cia
 
 cheats:
 	@mkdir -p $(BUILD) $(ROMFS)/cheats
@@ -181,8 +181,12 @@ $(TARGET)-strip.elf: $(BUILD)
 	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf
 
 cia: $(TARGET)-strip.elf
-	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon icon -banner banner
+	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon icon -banner banner -DAPP_SYSTEM_MODE="64MB"
 	@echo Built JKSM.cia
+
+mode3: $(TARGET)-strip.elf
+	@makerom -f cia -o $(TARGET)_mode3.cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon icon -banner banner -DAPP_SYSTEM_MODE="80MB"
+	@echo Built JKSM_mode3.cia
 
 send:
 	@3dslink $(TARGET).3dsx
