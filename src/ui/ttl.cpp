@@ -149,10 +149,10 @@ static void ttlOptManageCheats(void *a)
     std::string key = title->getIDStr();
 
     if (util::fexists("/cheats/" + key + ".txt")) {
-        std::string q = "该应用的 Luma 金手指文件已安装, 是否删除?";
+        std::string q = "该应用的金手指文件已安装, 是否删除?";
         ui::confirm(q, ttlOptDeleteCheats_t, NULL, NULL);
     } else if (CheatManager::getInstance().cheats() != nullptr && CheatManager::getInstance().areCheatsAvailable(key)) {
-        std::string q = "你确定要为 " + util::toUtf8(title->getTitle()) + " 安装 Luma 金手指文件?";
+        std::string q = "你确定要为 " + util::toUtf8(title->getTitle()) + " 安装金手指文件?";
         ui::confirm(q, ttlOptInstallCheats_t, NULL, NULL);
     } else {
         ui::showMessage("数据库中未找到该应用可用的金手指.");
@@ -192,7 +192,7 @@ void ui::ttlInit(void *a)
 
     ttlOpts = new ui::menu;
     ttlOpts->setCallback(ttlOptCallback, NULL);
-    ttlOpts->addOpt("安装或删除该应用的 Luma 金手指", 320);
+    ttlOpts->addOpt("安装或删除该应用的金手指文件", 320);
     ttlOpts->addOptEvent(0, KEY_A, ttlOptManageCheats, NULL);
     ttlOpts->addOpt("重置存档数据", 320);
     ttlOpts->addOptEvent(1, KEY_A, ttlOptResetSaveData, NULL);
