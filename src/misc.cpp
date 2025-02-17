@@ -27,6 +27,40 @@ void misc::setPC()
     }
 }
 
+Result getStepHistory()
+{
+    Result ret;
+    Handle ptmuHandle;
+    srvGetServiceHandle(&ptmuHandle, "ptm:u");
+
+    time_t raw, from = 0x386D4380;
+    time(&raw);
+    double msTime = difftime(raw, from);
+    msTime = msTime * 1000.0f;
+
+    u32 *cmdbuf = getThreadCommandBuffer();
+    cmdbuf[0] = IPC_MakeHeader(0xB, 3, 2); // 0x00B00C2
+    cmdbuf[1] = 2;
+
+    s64 msiTime = (s64) msTime;
+    u32 msiTimeLo, msiTimeHi;
+    msiTimeLo = (u32)(msiTime & 0xFFFFFFFF);  // Low 32 Bit
+    msiTimeHi = (u32)((msiTime >> 32) & 0xFFFFFFFF);
+
+    short* buffer = new short[2];
+
+    cmdbuf[2] = msiTimeLo;
+    cmdbuf[3] = msiTimeHi;
+    cmdbuf[4] = IPC_Desc_Buffer(2, IPC_BUFFER_RW);
+    cmdbuf[5] = (u32) buffer;
+
+    ret = svcSendSyncRequest(ptmuHandle);
+
+    svcCloseHandle(ptmuHandle);
+
+    return ret;
+}
+
 void misc::clearStepHistory(void *a)
 {
     threadInfo *t = (threadInfo *)a;
