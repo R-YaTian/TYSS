@@ -23,6 +23,10 @@ namespace misc
     void clearGameNotes(void *a);
 
     void removeSoftwareUpdateNag(void *a);
+
+    void unpackWrappedSoftware(void *a);
+
+    void hackStepCount(void *a);
 }
 
 #endif

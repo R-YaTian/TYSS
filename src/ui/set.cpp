@@ -89,6 +89,18 @@ static void setMenuRemoveSoftwareUpdateNag(void *a)
     ui::confirm(q, misc::removeSoftwareUpdateNag, NULL, NULL);
 }
 
+static void setMenuUnpackWrappedSoftware(void *a)
+{
+    std::string q = "你确定要打开所有的软件礼包吗?\n该操作无法撤销!";
+    ui::confirm(q, misc::unpackWrappedSoftware, NULL, NULL);
+}
+
+static void setMenuHackStepCount(void *a)
+{
+    std::string q = "你确定要修改主菜单上显示的今日步数吗?\n由于部分限制因素,该项功能只能影响当前\n小时的步数,此前产生的步数不会被修改!";
+    ui::confirm(q, misc::hackStepCount, NULL, NULL);
+}
+
 static void setMenuHackPlayCoin(void *a)
 {
     misc::setPC();
@@ -205,6 +217,11 @@ void ui::setInit(void *a)
     setMenu.addOpt("清除软件更新通知", 320);
     setMenu.addOptEvent(12, KEY_A, setMenuRemoveSoftwareUpdateNag, NULL);
 
+    setMenu.addOpt("打开所有软件礼包", 320);
+    setMenu.addOptEvent(13, KEY_A, setMenuUnpackWrappedSoftware, NULL);
+
+    setMenu.addOpt("修改今日步数", 320);
+    setMenu.addOptEvent(14, KEY_A, setMenuHackStepCount, NULL);
 #ifdef ENABLE_GD
     if(fs::gDrive)
     {

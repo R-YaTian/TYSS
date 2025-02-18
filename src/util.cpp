@@ -242,3 +242,65 @@ bool util::fexists(const std::string &path)
     FSFILE_Close(tmp);
     return ret;
 }
+
+Result util::getStepCount(Handle ptmHandle, u16 *stepValue)
+{
+    Result ret;
+
+    time_t raw;
+    time(&raw);
+    double msTime = difftime(raw, 0x386D4380);
+    msTime = msTime * 1000.0f;
+
+    u32 *cmdbuf = getThreadCommandBuffer();
+    cmdbuf[0] = IPC_MakeHeader(0xB, 3, 2); // 0x00B00C2
+    cmdbuf[1] = 2;
+
+    s64 msiTime = (s64) msTime;
+    u32 msiTimeLo, msiTimeHi;
+    msiTimeLo = (u32)(msiTime & 0xFFFFFFFF);  // Low 32 Bit
+    msiTimeHi = (u32)((msiTime >> 32) & 0xFFFFFFFF); // High 32 Bit
+
+    cmdbuf[2] = msiTimeLo;
+    cmdbuf[3] = msiTimeHi;
+    cmdbuf[4] = IPC_Desc_Buffer(2, (IPC_BufferRights) BIT(2));
+    cmdbuf[5] = (u32) stepValue;
+
+    ret = svcSendSyncRequest(ptmHandle);
+
+    if (ret >= 0)
+        return (Result) cmdbuf[1];
+
+    return ret;
+}
+
+Result util::setStepCount(Handle ptmHandle, u16 stepValue)
+{
+    Result ret;
+
+    time_t raw;
+    time(&raw);
+    double msTime = difftime(raw, 0x386D4380);
+    msTime = msTime * 1000.0f;
+
+    u32 *cmdbuf = getThreadCommandBuffer();
+    cmdbuf[0] = IPC_MakeHeader(0x806, 3, 2); // 0x80600C2
+    cmdbuf[1] = 2;
+
+    s64 msiTime = (s64) msTime;
+    u32 msiTimeLo, msiTimeHi;
+    msiTimeLo = (u32)(msiTime & 0xFFFFFFFF);  // Low 32 Bit
+    msiTimeHi = (u32)((msiTime >> 32) & 0xFFFFFFFF); // High 32 Bit
+
+    cmdbuf[2] = msiTimeLo;
+    cmdbuf[3] = msiTimeHi;
+    cmdbuf[4] = IPC_Desc_Buffer(2, (IPC_BufferRights) BIT(1));
+    cmdbuf[5] = (u32) &stepValue;
+
+    ret = svcSendSyncRequest(ptmHandle);
+
+    if (ret >= 0)
+        return (Result) cmdbuf[1];
+
+    return ret;
+}

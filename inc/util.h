@@ -33,6 +33,10 @@ namespace util
 
     bool fexists(const std::string& path);
 
+    Result getStepCount(Handle ptmHandle, u16 *stepValue);
+
+    Result setStepCount(Handle ptmHandle, u16 stepValue);
+
     inline void stripChar(char _c, std::string& _s)
     {
         size_t pos = 0;

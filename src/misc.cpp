@@ -3,6 +3,8 @@
 #include "util.h"
 #include "misc.h"
 
+static u32 homemenuID[] = {0x00000082, 0x0000008f, 0x00000098, 0x00000098, 0x000000a1, 0x000000a9, 0x000000b1};
+
 void misc::setPC()
 {
     data::titleData tmp;
@@ -23,42 +25,9 @@ void misc::setPC()
             playCoin.putByte(coinAmount >> 8);
         }
 
+        playCoin.close();
         fs::closeSaveArch();
     }
-}
-
-Result getStepHistory()
-{
-    Result ret;
-    Handle ptmuHandle;
-    srvGetServiceHandle(&ptmuHandle, "ptm:u");
-
-    time_t raw, from = 0x386D4380;
-    time(&raw);
-    double msTime = difftime(raw, from);
-    msTime = msTime * 1000.0f;
-
-    u32 *cmdbuf = getThreadCommandBuffer();
-    cmdbuf[0] = IPC_MakeHeader(0xB, 3, 2); // 0x00B00C2
-    cmdbuf[1] = 2;
-
-    s64 msiTime = (s64) msTime;
-    u32 msiTimeLo, msiTimeHi;
-    msiTimeLo = (u32)(msiTime & 0xFFFFFFFF);  // Low 32 Bit
-    msiTimeHi = (u32)((msiTime >> 32) & 0xFFFFFFFF);
-
-    short* buffer = new short[2];
-
-    cmdbuf[2] = msiTimeLo;
-    cmdbuf[3] = msiTimeHi;
-    cmdbuf[4] = IPC_Desc_Buffer(2, IPC_BUFFER_RW);
-    cmdbuf[5] = (u32) buffer;
-
-    ret = svcSendSyncRequest(ptmuHandle);
-
-    svcCloseHandle(ptmuHandle);
-
-    return ret;
 }
 
 void misc::clearStepHistory(void *a)
@@ -173,7 +142,6 @@ void misc::clearHomeMenuIconCache(void *a)
         return;
     }
 
-    u32 homemenuID[] = {0x00000082, 0x0000008f, 0x00000098, 0x00000098, 0x000000a1, 0x000000a9, 0x000000b1};
     data::titleData tmp;
     tmp.setExtdata(homemenuID[region]);
 
@@ -269,5 +237,105 @@ void misc::removeSoftwareUpdateNag(void *a)
             ui::showMessage("清除软件更新通知成功!");
     }
 
+    t->finished = true;
+}
+
+void misc::unpackWrappedSoftware(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在打开所有软件礼包...");
+
+    Result res;
+    u8 region = 0;
+
+    res = CFGU_SecureInfoGetRegion(&region);
+    if (R_FAILED(res)) {
+        ui::showMessage("获取系统区域失败,无法完成操作!\n错误: 0x%08X", (unsigned) res);
+        t->finished = true;
+        return;
+    }
+
+    data::titleData tmp;
+    tmp.setExtdata(homemenuID[region]);
+
+    if (fs::openArchive(tmp, ARCHIVE_EXTDATA, true))
+    {
+        fs::fsfile svHomemenu(fs::getSaveArch(), "/SaveData.dat", FS_OPEN_READ | FS_OPEN_WRITE);
+
+        u8* flags = new u8[0x168];
+        u32 readSize = 0;
+
+        svHomemenu.seek(0xB48, fs::seek_beg);
+        readSize = svHomemenu.read(flags, 0x168);
+
+        if (readSize == 0x168) {
+            u32 writeSize = 0;
+            memset(flags, 0, 0x168);
+            svHomemenu.seek(0xB48, fs::seek_beg);
+            writeSize = svHomemenu.write(flags, 0x168);
+            if (writeSize < 0x168)
+                ui::showMessage("主菜单数据写入失败,无法完成操作!");
+            else
+                ui::showMessage("所有的软件礼包打开成功!");
+        } else {
+            ui::showMessage("主菜单数据读取失败,无法完成操作!");
+        }
+
+        delete flags;
+        svHomemenu.close();
+        fs::closeSaveArch();
+    }
+
+    t->finished = true;
+}
+
+void misc::hackStepCount(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+
+    int stepValue = 0;
+
+    // Get today step count
+    data::titleData tmp;
+    tmp.setExtdata(0xF000000B);
+    if (fs::openArchive(tmp, ARCHIVE_SHARED_EXTDATA, true))
+    {
+        fs::fsfile gamecoin(fs::getSaveArch(), "/gamecoin.dat", FS_OPEN_READ);
+
+        gamecoin.seek(0xC, fs::seek_beg);
+        stepValue = gamecoin.getByte() | gamecoin.getByte() << 8 | gamecoin.getByte() << 16;
+        gamecoin.close();
+
+        fs::closeSaveArch();
+    }
+
+    Result ret;
+    Handle ptmSysmHandle;
+    srvGetServiceHandle(&ptmSysmHandle, "ptm:sysm");
+
+    u16 stepCount;
+    ret = util::getStepCount(ptmSysmHandle, &stepCount);
+
+    if (R_FAILED(ret))
+    {
+        ui::showMessage("获取当前小时步数失败!\n错误: 0x%08X", (unsigned) ret);
+        svcCloseHandle(ptmSysmHandle);
+        t->finished = true;
+        return;
+    } else {
+        ui::showMessage("今日步数为: %d\n当前小时步数为: %d", stepValue, stepCount);
+    }
+
+    stepValue = stepValue - stepCount;
+    stepCount = util::getInt("输入 0-18000 之间的数值", stepCount, 18000);
+    ret = util::setStepCount(ptmSysmHandle, stepCount);
+
+    if (R_FAILED(ret)) {
+        ui::showMessage("修改当前小时步数失败!\n错误: 0x%08X", (unsigned) ret);
+    } else {
+        ui::showMessage("修改当前小时步数成功!\n今日总步数: %d", stepValue + stepCount);
+    }
+
+    svcCloseHandle(ptmSysmHandle);
     t->finished = true;
 }
