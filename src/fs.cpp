@@ -65,47 +65,48 @@ void fs::driveInit(void *a)
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在启动 Google Drive...");
     fs::gDrive = new drive::gd(cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken);
-    if(fs::gDrive->hasToken())
+    if(gDrive->hasToken())
     {
-        cfg::driveRefreshToken = fs::gDrive->getRefreshToken();
+        ui::showMessage("GD Token 获取成功!");
+        cfg::driveRefreshToken = gDrive->getRefreshToken();
         if(!cfg::driveAuthCode.empty())
             cfg::saveGD();
 
-        fs::gDrive->loadDriveList();
-        if(!fs::gDrive->dirExists(DRIVE_JKSM_DIR))
-            fs::gDrive->createDir(DRIVE_JKSM_DIR, "");
+        gDrive->loadDriveList();
+        if(!gDrive->dirExists(DRIVE_JKSM_DIR))
+            gDrive->createDir(DRIVE_JKSM_DIR, "");
         
-        fs::jksmDirID = fs::gDrive->getFolderID("JKSM");
+        jksmDirID = gDrive->getFolderID("JKSM");
 
-        if(!fs::gDrive->dirExists(DRIVE_USER_SAVE_DIR, fs::jksmDirID))
-            fs::gDrive->createDir(DRIVE_USER_SAVE_DIR, fs::jksmDirID);
+        if(!gDrive->dirExists(DRIVE_USER_SAVE_DIR, jksmDirID))
+            gDrive->createDir(DRIVE_USER_SAVE_DIR, jksmDirID);
 
-        fs::usrSaveDirID = fs::gDrive->getFolderID(DRIVE_USER_SAVE_DIR, fs::jksmDirID);
+        usrSaveDirID = gDrive->getFolderID(DRIVE_USER_SAVE_DIR, jksmDirID);
 
-        if(!fs::gDrive->dirExists(DRIVE_EXTDATA_DIR, fs::jksmDirID))
-            fs::gDrive->createDir(DRIVE_EXTDATA_DIR, fs::jksmDirID);
+        if(!gDrive->dirExists(DRIVE_EXTDATA_DIR, jksmDirID))
+            gDrive->createDir(DRIVE_EXTDATA_DIR, jksmDirID);
 
-        fs::extDataDirID = fs::gDrive->getFolderID(DRIVE_EXTDATA_DIR, fs::jksmDirID);
+        extDataDirID = gDrive->getFolderID(DRIVE_EXTDATA_DIR, jksmDirID);
 
-        if(!fs::gDrive->dirExists(DRIVE_SYSTEM_DIR, fs::jksmDirID))
-            fs::gDrive->createDir(DRIVE_SYSTEM_DIR, fs::jksmDirID);
+        if(!gDrive->dirExists(DRIVE_SYSTEM_DIR, jksmDirID))
+            gDrive->createDir(DRIVE_SYSTEM_DIR, jksmDirID);
 
-        fs::sysSaveDirID = fs::gDrive->getFolderID(DRIVE_SYSTEM_DIR, fs::jksmDirID);
+        sysSaveDirID = gDrive->getFolderID(DRIVE_SYSTEM_DIR, jksmDirID);
 
-        if(!fs::gDrive->dirExists(DRIVE_BOSS_DIR, fs::jksmDirID))
-            fs::gDrive->createDir(DRIVE_BOSS_DIR, fs::jksmDirID);
+        if(!gDrive->dirExists(DRIVE_BOSS_DIR, jksmDirID))
+            gDrive->createDir(DRIVE_BOSS_DIR, jksmDirID);
 
-        fs::bossExtDirID = fs::gDrive->getFolderID(DRIVE_BOSS_DIR, fs::jksmDirID);
+        bossExtDirID = gDrive->getFolderID(DRIVE_BOSS_DIR, jksmDirID);
 
-        if(!fs::gDrive->dirExists(DRIVE_SHARED_DIR, fs::jksmDirID))
-            fs::gDrive->createDir(DRIVE_SHARED_DIR, fs::jksmDirID);
+        if(!gDrive->dirExists(DRIVE_SHARED_DIR, jksmDirID))
+            gDrive->createDir(DRIVE_SHARED_DIR, jksmDirID);
 
-        fs::sharedExtID = fs::gDrive->getFolderID(DRIVE_SHARED_DIR, fs::jksmDirID);
+        sharedExtID = gDrive->getFolderID(DRIVE_SHARED_DIR, jksmDirID);
     }
     else
     {
-        delete fs::gDrive;
-        fs::gDrive = NULL;
+        delete gDrive;
+        gDrive = NULL;
     }
     t->finished = true;
 }
