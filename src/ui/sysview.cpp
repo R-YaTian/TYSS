@@ -35,11 +35,10 @@ static void sysViewCallback(void *a)
 #ifdef ENABLE_GD
                 if(fs::gDrive)
                 {
+                    fs::currentDirID = fs::sysSaveDirID;
                     std::string ttlUTF8 = t->getTitleUTF8();
-                    if(!fs::gDrive->dirExists(ttlUTF8, fs::sysSaveDirID))
-                        fs::gDrive->createDir(ttlUTF8, fs::sysSaveDirID);
-
-                    uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::sysSaveDirID);
+                    if(fs::gDrive->dirExists(ttlUTF8, fs::sysSaveDirID))
+                        uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::sysSaveDirID);
                 }
 #endif
                 if(fs::openArchive(*t, ARCHIVE_SYSTEM_SAVEDATA, false))

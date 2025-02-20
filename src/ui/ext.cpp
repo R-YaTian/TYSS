@@ -35,11 +35,10 @@ static void extViewCallback(void *a)
 #ifdef ENABLE_GD
                 if(fs::gDrive)
                 {
+                    fs::currentDirID = fs::extDataDirID;
                     std::string ttlUTF8 = t->getTitleUTF8();
-                    if(!fs::gDrive->dirExists(ttlUTF8, fs::extDataDirID))
-                        fs::gDrive->createDir(ttlUTF8, fs::extDataDirID);
-
-                    uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::extDataDirID);
+                    if(fs::gDrive->dirExists(ttlUTF8, fs::extDataDirID))
+                        uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::extDataDirID);
                 }
 #endif
                 if(fs::openArchive(*t, ARCHIVE_EXTDATA, false))

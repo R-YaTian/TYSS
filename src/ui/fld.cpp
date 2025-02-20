@@ -163,14 +163,19 @@ void fldMenuUpload_t(void *a)
     threadInfo *t = (threadInfo *)a;
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
     std::u16string src = targetDir + in->name;
-    t->status->setStatus("正在上传 " + in->nameUTF8 + "...");
+    std::string utf8Name = in->nameUTF8;
+    t->status->setStatus("正在上传 " + utf8Name + "...");
 
     FS_Path srcPath = fsMakePath(PATH_UTF16, src.c_str());
     FS_Path tmpPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
     FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), tmpPath);
 
+    std::string ttlUTF8 = data::curData.getTitleUTF8();
+    if(!fs::gDrive->dirExists(ttlUTF8, fs::currentDirID))
+        fs::gDrive->createDir(ttlUTF8, fs::currentDirID);
+    uploadParent = fs::gDrive->getFolderID(ttlUTF8,  fs::currentDirID);
+
     FILE *upload = fopen("/JKSV/tmp.zip", "rb");
-    std::string utf8Name = in->nameUTF8;
     if(fs::gDrive->fileExists(utf8Name, uploadParent))
     {
         std::string fileID = fs::gDrive->getFileID(utf8Name, uploadParent);

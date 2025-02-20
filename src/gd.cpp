@@ -331,6 +331,7 @@ void drive::gd::loadDriveList()
 void drive::gd::getListWithParent(const std::string& _parent, std::vector<drive::gdItem *>& _out)
 {
     _out.clear();
+    if (_parent.empty()) return;
     for(unsigned i = 0; i < driveList.size(); i++)
     {
         if(driveList[i].parent == _parent)

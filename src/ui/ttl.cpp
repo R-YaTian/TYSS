@@ -37,10 +37,9 @@ static void ttlViewCallback(void *a)
 #ifdef ENABLE_GD
                 if(fs::gDrive)
                 {
-                    if(!fs::gDrive->dirExists(t->getTitleUTF8(), fs::usrSaveDirID))
-                        fs::gDrive->createDir(t->getTitleUTF8(), fs::usrSaveDirID);
-
-                    uploadParent = fs::gDrive->getFolderID(t->getTitleUTF8(), fs::usrSaveDirID);
+                    fs::currentDirID = fs::usrSaveDirID;
+                    if(fs::gDrive->dirExists(t->getTitleUTF8(), fs::usrSaveDirID))
+                        uploadParent = fs::gDrive->getFolderID(t->getTitleUTF8(), fs::usrSaveDirID);
                 }
 #endif
                 if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false))

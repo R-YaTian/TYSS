@@ -28,7 +28,7 @@ namespace fs
     void driveInit(void *a);
     void driveExit();
     extern drive::gd *gDrive;
-    extern std::string jksmDirID, usrSaveDirID, extDataDirID, sysSaveDirID, bossExtDirID, sharedExtID;
+    extern std::string jksmDirID, usrSaveDirID, extDataDirID, sysSaveDirID, bossExtDirID, sharedExtID, currentDirID;
 #endif
 
     enum fsSeek

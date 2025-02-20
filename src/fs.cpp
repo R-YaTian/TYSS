@@ -59,6 +59,7 @@ void fs::exit()
 #ifdef ENABLE_GD
 drive::gd *fs::gDrive = NULL;
 std::string fs::jksmDirID, fs::usrSaveDirID, fs::extDataDirID, fs::sysSaveDirID, fs::bossExtDirID, fs::sharedExtID;
+std::string fs::currentDirID;
 
 void fs::driveInit(void *a)
 {

@@ -35,11 +35,10 @@ static void bossViewCallback(void *a)
 #ifdef ENABLE_GD
                 if(fs::gDrive)
                 {
+                    fs::currentDirID = fs::bossExtDirID;
                     std::string ttlUTF8 = t->getTitleUTF8();
-                    if(!fs::gDrive->dirExists(ttlUTF8, fs::bossExtDirID))
-                        fs::gDrive->createDir(ttlUTF8, fs::bossExtDirID);
-
-                    uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::bossExtDirID);
+                    if(fs::gDrive->dirExists(ttlUTF8, fs::bossExtDirID))
+                        uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::bossExtDirID);
                 }
 #endif
                 if(fs::openArchive(*t, ARCHIVE_BOSS_EXTDATA, false))

@@ -66,11 +66,10 @@ static void shrdViewCallback(void *)
 #ifdef ENABLE_GD
             if(fs::gDrive)
             {
+                fs::currentDirID = fs::sharedExtID;
                 std::string ttl = util::toUtf8(shared[shrdView->getSelected()].getTitle());
-                if(!fs::gDrive->dirExists(ttl, fs::sharedExtID))
-                    fs::gDrive->createDir(ttl, fs::sharedExtID);
-
-                uploadParent = fs::gDrive->getFolderID(ttl, fs::sharedExtID);
+                if(fs::gDrive->dirExists(ttl, fs::sharedExtID))
+                    uploadParent = fs::gDrive->getFolderID(ttl, fs::sharedExtID);
             }
 #endif
             if(fs::openArchive(*t, ARCHIVE_SHARED_EXTDATA, false))
