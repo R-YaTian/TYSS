@@ -164,6 +164,7 @@ void fldMenuUpload_t(void *a)
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
     std::u16string src = targetDir + in->name;
     std::string utf8Name = in->nameUTF8;
+    std::string srcSv = util::toUtf8(targetDir) + utf8Name + ".sv";
     t->status->setStatus("正在上传 " + utf8Name + "...");
 
     FS_Path srcPath = fsMakePath(PATH_UTF16, src.c_str());
@@ -180,6 +181,7 @@ void fldMenuUpload_t(void *a)
     {
         std::string fileID = fs::gDrive->getFileID(utf8Name, uploadParent);
         fs::gDrive->updateFile(fileID, upload);
+        ui::showMessage("云端存储: 云盘中已存在该存档,已覆盖");
     } else
         fs::gDrive->uploadFile(utf8Name, uploadParent, upload);
 
@@ -301,7 +303,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
 
         for(unsigned i = 0; i < gdList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt("[GD] " + gdList[i]->name, 320);
+            fldMenu.addOpt("[云] " + gdList[i]->name, 320);
 
             fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, gdList[i]);
             fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, gdList[i]);
@@ -340,7 +342,7 @@ void ui::fldRefresh()
 
         for(unsigned i = 0; i < gdList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt("[GD] " + gdList[i]->name, 320);
+            fldMenu.addOpt("[云] " + gdList[i]->name, 320);
 
             fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, gdList[i]);
             fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, gdList[i]);

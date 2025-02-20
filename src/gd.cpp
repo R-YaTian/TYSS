@@ -107,32 +107,26 @@ void drive::gd::exhangeAuthCode(const std::string& _authCode)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
 
-    int error = curl_easy_perform(curl);
+    CURLcode error = curl_easy_perform(curl);
+    json_object *respParse = json_tokener_parse(jsonResp->c_str());
     if (error == CURLE_OK)
     {
-        json_object *respParse = json_tokener_parse(jsonResp->c_str());
-        if (respParse)
+        json_object *accessToken = json_object_object_get(respParse, "access_token");
+        json_object *refreshToken = json_object_object_get(respParse, "refresh_token");
+
+        if(accessToken && refreshToken)
         {
-            json_object *accessToken = json_object_object_get(respParse, "access_token");
-            json_object *refreshToken = json_object_object_get(respParse, "refresh_token");
-
-            if(accessToken && refreshToken)
-            {
-                ui::showMessage("云端存储: Token 请求并解析成功!");
-                token = json_object_get_string(accessToken);
-                rToken = json_object_get_string(refreshToken);
-                json_object_put(accessToken);
-                json_object_put(refreshToken);
-            }
-
-            json_object_put(respParse);
+            ui::showMessage("云端存储: Token 请求并解析成功!");
+            token = json_object_get_string(accessToken);
+            rToken = json_object_get_string(refreshToken);
         }
     }
 
-    delete jsonResp;
+    json_object_put(respParse);
     json_object_put(post);
     curl_slist_free_all(postHeader);
     curl_easy_cleanup(curl);
+    delete jsonResp;
 }
 
 void drive::gd::refreshToken()
@@ -170,30 +164,22 @@ void drive::gd::refreshToken()
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
 
-    int error = curl_easy_perform(curl);
+    CURLcode error = curl_easy_perform(curl);
+    json_object *parse = json_tokener_parse(jsonResp->c_str());
     if (error == CURLE_OK)
     {
-        json_object *parse = json_tokener_parse(jsonResp->c_str());
-        if (parse)
-        {
-            json_object *accessToken, *perror;
-            json_object_object_get_ex(parse, "access_token", &accessToken);
-            json_object_object_get_ex(parse, "error", &perror);
+        json_object *accessToken;
+        json_object_object_get_ex(parse, "access_token", &accessToken);
 
-            if (accessToken)
-            {
-                token = json_object_get_string(accessToken);
-                json_object_put(accessToken);
-            }
-            if (perror) json_object_put(perror);
-            json_object_put(parse);
-        }
+        if (accessToken)
+            token = json_object_get_string(accessToken);
     }
 
-    delete jsonResp;
+    json_object_put(parse);
     json_object_put(post);
     curl_slist_free_all(header);
     curl_easy_cleanup(curl);
+    delete jsonResp;
 }
 
 bool drive::gd::tokenIsValid()
@@ -218,24 +204,19 @@ bool drive::gd::tokenIsValid()
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
 
-    int error = curl_easy_perform(curl);
+    CURLcode error = curl_easy_perform(curl);
+    json_object *parse = json_tokener_parse(jsonResp->c_str());
     if (error == CURLE_OK)
     {
-        json_object *parse = json_tokener_parse(jsonResp->c_str());
-        if (parse)
-        {
-            json_object *checkError;
-            json_object_object_get_ex(parse, "error", &checkError);
-            if(!checkError)
-                ret = true;
-            else
-                json_object_put(checkError);
-            json_object_put(parse);
-        }
+        json_object *checkError;
+        json_object_object_get_ex(parse, "error", &checkError);
+        if(!checkError)
+            ret = true;
     }
 
-    delete jsonResp;
+    json_object_put(parse);
     curl_easy_cleanup(curl);
+    delete jsonResp;
     return ret;
 }
 
@@ -270,62 +251,53 @@ void drive::gd::loadDriveList()
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
 
-    int error = curl_easy_perform(curl);
+    CURLcode error = curl_easy_perform(curl);
+    json_object *parse = json_tokener_parse(jsonResp->c_str());
     if (error == CURLE_OK)
     {
-        json_object *parse = json_tokener_parse(jsonResp->c_str());
-        if (parse)
+        driveList.clear();
+        json_object *fileArray;
+        json_object_object_get_ex(parse, "files", &fileArray);
+        if(fileArray)
         {
-            driveList.clear();
-            json_object *fileArray;
-            json_object_object_get_ex(parse, "files", &fileArray);
-            if(fileArray)
+            size_t count = json_object_array_length(fileArray);
+            driveList.reserve(count);
+            for (unsigned i = 0; i < count; i++)
             {
-                size_t count = json_object_array_length(fileArray);
-                driveList.reserve(count);
-                for (unsigned i = 0; i < count; i++)
+                json_object *idString, *nameString, *mimeTypeString, *size, *parentArray;
+                json_object *curFile = json_object_array_get_idx(fileArray, i);
+                json_object_object_get_ex(curFile, "id", &idString);
+                json_object_object_get_ex(curFile, "name", &nameString);
+                json_object_object_get_ex(curFile, "mimeType", &mimeTypeString);
+                json_object_object_get_ex(curFile, "size", &size);
+                json_object_object_get_ex(curFile, "parents", &parentArray);
+
+                drive::gdItem newItem;
+                newItem.name = json_object_get_string(nameString);
+                newItem.id = json_object_get_string(idString);
+                newItem.size = json_object_get_int(size);
+                if(strcmp(json_object_get_string(mimeTypeString), MIMETYPE_FOLDER) == 0)
+                    newItem.isDir = true;
+
+                if (parentArray)
                 {
-                    json_object *idString, *nameString, *mimeTypeString, *size, *parentArray;
-                    json_object *curFile = json_object_array_get_idx(fileArray, i);
-                    json_object_object_get_ex(curFile, "id", &idString);
-                    json_object_object_get_ex(curFile, "name", &nameString);
-                    json_object_object_get_ex(curFile, "mimeType", &mimeTypeString);
-                    json_object_object_get_ex(curFile, "size", &size);
-                    json_object_object_get_ex(curFile, "parents", &parentArray);
-
-                    drive::gdItem newItem;
-                    newItem.name = json_object_get_string(nameString);
-                    newItem.id = json_object_get_string(idString);
-                    newItem.size = json_object_get_int(size);
-                    if(strcmp(json_object_get_string(mimeTypeString), MIMETYPE_FOLDER) == 0)
-                        newItem.isDir = true;
-
-                    if (parentArray)
+                    size_t parentCount = json_object_array_length(parentArray);
+                    for (unsigned j = 0; j < parentCount; j++)
                     {
-                        size_t parentCount = json_object_array_length(parentArray);
-                        for (unsigned j = 0; j < parentCount; j++)
-                        {
-                            json_object *parent = json_object_array_get_idx(parentArray, j);
-                            newItem.parent = json_object_get_string(parent);
-                            json_object_put(parent);
-                        }
-                        json_object_put(parentArray);
+                        json_object *parent = json_object_array_get_idx(parentArray, j);
+                        newItem.parent = json_object_get_string(parent);
                     }
-                    driveList.push_back(newItem);
-                    json_object_put(idString);
-                    json_object_put(nameString);
-                    json_object_put(mimeTypeString);
-                    json_object_put(size);
                 }
-                json_object_put(fileArray);
+                if (newItem.isDir || util::endsWith(newItem.name, ".zip") || util::endsWith(newItem.name, ".sv"))
+                    driveList.push_back(newItem);
             }
-            json_object_put(parse);
         }
     }
 
-    delete jsonResp;
+    json_object_put(parse);
     curl_slist_free_all(postHeaders);
     curl_easy_cleanup(curl);
+    delete jsonResp;
 }
 
 void drive::gd::getListWithParent(const std::string& _parent, std::vector<drive::gdItem *>& _out)
@@ -395,36 +367,32 @@ bool drive::gd::createDir(const std::string& _dirName, const std::string& _paren
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
 
-    int error = curl_easy_perform(curl);
+    CURLcode error = curl_easy_perform(curl);
+    json_object *respParse = json_tokener_parse(jsonResp->c_str()), *checkError;
     if (error == CURLE_OK)
     {
-        json_object *respParse = json_tokener_parse(jsonResp->c_str()), *checkError;
-        if (respParse) {
-            json_object_object_get_ex(respParse, "error", &checkError);
-            if (!checkError) {
-                // Append it to list
-                json_object *id;
-                json_object_object_get_ex(respParse, "id", &id);
+        json_object_object_get_ex(respParse, "error", &checkError);
+        if (!checkError) {
+            // Append it to list
+            json_object *id;
+            json_object_object_get_ex(respParse, "id", &id);
 
-                drive::gdItem newDir;
-                newDir.name = _dirName;
-                newDir.id = json_object_get_string(id);
-                newDir.isDir = true;
-                newDir.size = 0;
-                newDir.parent = _parent;
-                driveList.push_back(newDir);
-                json_object_put(id);
-            } else
-                json_object_put(checkError);
-            json_object_put(respParse);
+            drive::gdItem newDir;
+            newDir.name = _dirName;
+            newDir.id = json_object_get_string(id);
+            newDir.isDir = true;
+            newDir.size = 0;
+            newDir.parent = _parent;
+            driveList.push_back(newDir);
         }
     } else
         ret = false;
 
-    delete jsonResp;
+    json_object_put(respParse);
     json_object_put(post);
     curl_slist_free_all(postHeaders);
     curl_easy_cleanup(curl);
+    delete jsonResp;
     return ret;
 }
 
@@ -462,7 +430,7 @@ bool drive::gd::fileExists(const std::string& _filename, const std::string& _par
 {
     for(unsigned i = 0; i < driveList.size(); i++)
     {
-        if(!driveList[i].isDir && driveList[i].name == _filename)
+        if(!driveList[i].isDir && driveList[i].name == _filename && driveList[i].parent == _parent)
             return true;
     }
     return false;
@@ -513,7 +481,7 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, headers);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
 
-    int error = curl_easy_perform(curl);
+    CURLcode error = curl_easy_perform(curl);
     if (error == CURLE_OK)
     {
         std::string location = curlFuncs::getHeader("Location", headers);
@@ -534,11 +502,12 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
             curl_easy_setopt(curlUp, CURLOPT_READDATA, _upload);
             curl_easy_setopt(curlUp, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_UPLOAD_BUFFER_SIZE);
             curl_easy_setopt(curlUp, CURLOPT_UPLOAD, 1);
+            CURLcode upError = curl_easy_perform(curlUp);
+            curl_easy_cleanup(curlUp);
 
-            int upError = curl_easy_perform(curlUp);
+            json_object *parse = json_tokener_parse(jsonResp->c_str()), *id, *name, *mimeType;
             if (upError == CURLE_OK)
             {
-                json_object *parse = json_tokener_parse(jsonResp->c_str()), *id, *name, *mimeType;
                 json_object_object_get_ex(parse, "id", &id);
                 json_object_object_get_ex(parse, "name", &name);
                 json_object_object_get_ex(parse, "mimeType", &mimeType);
@@ -551,13 +520,9 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
                     uploadData.isDir = false;
                     uploadData.parent = _parent;
                     driveList.push_back(uploadData);
-                    json_object_put(id);
-                    json_object_put(name);
-                    json_object_put(mimeType);
                 }
-                json_object_put(parse);
             }
-            curl_easy_cleanup(curlUp);
+            json_object_put(parse);
         }
     }
 
@@ -602,7 +567,7 @@ void drive::gd::updateFile(const std::string& _fileID, FILE *_upload)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, headers);
 
-    int error = curl_easy_perform(curl);
+    CURLcode error = curl_easy_perform(curl);
     if(error == CURLE_OK)
     {
         std::string location = curlFuncs::getHeader("Location", headers);
@@ -691,7 +656,7 @@ void drive::gd::deleteFile(const std::string& _fileID)
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, delHeaders);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
-    int error = curl_easy_perform(curl);
+    CURLcode error = curl_easy_perform(curl);
     if(error == CURLE_OK) {
         for(unsigned i = 0; i < driveList.size(); i++)
         {

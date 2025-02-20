@@ -533,10 +533,6 @@ fs::dirList::~dirList()
     entry.clear();
 }
 
-static bool endsWith(const std::string& str, const std::string& suffix) {
-    return str.size() >= suffix.size() && str.rfind(suffix) == (str.size() - suffix.size());
-}
-
 void fs::dirList::rescan()
 {
     entry.clear();
@@ -553,7 +549,7 @@ void fs::dirList::rescan()
             fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
                                     util::toUtf8(std::u16string((char16_t *)ent.name)),
                                     ent.attributes == FS_ATTRIBUTE_DIRECTORY};
-            if (newEntry.isDir || endsWith(newEntry.nameUTF8, ".zip"))
+            if (newEntry.isDir || util::endsWith(newEntry.nameUTF8, ".zip"))
                 entry.push_back(newEntry);
         }
     }
@@ -582,7 +578,7 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
             fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
                                     util::toUtf8(std::u16string((char16_t *)ent.name)),
                                     ent.attributes == FS_ATTRIBUTE_DIRECTORY};
-            if (newEntry.isDir || endsWith(newEntry.nameUTF8, ".zip"))
+            if (newEntry.isDir || util::endsWith(newEntry.nameUTF8, ".zip"))
                 entry.push_back(newEntry);
         }
     }

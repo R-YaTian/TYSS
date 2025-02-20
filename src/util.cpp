@@ -243,6 +243,10 @@ bool util::fexists(const std::string &path)
     return ret;
 }
 
+bool util::endsWith(const std::string& str, const std::string& suffix) {
+    return str.size() >= suffix.size() && str.rfind(suffix) == (str.size() - suffix.size());
+}
+
 Result util::getStepCount(Handle ptmHandle, u16 *stepValue)
 {
     Result ret;

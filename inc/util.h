@@ -33,6 +33,8 @@ namespace util
 
     bool fexists(const std::string& path);
 
+    bool endsWith(const std::string& str, const std::string& suffix);
+
     Result getStepCount(Handle ptmHandle, u16 *stepValue);
 
     Result setStepCount(Handle ptmHandle, u16 stepValue);
