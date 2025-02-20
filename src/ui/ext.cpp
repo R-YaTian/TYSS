@@ -30,6 +30,7 @@ static void extViewCallback(void *a)
         case KEY_A:
             {
                 data::titleData *t = &data::extDataTitles[extView->getSelected()];
+                data::curData = *t;
                 std::string uploadParent;
 #ifdef ENABLE_GD
                 if(fs::gDrive)

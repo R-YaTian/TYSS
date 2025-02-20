@@ -123,7 +123,7 @@ void fldMenuRestore_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
-    fs::deleteSv(fs::getSaveMode());
+    fs::deleteSv(fs::getSaveMode(), data::curData);
     if(in->isDir)
     {
         std::u16string rest = targetDir + in->name + util::toUtf16("/");

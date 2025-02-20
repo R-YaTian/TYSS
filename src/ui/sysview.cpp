@@ -30,6 +30,7 @@ static void sysViewCallback(void *a)
         case KEY_A:
             {
                 data::titleData *t = &data::sysDataTitles[sysView->getSelected()];
+                data::curData = *t;
                 std::string uploadParent;
 #ifdef ENABLE_GD
                 if(fs::gDrive)

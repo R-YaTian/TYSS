@@ -46,7 +46,7 @@ namespace fs
     bool openArchive(data::titleData& dat, const uint32_t& mode, bool error);
     void closeSaveArch();
     void commitData(const uint32_t& mode);
-    void deleteSv(const uint32_t& mode);
+    void deleteSv(const uint32_t& mode, const data::titleData& dat);
     void exportSv(const uint32_t& mode, const std::u16string& _dst, const data::titleData& dat);
     void importSv(const uint32_t& mode, const std::u16string& _src, const data::titleData& dat);
 

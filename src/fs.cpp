@@ -218,12 +218,12 @@ void fs::commitData(const uint32_t& mode)
     }
 }
 
-void fs::deleteSv(const uint32_t& mode)
+void fs::deleteSv(const uint32_t& mode, const data::titleData& dat)
 {
-    if(data::curData.getMedia() != MEDIATYPE_GAME_CARD && mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
+    if(dat.getMedia() != MEDIATYPE_GAME_CARD && mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
     {
         Result res = 0;
-        u64 in = ((u64)SECUREVALUE_SLOT_SD << 32) | (data::curData.getUnique() << 8);
+        u64 in = ((u64)SECUREVALUE_SLOT_SD << 32) | (dat.getUnique() << 8);
         u8 out;
 
         res = FSUSER_ControlSecureSave(SECURESAVE_ACTION_DELETE, &in, 8, &out, 1);
