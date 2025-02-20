@@ -304,3 +304,21 @@ Result util::setStepCount(Handle ptmHandle, u16 stepValue)
 
     return ret;
 }
+
+Result util::ACU_GetProxyHost(char *host)
+{
+    Handle acHandle = *acGetSessionHandle();
+    Result ret;
+
+    u32 *cmdbuf = getThreadCommandBuffer();
+    u32 *staticbufs = getThreadStaticBuffers();
+
+    cmdbuf[0] = IPC_MakeHeader(0x39,0,0); // 0x390000
+
+    staticbufs[0] = IPC_Desc_StaticBuffer(0x100, 0);
+    staticbufs[1] = (u32)host;
+
+    if(R_FAILED(ret = svcSendSyncRequest(acHandle))) return ret;
+
+    return (Result)cmdbuf[1];
+}

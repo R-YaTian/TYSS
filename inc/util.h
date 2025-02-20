@@ -37,6 +37,8 @@ namespace util
 
     Result setStepCount(Handle ptmHandle, u16 stepValue);
 
+    Result ACU_GetProxyHost(char *host);
+
     inline void stripChar(char _c, std::string& _s)
     {
         size_t pos = 0;

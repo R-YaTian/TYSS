@@ -165,7 +165,6 @@ void fldMenuUpload_t(void *a)
     std::u16string src = targetDir + in->name;
     t->status->setStatus("正在上传 " + in->nameUTF8 + "...");
 
-    //For now
     FS_Path srcPath = fsMakePath(PATH_UTF16, src.c_str());
     FS_Path tmpPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
     FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), tmpPath);
@@ -176,8 +175,7 @@ void fldMenuUpload_t(void *a)
     {
         std::string fileID = fs::gDrive->getFileID(utf8Name, uploadParent);
         fs::gDrive->updateFile(fileID, upload);
-    }
-    else
+    } else
         fs::gDrive->uploadFile(utf8Name, uploadParent, upload);
 
     fclose(upload);
@@ -194,6 +192,10 @@ void fldMenuUpload(void *a)
     fs::dirItem *in = (fs::dirItem *)a;
     if(fs::gDrive && !in->isDir)
         ui::newThread(fldMenuUpload_t, a, NULL);
+    else if (in->isDir)
+        ui::showMessage("云端存储: 仅支持上传压缩包存档");
+    else
+        ui::showMessage("云端存储: 服务尚未初始化");
 }
 
 void fldMenuDriveDownload_t(void *a)
@@ -226,7 +228,7 @@ void fldMenuDriveDownload(void *a)
     drive::gdItem *in = (drive::gdItem *)a;
     std::u16string checkPath = targetDir + util::toUtf16(in->name);
     if(fs::fsfexists(fs::getSDMCArch(), checkPath))
-        ui::confirm("下载此存档将会替换 SD 卡中的数据. 你确定仍要进行下载吗?", fldMenuDriveDownload_t, NULL, a);
+        ui::confirm("下载此存档将会替换 SD 卡中的数据.\n你确定仍要进行下载吗?", fldMenuDriveDownload_t, NULL, a);
     else
         ui::newThread(fldMenuDriveDownload_t, a, NULL);
 }
@@ -262,6 +264,7 @@ void fldMenuDriveRestore_t(void *a)
     fs::copyZipToArch(fs::getSaveArch(), unz, NULL);
     unzClose(unz);
 
+    // Todo: SV logic
     FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_ASCII, "/JKSV/tmp.zip"));
 
     t->finished = true;
@@ -310,7 +313,8 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
         fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDelete, di);
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
 #ifdef ENABLE_GD
-        if (fs::gDrive) fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
+        if (fs::gDrive)
+            fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
 #endif
     }
 }
@@ -348,7 +352,8 @@ void ui::fldRefresh()
         fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDelete, di);
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
 #ifdef ENABLE_GD
-        if (fs::gDrive) fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
+        if (fs::gDrive)
+            fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
 #endif
     }
 }

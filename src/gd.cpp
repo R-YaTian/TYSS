@@ -13,7 +13,8 @@
 /*
 Google Drive code for JKSV.
 Modified 3DS version
-Still WIP
+Original author: J-D-K
+Continued by: R-YaTian
 */
 
 #define DRIVE_UPLOAD_BUFFER_SIZE 0x8000
@@ -30,10 +31,41 @@ drive::gd::gd(const std::string &_clientID, const std::string& _secretID, const 
     secretID = _secretID;
     rToken = _rToken;
 
+    setupProxy();
+
     if(!_authCode.empty())
         exhangeAuthCode(_authCode);
     else if(!rToken.empty())
         refreshToken();
+}
+
+Result drive::gd::setupProxy(void)
+{
+    Result res;
+    bool proxyEnable = false;
+
+    res = acInit();
+    if (R_FAILED(res)) return res;
+
+    res = ACU_GetProxyEnable(&proxyEnable);
+    if (R_FAILED(res))  return res;
+
+    if (proxyEnable)
+    {
+        u16 proxyPort;
+        res = ACU_GetProxyPort((u32*) &proxyPort);
+        if (R_FAILED(res)) return res;
+
+        char *proxyHost = new char[0x100];
+        res = util::ACU_GetProxyHost(proxyHost);
+        if (R_SUCCEEDED(res))
+            proxyURL = "http://" + std::string(proxyHost) + ":" + std::to_string(proxyPort);
+
+        delete proxyHost;
+    }
+
+    acExit();
+    return res;
 }
 
 void drive::gd::exhangeAuthCode(const std::string& _authCode)
@@ -61,8 +93,11 @@ void drive::gd::exhangeAuthCode(const std::string& _authCode)
     CURL *curl = curl_easy_init();
     std::string *jsonResp = new std::string;
 
-    curl_easy_setopt(curl, CURLOPT_PROXY, "http://192.168.50.236:10808");
-    curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
@@ -73,25 +108,29 @@ void drive::gd::exhangeAuthCode(const std::string& _authCode)
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
 
     int error = curl_easy_perform(curl);
-
-    json_object *respParse = json_tokener_parse(jsonResp->c_str());
     if (error == CURLE_OK)
     {
-        ui::showMessage("GD 请求成功!");
-        json_object *accessToken = json_object_object_get(respParse, "access_token");
-        json_object *refreshToken = json_object_object_get(respParse, "refresh_token");
-
-        if(accessToken && refreshToken)
+        json_object *respParse = json_tokener_parse(jsonResp->c_str());
+        if (respParse)
         {
-            ui::showMessage("Token 解析成功!");
-            token = json_object_get_string(accessToken);
-            rToken = json_object_get_string(refreshToken);
+            json_object *accessToken = json_object_object_get(respParse, "access_token");
+            json_object *refreshToken = json_object_object_get(respParse, "refresh_token");
+
+            if(accessToken && refreshToken)
+            {
+                ui::showMessage("云端存储: Token 请求并解析成功!");
+                token = json_object_get_string(accessToken);
+                rToken = json_object_get_string(refreshToken);
+                json_object_put(accessToken);
+                json_object_put(refreshToken);
+            }
+
+            json_object_put(respParse);
         }
     }
 
     delete jsonResp;
     json_object_put(post);
-    json_object_put(respParse);
     curl_slist_free_all(postHeader);
     curl_easy_cleanup(curl);
 }
@@ -117,8 +156,11 @@ void drive::gd::refreshToken()
     CURL *curl = curl_easy_init();
     std::string *jsonResp = new std::string;
 
-    curl_easy_setopt(curl, CURLOPT_PROXY, "http://192.168.50.236:10808");
-    curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
@@ -129,21 +171,27 @@ void drive::gd::refreshToken()
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
 
     int error = curl_easy_perform(curl);
-
-    json_object *parse = json_tokener_parse(jsonResp->c_str());
     if (error == CURLE_OK)
     {
-        json_object *accessToken, *error;
-        json_object_object_get_ex(parse, "access_token", &accessToken);
-        json_object_object_get_ex(parse, "error", &error);
+        json_object *parse = json_tokener_parse(jsonResp->c_str());
+        if (parse)
+        {
+            json_object *accessToken, *perror;
+            json_object_object_get_ex(parse, "access_token", &accessToken);
+            json_object_object_get_ex(parse, "error", &perror);
 
-        if(accessToken)
-            token = json_object_get_string(accessToken);
+            if (accessToken)
+            {
+                token = json_object_get_string(accessToken);
+                json_object_put(accessToken);
+            }
+            if (perror) json_object_put(perror);
+            json_object_put(parse);
+        }
     }
 
     delete jsonResp;
     json_object_put(post);
-    json_object_put(parse);
     curl_slist_free_all(header);
     curl_easy_cleanup(curl);
 }
@@ -157,8 +205,12 @@ bool drive::gd::tokenIsValid()
 
     CURL *curl = curl_easy_init();
     std::string *jsonResp = new std::string;
-    curl_easy_setopt(curl, CURLOPT_PROXY, "http://192.168.50.236:10808");
-    curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
     curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
@@ -167,17 +219,22 @@ bool drive::gd::tokenIsValid()
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
 
     int error = curl_easy_perform(curl);
-    json_object *parse = json_tokener_parse(jsonResp->c_str());
     if (error == CURLE_OK)
     {
-        json_object *checkError;
-        json_object_object_get_ex(parse, "error", &checkError);
-        if(!checkError)
-            ret = true;
+        json_object *parse = json_tokener_parse(jsonResp->c_str());
+        if (parse)
+        {
+            json_object *checkError;
+            json_object_object_get_ex(parse, "error", &checkError);
+            if(!checkError)
+                ret = true;
+            else
+                json_object_put(checkError);
+            json_object_put(parse);
+        }
     }
 
     delete jsonResp;
-    json_object_put(parse);
     curl_easy_cleanup(curl);
     return ret;
 }
@@ -196,11 +253,14 @@ void drive::gd::loadDriveList()
     postHeaders = curl_slist_append(postHeaders, std::string(HEADER_AUTHORIZATION + token).c_str());
 
     // Curl request
-    std::string *jsonResp = new std::string;
     CURL *curl = curl_easy_init();
+    std::string *jsonResp = new std::string;
 
-    curl_easy_setopt(curl, CURLOPT_PROXY, "http://192.168.50.236:10808");
-    curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
     curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
@@ -211,50 +271,59 @@ void drive::gd::loadDriveList()
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
 
     int error = curl_easy_perform(curl);
-
-    json_object *parse = json_tokener_parse(jsonResp->c_str());
     if (error == CURLE_OK)
     {
-        driveList.clear();
-        json_object *fileArray;
-        json_object_object_get_ex(parse, "files", &fileArray);
-        if(fileArray)
+        json_object *parse = json_tokener_parse(jsonResp->c_str());
+        if (parse)
         {
-            size_t count = json_object_array_length(fileArray);
-            driveList.reserve(count);
-            for (unsigned i = 0; i < count; i++)
+            driveList.clear();
+            json_object *fileArray;
+            json_object_object_get_ex(parse, "files", &fileArray);
+            if(fileArray)
             {
-                json_object *idString, *nameString, *mimeTypeString, *size, *parentArray;
-                json_object *curFile = json_object_array_get_idx(fileArray, i);
-                json_object_object_get_ex(curFile, "id", &idString);
-                json_object_object_get_ex(curFile, "name", &nameString);
-                json_object_object_get_ex(curFile, "mimeType", &mimeTypeString);
-                json_object_object_get_ex(curFile, "size", &size);
-                json_object_object_get_ex(curFile, "parents", &parentArray);
-
-                drive::gdItem newItem;
-                newItem.name = json_object_get_string(nameString);
-                newItem.id = json_object_get_string(idString);
-                newItem.size = json_object_get_int(size);
-                if(strcmp(json_object_get_string(mimeTypeString), MIMETYPE_FOLDER) == 0)
-                    newItem.isDir = true;
-
-                if (parentArray)
+                size_t count = json_object_array_length(fileArray);
+                driveList.reserve(count);
+                for (unsigned i = 0; i < count; i++)
                 {
-                    size_t parentCount = json_object_array_length(parentArray);
-                    for (unsigned j = 0; j < parentCount; j++)
+                    json_object *idString, *nameString, *mimeTypeString, *size, *parentArray;
+                    json_object *curFile = json_object_array_get_idx(fileArray, i);
+                    json_object_object_get_ex(curFile, "id", &idString);
+                    json_object_object_get_ex(curFile, "name", &nameString);
+                    json_object_object_get_ex(curFile, "mimeType", &mimeTypeString);
+                    json_object_object_get_ex(curFile, "size", &size);
+                    json_object_object_get_ex(curFile, "parents", &parentArray);
+
+                    drive::gdItem newItem;
+                    newItem.name = json_object_get_string(nameString);
+                    newItem.id = json_object_get_string(idString);
+                    newItem.size = json_object_get_int(size);
+                    if(strcmp(json_object_get_string(mimeTypeString), MIMETYPE_FOLDER) == 0)
+                        newItem.isDir = true;
+
+                    if (parentArray)
                     {
-                        json_object *parent = json_object_array_get_idx(parentArray, j);
-                        newItem.parent = json_object_get_string(parent);
+                        size_t parentCount = json_object_array_length(parentArray);
+                        for (unsigned j = 0; j < parentCount; j++)
+                        {
+                            json_object *parent = json_object_array_get_idx(parentArray, j);
+                            newItem.parent = json_object_get_string(parent);
+                            json_object_put(parent);
+                        }
+                        json_object_put(parentArray);
                     }
+                    driveList.push_back(newItem);
+                    json_object_put(idString);
+                    json_object_put(nameString);
+                    json_object_put(mimeTypeString);
+                    json_object_put(size);
                 }
-                driveList.push_back(newItem);
+                json_object_put(fileArray);
             }
+            json_object_put(parse);
         }
     }
 
     delete jsonResp;
-    json_object_put(parse);
     curl_slist_free_all(postHeaders);
     curl_easy_cleanup(curl);
 }
@@ -311,8 +380,11 @@ bool drive::gd::createDir(const std::string& _dirName, const std::string& _paren
     CURL *curl = curl_easy_init();
     std::string *jsonResp = new std::string;
 
-    curl_easy_setopt(curl, CURLOPT_PROXY, "http://192.168.50.236:10808");
-    curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
@@ -323,28 +395,33 @@ bool drive::gd::createDir(const std::string& _dirName, const std::string& _paren
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
 
     int error = curl_easy_perform(curl);
-
-    json_object *respParse = json_tokener_parse(jsonResp->c_str()), *checkError;
-    json_object_object_get_ex(respParse, "error", &checkError);
-    if (error == CURLE_OK && !checkError)
+    if (error == CURLE_OK)
     {
-        //Append it to list
-        json_object *id;
-        json_object_object_get_ex(respParse, "id", &id);
+        json_object *respParse = json_tokener_parse(jsonResp->c_str()), *checkError;
+        if (respParse) {
+            json_object_object_get_ex(respParse, "error", &checkError);
+            if (!checkError) {
+                // Append it to list
+                json_object *id;
+                json_object_object_get_ex(respParse, "id", &id);
 
-        drive::gdItem newDir;
-        newDir.name = _dirName;
-        newDir.id = json_object_get_string(id);
-        newDir.isDir = true;
-        newDir.size = 0;
-        newDir.parent = _parent;
-        driveList.push_back(newDir);
+                drive::gdItem newDir;
+                newDir.name = _dirName;
+                newDir.id = json_object_get_string(id);
+                newDir.isDir = true;
+                newDir.size = 0;
+                newDir.parent = _parent;
+                driveList.push_back(newDir);
+                json_object_put(id);
+            } else
+                json_object_put(checkError);
+            json_object_put(respParse);
+        }
     } else
         ret = false;
 
     delete jsonResp;
     json_object_put(post);
-    json_object_put(respParse);
     curl_slist_free_all(postHeaders);
     curl_easy_cleanup(curl);
     return ret;
@@ -421,8 +498,11 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
     std::string *jsonResp = new std::string;
     std::vector<std::string> *headers = new std::vector<std::string>;
 
-    curl_easy_setopt(curl, CURLOPT_PROXY, "http://192.168.50.236:10808");
-    curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
@@ -433,39 +513,51 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_get_string(post));
 
     int error = curl_easy_perform(curl);
-    std::string location = curlFuncs::getHeader("Location", headers);
-    if (error == CURLE_OK && location != HEADER_ERROR)
+    if (error == CURLE_OK)
     {
-        CURL *curlUp = curl_easy_init();
-        curl_easy_setopt(curlUp, CURLOPT_PROXY, "http://192.168.50.236:10808");
-        curl_easy_setopt(curlUp, CURLOPT_HTTPPROXYTUNNEL, 1);
-        curl_easy_setopt(curlUp, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_easy_setopt(curlUp, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_easy_setopt(curlUp, CURLOPT_URL, location.c_str());
-        curl_easy_setopt(curlUp, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
-        curl_easy_setopt(curlUp, CURLOPT_WRITEDATA, jsonResp);
-        curl_easy_setopt(curlUp, CURLOPT_READFUNCTION, curlFuncs::readDataFile);
-        curl_easy_setopt(curlUp, CURLOPT_READDATA, _upload);
-        curl_easy_setopt(curlUp, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_UPLOAD_BUFFER_SIZE);
-        curl_easy_setopt(curlUp, CURLOPT_UPLOAD, 1);
-        curl_easy_perform(curlUp);
-        curl_easy_cleanup(curlUp);
-
-        json_object *parse = json_tokener_parse(jsonResp->c_str()), *id, *name, *mimeType;
-        json_object_object_get_ex(parse, "id", &id);
-        json_object_object_get_ex(parse, "name", &name);
-        json_object_object_get_ex(parse, "mimeType", &mimeType);
-
-        if(name && id && mimeType)
+        std::string location = curlFuncs::getHeader("Location", headers);
+        if (location != HEADER_ERROR)
         {
-            drive::gdItem uploadData;
-            uploadData.id = json_object_get_string(id);
-            uploadData.name = json_object_get_string(name);
-            uploadData.isDir = false;
-            uploadData.parent = _parent;
-            driveList.push_back(uploadData);
+            CURL *curlUp = curl_easy_init();
+            if (!proxyURL.empty())
+            {
+                curl_easy_setopt(curlUp, CURLOPT_PROXY, proxyURL.c_str());
+                curl_easy_setopt(curlUp, CURLOPT_HTTPPROXYTUNNEL, 1);
+            }
+            curl_easy_setopt(curlUp, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_easy_setopt(curlUp, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_easy_setopt(curlUp, CURLOPT_URL, location.c_str());
+            curl_easy_setopt(curlUp, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
+            curl_easy_setopt(curlUp, CURLOPT_WRITEDATA, jsonResp);
+            curl_easy_setopt(curlUp, CURLOPT_READFUNCTION, curlFuncs::readDataFile);
+            curl_easy_setopt(curlUp, CURLOPT_READDATA, _upload);
+            curl_easy_setopt(curlUp, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_UPLOAD_BUFFER_SIZE);
+            curl_easy_setopt(curlUp, CURLOPT_UPLOAD, 1);
+
+            int upError = curl_easy_perform(curlUp);
+            if (upError == CURLE_OK)
+            {
+                json_object *parse = json_tokener_parse(jsonResp->c_str()), *id, *name, *mimeType;
+                json_object_object_get_ex(parse, "id", &id);
+                json_object_object_get_ex(parse, "name", &name);
+                json_object_object_get_ex(parse, "mimeType", &mimeType);
+
+                if(name && id && mimeType)
+                {
+                    drive::gdItem uploadData;
+                    uploadData.id = json_object_get_string(id);
+                    uploadData.name = json_object_get_string(name);
+                    uploadData.isDir = false;
+                    uploadData.parent = _parent;
+                    driveList.push_back(uploadData);
+                    json_object_put(id);
+                    json_object_put(name);
+                    json_object_put(mimeType);
+                }
+                json_object_put(parse);
+            }
+            curl_easy_cleanup(curlUp);
         }
-        json_object_put(parse);
     }
 
     delete jsonResp;
@@ -490,12 +582,15 @@ void drive::gd::updateFile(const std::string& _fileID, FILE *_upload)
     patchHeader = curl_slist_append(patchHeader, std::string(HEADER_AUTHORIZATION + token).c_str());
 
     // Curl
+    CURL *curl = curl_easy_init();
     std::string *jsonResp = new std::string;
     std::vector<std::string> *headers = new std::vector<std::string>;
-    CURL *curl = curl_easy_init();
 
-    curl_easy_setopt(curl, CURLOPT_PROXY, "http://192.168.50.236:10808");
-    curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PATCH");
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, patchHeader);
@@ -507,21 +602,26 @@ void drive::gd::updateFile(const std::string& _fileID, FILE *_upload)
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, headers);
 
     int error = curl_easy_perform(curl);
-    std::string location = curlFuncs::getHeader("Location", headers);
-    if(error == CURLE_OK && location != HEADER_ERROR)
+    if(error == CURLE_OK)
     {
-        CURL *curlPatch = curl_easy_init();
-        curl_easy_setopt(curlPatch, CURLOPT_PROXY, "http://192.168.50.236:10808");
-        curl_easy_setopt(curlPatch, CURLOPT_HTTPPROXYTUNNEL, 1);
-        curl_easy_setopt(curlPatch, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_easy_setopt(curlPatch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_easy_setopt(curlPatch, CURLOPT_URL, location.c_str());
-        curl_easy_setopt(curlPatch, CURLOPT_READFUNCTION, curlFuncs::readDataFile);
-        curl_easy_setopt(curlPatch, CURLOPT_READDATA, _upload);
-        curl_easy_setopt(curlPatch, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_UPLOAD_BUFFER_SIZE);
-        curl_easy_setopt(curlPatch, CURLOPT_UPLOAD, 1);
-        curl_easy_perform(curlPatch);
-        curl_easy_cleanup(curlPatch);
+        std::string location = curlFuncs::getHeader("Location", headers);
+        if (location != HEADER_ERROR) {
+            CURL *curlPatch = curl_easy_init();
+            if (!proxyURL.empty())
+            {
+                curl_easy_setopt(curlPatch, CURLOPT_PROXY, proxyURL.c_str());
+                curl_easy_setopt(curlPatch, CURLOPT_HTTPPROXYTUNNEL, 1);
+            }
+            curl_easy_setopt(curlPatch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_easy_setopt(curlPatch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_easy_setopt(curlPatch, CURLOPT_URL, location.c_str());
+            curl_easy_setopt(curlPatch, CURLOPT_READFUNCTION, curlFuncs::readDataFile);
+            curl_easy_setopt(curlPatch, CURLOPT_READDATA, _upload);
+            curl_easy_setopt(curlPatch, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_UPLOAD_BUFFER_SIZE);
+            curl_easy_setopt(curlPatch, CURLOPT_UPLOAD, 1);
+            curl_easy_perform(curlPatch);
+            curl_easy_cleanup(curlPatch);
+        }
     }
 
     delete jsonResp;
@@ -546,8 +646,11 @@ void drive::gd::downloadFile(const std::string& _fileID, FILE *_download)
 
     // Curl
     CURL *curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_PROXY, "http://192.168.50.236:10808");
-    curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
     curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
@@ -576,8 +679,11 @@ void drive::gd::deleteFile(const std::string& _fileID)
 
     // Curl
     CURL *curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_PROXY, "http://192.168.50.236:10808");
-    curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);

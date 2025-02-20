@@ -128,15 +128,17 @@ static void setMenuReloadTitles(void *a)
 static void setMenuReloadDriveList_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在重载 Google Drive 列表...");
+    t->status->setStatus("正在重载云端存储列表...");
     fs::gDrive->loadDriveList();
     t->finished = true;
 }
 
 static void setMenuReloadDriveList(void *a)
 {
-    if(fs::gDrive)
+    if (fs::gDrive)
         ui::newThread(setMenuReloadDriveList_t, NULL, NULL);
+    else
+        ui::showMessage("云端存储: 服务尚未初始化");
 }
 #endif
 
@@ -222,12 +224,10 @@ void ui::setInit(void *a)
 
     setMenu.addOpt("修改今日步数", 320);
     setMenu.addOptEvent(14, KEY_A, setMenuHackStepCount, NULL);
+
 #ifdef ENABLE_GD
-    if(fs::gDrive)
-    {
-        setMenu.addOpt("重载 Google Drive 列表", 320);
-        setMenu.addOptEvent(setMenu.getCount(), KEY_A, setMenuReloadDriveList, NULL);
-    }
+    setMenu.addOpt("重载云端存储列表", 320);
+    setMenu.addOptEvent(setMenu.getCount() - 1, KEY_A, setMenuReloadDriveList, NULL);
 #endif
 
     t->finished = true;

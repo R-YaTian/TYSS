@@ -58,8 +58,10 @@ namespace drive
             size_t getDriveListCount() const { return driveList.size(); }
             drive::gdItem *getItemAt(unsigned int _ind) { return &driveList[_ind]; }
 
+            Result setupProxy(void);
+
         private:
             std::vector<gdItem> driveList;
-            std::string clientID, secretID, token, rToken;
+            std::string clientID, secretID, token, rToken, proxyURL;
     };
 }

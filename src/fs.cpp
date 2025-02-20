@@ -63,20 +63,20 @@ std::string fs::jksmDirID, fs::usrSaveDirID, fs::extDataDirID, fs::sysSaveDirID,
 void fs::driveInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在启动 Google Drive...");
+    t->status->setStatus("正在启动云端存储服务...");
     fs::gDrive = new drive::gd(cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken);
     if(gDrive->hasToken())
     {
-        ui::showMessage("GD Token 获取成功!");
         cfg::driveRefreshToken = gDrive->getRefreshToken();
         if(!cfg::driveAuthCode.empty())
             cfg::saveGD();
 
         gDrive->loadDriveList();
+
         if(!gDrive->dirExists(DRIVE_JKSM_DIR))
             gDrive->createDir(DRIVE_JKSM_DIR, "");
-        
-        jksmDirID = gDrive->getFolderID("JKSM");
+
+        jksmDirID = gDrive->getFolderID(DRIVE_JKSM_DIR);
 
         if(!gDrive->dirExists(DRIVE_USER_SAVE_DIR, jksmDirID))
             gDrive->createDir(DRIVE_USER_SAVE_DIR, jksmDirID);
@@ -102,9 +102,9 @@ void fs::driveInit(void *a)
             gDrive->createDir(DRIVE_SHARED_DIR, jksmDirID);
 
         sharedExtID = gDrive->getFolderID(DRIVE_SHARED_DIR, jksmDirID);
-    }
-    else
-    {
+
+        ui::showMessage("云端存储: 服务初始化完成!");
+    } else {
         delete gDrive;
         gDrive = NULL;
     }
@@ -113,8 +113,11 @@ void fs::driveInit(void *a)
 
 void fs::driveExit()
 {
-    if(fs::gDrive)
-        delete fs::gDrive;
+    if(gDrive)
+    {
+        delete gDrive;
+        gDrive = NULL;
+    }
 }
 #endif
 
