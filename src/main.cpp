@@ -8,7 +8,6 @@
 #include "data.h"
 #include "sys.h"
 #include "cfg.h"
-#include "cheatmanager.h"
 
 extern int state;
 
@@ -34,8 +33,6 @@ int main(int argc, const char *argv[])
     curl_global_init(CURL_GLOBAL_ALL);
 #endif
 
-    CheatManager::getInstance(); // Initialize the cheats db
-
     ui::newThread(data::loadTitles, NULL, NULL);
     ui::newThread(ui::ttlInit, NULL, NULL);
     ui::newThread(ui::extInit, NULL, NULL);
@@ -43,6 +40,7 @@ int main(int argc, const char *argv[])
     ui::newThread(ui::bossViewInit, NULL, NULL);
     ui::newThread(ui::shrdInit, NULL, NULL);
     ui::newThread(ui::setInit, NULL, NULL);
+    ui::newThread(data::loadCheatsDB, NULL, NULL);
 
 #ifdef ENABLE_GD
     if(!cfg::driveClientID.empty() && !cfg::driveClientSecret.empty())

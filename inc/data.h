@@ -84,6 +84,7 @@ namespace data
     extern titleData curData;
 
     smdh_s *loadSMDH(const uint32_t& low, const uint32_t& high, const uint8_t& media);
+    void loadCheatsDB(void *a);
     void loadTitles(void *a);
     void deleteExtData(void *a);
 

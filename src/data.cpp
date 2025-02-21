@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <zlib.h>
+#include <future>
 
 #include "util.h"
 #include "data.h"
@@ -13,6 +14,7 @@
 #include "ui.h"
 #include "gfx.h"
 #include "type.h"
+#include "cheatmanager.h"
 
 #define ICON_BUFF_SIZE 0x2000
 
@@ -444,6 +446,19 @@ static inline bool checkHigh(const uint64_t& id)
 {
     uint32_t high = (uint32_t)(id >> 32);
     return (high == 0x00040000 || high == 0x00040002);
+}
+
+void data::loadCheatsDB(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在加载金手指数据库...");
+
+    auto future = std::async(std::launch::async, []() {
+        CheatManager::getInstance(); // Initialize the cheats db
+    });
+    future.get();
+
+    t->finished = true;
 }
 
 void data::loadTitles(void *a)

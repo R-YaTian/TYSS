@@ -1,4 +1,5 @@
 #include <3ds.h>
+#include <future>
 
 #include "ui.h"
 #include "ttl.h"
@@ -123,7 +124,12 @@ static void ttlOptInstallCheats_t(void *a)
     t->status->setStatus("正在安装金手指文件...");
 
     std::string key = data::curData.getIDStr();
-    if (CheatManager::getInstance().install(key))
+    auto asyncTask = std::async(std::launch::async, [key]() {
+        return CheatManager::getInstance().install(key);
+    });
+
+    bool ret = asyncTask.get();
+    if (ret)
         ui::showMessage("金手指文件安装成功!");
     else
         ui::showMessage("金手指文件安装失败!");
