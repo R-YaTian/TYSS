@@ -20,7 +20,7 @@ const char *blPath    = "/JKSV/blacklist.txt";
 const char *favPath   = "/JKSV/favorites.txt";
 const char *titlePath = "/JKSV/cache.bin";
 static uint8_t lang = CFG_LANGUAGE_EN;
-static bool cartValid = true;
+static bool cartValid = false;
 static bool titleLoaded = false;
 
 static uint32_t extdataRedirect(const uint32_t& low)
@@ -335,6 +335,7 @@ static void loadcart(void *a)
     FS_CardType cardType;
     res = FSUSER_GetCardType(&cardType);
     if (R_SUCCEEDED(res)) {
+        ui::showMessage("卡带类型获取成功"); // debug
         if (cardType == CARD_CTR) {
             res = AM_GetTitleCount(MEDIATYPE_GAME_CARD, &count);
             if (R_SUCCEEDED(res) && count > 0) {
@@ -344,6 +345,7 @@ static void loadcart(void *a)
                     data::titleData cartData;
                     if(cartData.init(cartID, MEDIATYPE_GAME_CARD))
                     {
+                        ui::showMessage("添加卡带应用成功!"); // debug
                         data::titleSaveTypes tmp = cartData.getSaveTypes();
                         if(tmp.hasUser)
                             data::usrSaveTitles.insert(data::usrSaveTitles.begin(), cartData);
@@ -353,7 +355,7 @@ static void loadcart(void *a)
 
                         ui::ttlRefresh();
                         ui::extRefresh();
-                        if (!cartValid) cartValid = true;
+                        cartValid = true;
                     }
                 } else
                     cartValid = false;
@@ -367,41 +369,52 @@ static void loadcart(void *a)
     t->finished = true;
 }
 
-static bool checkForCart()
+// true = already loaded
+// false = prepare to load
+static bool isCartLoaded()
 {
-    if (!cartValid)
+    if (cartValid)
         return true;
 
-    if (data::usrSaveTitles.empty() || data::extDataTitles.empty())
-        return false;
+    if (!data::usrSaveTitles.empty())
+        return (data::usrSaveTitles[0].getMedia() == MEDIATYPE_GAME_CARD);
 
-    return data::usrSaveTitles[0].getMedia() == MEDIATYPE_GAME_CARD || data::extDataTitles[0].getMedia() == MEDIATYPE_GAME_CARD;
+    if (!data::extDataTitles.empty())
+        return (data::extDataTitles[0].getMedia() == MEDIATYPE_GAME_CARD);
+
+    return false;
 }
 
 void data::cartCheck()
 {
-    bool ins = false;
+    static bool lastIns = false;
+    bool ins;
     FSUSER_CardSlotIsInserted(&ins);
 
-    if(ins && !checkForCart())
-        ui::newThread(loadcart, NULL, NULL);
-    else if(!ins)
+    if (ins != lastIns)
     {
-        if(!data::usrSaveTitles.empty() && data::usrSaveTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
+        if(ins && !isCartLoaded())
+            ui::newThread(loadcart, NULL, NULL);
+        else if(!ins && cartValid)
         {
-            data::usrSaveTitles[0].freeIcon();
-            data::usrSaveTitles.erase(data::usrSaveTitles.begin());
-            ui::ttlRefresh();
+            if(!data::usrSaveTitles.empty() && data::usrSaveTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
+            {
+                data::usrSaveTitles[0].freeIcon();
+                data::usrSaveTitles.erase(data::usrSaveTitles.begin());
+                ui::ttlRefresh();
+            }
+
+            if(!data::extDataTitles.empty() && data::extDataTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
+            {
+                data::extDataTitles[0].freeIcon();
+                data::extDataTitles.erase(data::extDataTitles.begin());
+                ui::extRefresh();
+            }
+
+            cartValid = false;
         }
 
-        if(!data::extDataTitles.empty() && data::extDataTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
-        {
-            data::extDataTitles[0].freeIcon();
-            data::extDataTitles.erase(data::extDataTitles.begin());
-            ui::extRefresh();
-        }
-
-        if (!cartValid) cartValid = true;
+        lastIns = ins;
     }
 }
 
