@@ -36,17 +36,18 @@ AccessControlInfo:
   FileSystemAccess:
    #- CategorySystemApplication
    #- CategoryHardwareCheck
+   #- CategorySystemSettings
+   #- CategoryHomeMenu
    - CategoryFileSystemTool
    #- Debug
-   #- TwlCardBackup
-   #- TwlNandData
+   - TwlCardBackup
+   - TwlNandData
    - Boss
    - DirectSdmc
    #- Core
    #- CtrNandRo
    - CtrNandRw
    #- CtrNandRoWrite
-   #- CategorySystemSettings
    #- CardBoard
    #- ExportImportIvs
    #- DirectSdmcWrite
@@ -54,16 +55,15 @@ AccessControlInfo:
    - SaveDataMove
    #- Shop
    #- Shell
-   #- CategoryHomeMenu
   IoAccessControl:
-   #- FsMountNand
-   #- FsMountNandRoWrite
-   #- FsMountTwln
-   #- FsMountWnand
-   #- FsMountCardSpi
+   - FsMountNand
+   - FsMountNandRoWrite
+   - FsMountTwln
+   - FsMountWnand
+   - FsMountCardSpi
    #- UseSdif3
    #- CreateSeed
-   #- UseCardSpi
+   - UseCardSpi
 
   # Process Settings
   MemoryType                    : Application # Application/System/Base

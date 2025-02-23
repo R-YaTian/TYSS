@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 
+#include "spi.h"
 #include "smdh.h"
 
 bool isFavorite(const uint64_t& id);
@@ -27,6 +28,7 @@ namespace data
     {
         public:
             bool init(const uint64_t& _id, const FS_MediaType& mt);
+            bool initTWL(const uint64_t& _id, const FS_MediaType& mt);
             bool initFromCache(const uint64_t& _id, const std::u16string& _title, const std::u16string& _pub, const std::string& code, const data::titleSaveTypes& _st, const uint8_t& mt);
             void testMounts();
             bool hasSaveData();
@@ -68,6 +70,7 @@ namespace data
             uint32_t high, low, unique, extdata;
             std::string prodCode, idStr, titleUTF8;
             std::u16string title, titleSafe, publisher;
+            CardType spiCardType;
             FS_MediaType m;
             bool fav = false;
             bool bhaveIcon = false;
@@ -101,6 +104,7 @@ namespace data
 
     //Reads icon to C2D_image
     C2D_Image readIconFromSMDH(smdh_s *smdh);
+    C2D_Image readDSIcon(const u8* banner);
 
     //Writes title data cache to path
     bool readCache(std::vector<titleData>& vect, const std::string& path);

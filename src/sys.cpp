@@ -13,6 +13,7 @@ void sys::init()
     cfguInit();
     hidInit();
     amInit();
+    pxiDevInit();
     aptInit();
     romfsInit();
 
@@ -33,6 +34,7 @@ void sys::exit()
     cfguExit();
     hidExit();
     amExit();
+    pxiDevExit();
     aptExit();
     romfsExit();
 }

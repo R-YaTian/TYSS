@@ -14,10 +14,16 @@ C3D_RenderTarget *gfx::top, *gfx::bot;
 
 //Needed for icon sub tex. Top UV needs to be higher than bottom so it's rotated.
 Tex3DS_SubTexture gfx::iconSubTex = {48, 48, 0.0f, 0.75f, 0.75f, 0.0f};
+Tex3DS_SubTexture gfx::dsIconSubTex = {32, 32, 0.0f, 1.0f, 1.0f, 0.0f};
 
 C2D_Image gfx::noIcon(void)
 {
     return C2D_SpriteSheetGetImage(spritesheet, sprites_noicon_idx);
+}
+
+C2D_Image gfx::dsIcon(void)
+{
+    return C2D_SpriteSheetGetImage(spritesheet, sprites_dsicon_idx);
 }
 
 void gfx::init()

@@ -222,9 +222,11 @@ void ui::ttlOptBack()
     ui::ttlUpdate();
 }
 
-void ui::ttlRefresh()
+void ui::ttlRefresh(int selFlag)
 {
     ttlView->refresh(data::usrSaveTitles);
+    if (selFlag == 1) ttlView->setSelected(0);
+    else if (selFlag == 2) ttlView->setSelected(ttlView->getSelected() == 0 ? 0 : ttlView->getSelected() - 1);
 }
 
 void ui::ttlUpdate()

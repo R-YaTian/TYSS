@@ -15,6 +15,7 @@
 #include "gfx.h"
 #include "type.h"
 #include "cheatmanager.h"
+#include "makercode.h"
 
 #define ICON_BUFF_SIZE 0x2000
 
@@ -66,10 +67,6 @@ static uint32_t extdataRedirect(const uint32_t& low)
         case 0x0012DE00:
             return 0x000012DC;
             break;
-
-        // Face Raider JP
-        // case 0x20020D00:
-            // return 0x0000020D;
 
         default:
             return (low >> 8) & 0xFFFFF;
@@ -171,7 +168,7 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt)
     extdata = extdataRedirect(low);
 
     char tid[32];
-    sprintf(tid, "%016llX", _id);
+    sprintf(tid, "%016llX", id);
     idStr.assign(tid);
 
     char tmp[16];
@@ -210,6 +207,74 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt)
         publisher.assign(util::toUtf16("Someone?"));
         icon = gfx::noIcon();
     }
+
+    return true;
+}
+
+bool data::titleData::initTWL(const uint64_t& _id, const FS_MediaType& mt)
+{
+    m = mt;
+    u64 programID = (m == MEDIATYPE_GAME_CARD) ? 0LL : _id;
+
+    u8* headerData = new u8[0x3B4];
+    Result res;
+    res = FSUSER_GetLegacyRomHeader(m, programID, headerData);
+    if (R_FAILED(res)) {
+        delete[] headerData;
+        return false;
+    }
+
+    char _cardTitle[14] = {0};
+    char _gameCode[6]   = {0};
+    char _makerCode[3]  = {0};
+
+    std::copy(headerData, headerData + 12, _cardTitle);
+    std::copy(headerData + 12, headerData + 16, _gameCode);
+    std::copy(headerData + 16, headerData + 18, _makerCode);
+    _cardTitle[13] = '\0';
+    _gameCode[5]   = '\0';
+    _makerCode[2]  = '\0';
+
+    prodCode = _gameCode;
+
+    if (m == MEDIATYPE_GAME_CARD)
+    {
+        id = (static_cast<u32>(_gameCode[0]) << 24) |
+             (static_cast<u32>(_gameCode[1]) << 16) |
+             (static_cast<u32>(_gameCode[2]) << 8)  |
+              static_cast<u32>(_gameCode[3]);
+    } else
+        id = _id;
+
+    low = (uint32_t)id;
+    high = (uint32_t)(id >> 32);
+    unique = (low >> 8) & 0xFFFFF;
+    extdata = extdataRedirect(low);
+
+    char tid[32];
+    sprintf(tid, "%016llX", id);
+    idStr.assign(tid);
+
+    delete[] headerData;
+    headerData = new u8[0x23C0];
+    FSUSER_GetLegacyBannerData(m, programID, headerData);
+
+    icon = readDSIcon(headerData);
+    bhaveIcon = true;
+    delete[] headerData;
+
+    res = SPIGetCardType(&spiCardType, (_gameCode[0] == 'I') ? 1 : 0);
+    if (R_FAILED(res)) {
+        return false;
+    }
+
+    title.assign(util::toUtf16(_cardTitle));
+    titleSafe.assign(util::safeString(util::toUtf16(_cardTitle)));
+    titleUTF8 = _cardTitle;
+
+    Makercode pb;
+    publisher.assign(util::toUtf16(pb.findPublisher(_makerCode)));
+    types.hasUser = true;
 
     return true;
 }
@@ -328,16 +393,13 @@ void data::titleData::assignIcon(C3D_Tex *_icon)
     icon = {_icon, &gfx::iconSubTex};
 }
 
-static void loadcart(void *a)
+static void loadcart()
 {
-    threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在读取卡带数据...");
     Result res = 0;
     u32 count  = 0;
     FS_CardType cardType;
     res = FSUSER_GetCardType(&cardType);
     if (R_SUCCEEDED(res)) {
-        ui::showMessage("卡带类型获取成功"); // debug
         if (cardType == CARD_CTR) {
             res = AM_GetTitleCount(MEDIATYPE_GAME_CARD, &count);
             if (R_SUCCEEDED(res) && count > 0) {
@@ -347,28 +409,37 @@ static void loadcart(void *a)
                     data::titleData cartData;
                     if(cartData.init(cartID, MEDIATYPE_GAME_CARD))
                     {
-                        ui::showMessage("添加卡带应用成功!"); // debug
                         data::titleSaveTypes tmp = cartData.getSaveTypes();
                         if(tmp.hasUser)
+                        {
                             data::usrSaveTitles.insert(data::usrSaveTitles.begin(), cartData);
+                            ui::ttlRefresh(1);
+                        }
 
                         if(tmp.hasExt)
+                        {
                             data::extDataTitles.insert(data::extDataTitles.begin(), cartData);
+                            ui::extRefresh(1);
+                        }
 
-                        ui::ttlRefresh();
-                        ui::extRefresh();
                         cartValid = true;
                     }
                 } else
                     cartValid = false;
             } else
-                cartValid = false; // Is CARD_CTR, but no valid titles, maybe GW cart without game loaded?
-        } else
-            cartValid = false; // Not yet support CARD_TWL
+                cartValid = false; // Is CARD_CTR, but no valid titles. Or get a wrong type...
+        } else {
+            data::titleData cartData;
+            if(cartData.initTWL(0, MEDIATYPE_GAME_CARD))
+            {
+                data::usrSaveTitles.insert(data::usrSaveTitles.begin(), cartData);
+                ui::ttlRefresh(1);
+                cartValid = true;
+            } else
+                cartValid = false;
+        }
     } else
         cartValid = false;
-
-    t->finished = true;
 }
 
 // true = already loaded
@@ -389,34 +460,33 @@ static bool isCartLoaded()
 
 void data::cartCheck()
 {
-    static bool lastIns = false;
     bool ins;
     FSUSER_CardSlotIsInserted(&ins);
 
-    if (ins != lastIns)
+    if(ins && !isCartLoaded())
     {
-        if(ins && !isCartLoaded())
-            ui::newThread(loadcart, NULL, NULL);
-        else if(!ins && cartValid)
+        cartValid = true; // assume valid
+        auto future = std::async(std::launch::async, []() {
+            loadcart();
+        });
+    }
+    else if(!ins && cartValid)
+    {
+        if(!data::usrSaveTitles.empty() && data::usrSaveTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
         {
-            if(!data::usrSaveTitles.empty() && data::usrSaveTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
-            {
-                data::usrSaveTitles[0].freeIcon();
-                data::usrSaveTitles.erase(data::usrSaveTitles.begin());
-                ui::ttlRefresh();
-            }
-
-            if(!data::extDataTitles.empty() && data::extDataTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
-            {
-                data::extDataTitles[0].freeIcon();
-                data::extDataTitles.erase(data::extDataTitles.begin());
-                ui::extRefresh();
-            }
-
-            cartValid = false;
+            data::usrSaveTitles[0].freeIcon();
+            data::usrSaveTitles.erase(data::usrSaveTitles.begin());
+            ui::ttlRefresh(2);
         }
 
-        lastIns = ins;
+        if(!data::extDataTitles.empty() && data::extDataTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
+        {
+            data::extDataTitles[0].freeIcon();
+            data::extDataTitles.erase(data::extDataTitles.begin());
+            ui::extRefresh(2);
+        }
+
+        cartValid = false;
     }
 }
 
@@ -452,6 +522,8 @@ void data::loadCheatsDB(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在加载金手指数据库...");
+
+    fs::createDir("/cheats");
 
     auto future = std::async(std::launch::async, []() {
         CheatManager::getInstance(); // Initialize the cheats db
@@ -791,6 +863,47 @@ void data::favRem(titleData& t)
 C2D_Image data::readIconFromSMDH(smdh_s *smdh)
 {
     return (C2D_Image){loadIcon(smdh), &gfx::iconSubTex};
+}
+
+C2D_Image data::readDSIcon(const u8* banner)
+{
+    static constexpr int WIDTH_POW2  = 32;
+    static constexpr int HEIGHT_POW2 = 32;
+
+    C3D_Tex *dsIconTex = new C3D_Tex;
+    C3D_TexInit(dsIconTex, WIDTH_POW2, HEIGHT_POW2, GPU_RGB565);
+
+    struct bannerData {
+        u16 version;
+        u16 crc;
+        u8 reserved[28];
+        u8 data[512];
+        u16 palette[16];
+    };
+    bannerData* iconData = (bannerData*)banner;
+
+    u16* output = (u16*)dsIconTex->data;
+    for (size_t x = 0; x < 32; x++) {
+        for (size_t y = 0; y < 32; y++) {
+            u32 srcOff   = (((y >> 3) * 4 + (x >> 3)) * 8 + (y & 7)) * 4 + ((x & 7) >> 1);
+            u32 srcShift = (x & 1) * 4;
+
+            u16 pIndex = (iconData->data[srcOff] >> srcShift) & 0xF;
+            u16 color  = 0xFFFF;
+            if (pIndex != 0) {
+                u16 r = iconData->palette[pIndex] & 0x1F;
+                u16 g = (iconData->palette[pIndex] >> 5) & 0x1F;
+                u16 b = (iconData->palette[pIndex] >> 10) & 0x1F;
+                color = (r << 11) | (g << 6) | (g >> 4) | (b);
+            }
+
+            u32 dst     = ((((y >> 3) * (32 >> 3) + (x >> 3)) << 6) +
+                       ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) | ((y & 2) << 2) | ((x & 4) << 2) | ((y & 4) << 3)));
+            output[dst] = color;
+        }
+    }
+
+    return (C2D_Image){dsIconTex, &gfx::dsIconSubTex};
 }
 
 void data::createCache(std::vector<titleData>& vect, const std::string& path)

@@ -18,8 +18,10 @@ namespace gfx
 
     extern C3D_RenderTarget *top, *bot;
     extern Tex3DS_SubTexture iconSubTex;
+    extern Tex3DS_SubTexture dsIconSubTex;
 
     C2D_Image noIcon(void);
+    C2D_Image dsIcon(void);
 
     inline void frameBegin()
     {

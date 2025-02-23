@@ -11,9 +11,12 @@ void ui::titleTile::draw(int x, int y, bool sel, uint8_t clrShft)
     {
         uint32_t bbClr = 0xFF << 24 | (uint8_t)(0xC5 + (clrShft / 2)) << 16 | (uint8_t)(0x88 + clrShft) << 8 | 0x00;
         gfx::drawBoundingBox(x - 3, y - 3, 54, 54, GFX_DEPTH_DEFAULT, bbClr, false);
-        C2D_DrawImageAt(*icon, (float)x, (float)y, GFX_DEPTH_DEFAULT);
     }
-    else
+
+    if (icon->subtex->width == 32) {
+        C2D_DrawImageAt(gfx::dsIcon(), (float)x, (float)y, GFX_DEPTH_DEFAULT);
+        C2D_DrawImageAt(*icon, (float)(x + 8), (float)(y + 8), GFX_DEPTH_DEFAULT);
+    } else
         C2D_DrawImageAt(*icon, (float)x, (float)y, GFX_DEPTH_DEFAULT);
 
     if(fav)

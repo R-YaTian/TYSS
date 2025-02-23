@@ -6,7 +6,7 @@ namespace ui
     void extExit();
     void extOptBack();
     void extUpdate();
-    void extRefresh();
+    void extRefresh(int selFlag = 0);
     void extDrawTop();
     void extDrawBot();
 }
