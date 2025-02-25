@@ -197,8 +197,9 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_
             {
                 char* saveDir = new char[32];
                 sprintf(saveDir, "/title/%08lx/%08lx/data", (dat.getHigh() & 0x00000FFF) | 0x00030000, dat.getLow());
-                FS_Path targetPath = fsMakePath(PATH_ASCII, saveDir);
-                res = FSUSER_OpenArchive(&arch, ARCHIVE_NAND_TWL_FS, targetPath);
+                res = FSUSER_OpenArchive(&arch, ARCHIVE_NAND_TWL_FS, fsMakePath(PATH_EMPTY, ""));
+                if (R_SUCCEEDED(res))
+                    res = FSUSER_OpenDirectory(NULL, arch, fsMakePath(PATH_UTF16, util::toUtf16(saveDir).data()));
                 delete[] saveDir;
             }
             break;

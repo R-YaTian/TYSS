@@ -91,11 +91,19 @@ struct
 {
     bool operator()(data::titleData& a, data::titleData& b)
     {
-        if(a.getMedia() != b.getMedia())
-            return a.getMedia() == MEDIATYPE_GAME_CARD;
+        if (a.getMedia() != b.getMedia()) {
+            // MEDIATYPE_GAME_CARD is top first
+            if (a.getMedia() == MEDIATYPE_GAME_CARD) return true;
+            if (b.getMedia() == MEDIATYPE_GAME_CARD) return false;
+            if (a.getFav() != b.getFav())
+                return a.getFav() > b.getFav();
+            else
+                return a.getMedia() > b.getMedia();
+        }
 
-        if(a.getFav() != b.getFav())
-            return a.getFav() == true;
+        if (a.getFav() != b.getFav()) {
+            return a.getFav() > b.getFav();
+        }
 
         unsigned aLen = a.getTitleUTF8().length();
         unsigned bLen = b.getTitleUTF8().length();
