@@ -24,6 +24,12 @@ namespace data
         bool hasBoss = false;
     } titleSaveTypes;
 
+    typedef struct
+    {
+        bool isDSCard = false;
+        CardType spiCardType = NO_CHIP;
+    } titleExtInfos;
+
     class titleData
     {
         public:
@@ -55,6 +61,7 @@ namespace data
             std::u16string getTitleSafe() { return titleSafe; }
             std::u16string getPublisher() { return publisher; }
             data::titleSaveTypes getSaveTypes() { return types; }
+            data::titleExtInfos getExtInfos() { return extInfo; }
 
             void drawInfo(unsigned x, unsigned y);
             void setIcon(C2D_Image _set) { icon = _set; }
@@ -62,7 +69,7 @@ namespace data
             uint8_t *getIconData() { return (uint8_t *)icon.tex->data; }
             C2D_Image *getIcon() { return &icon; }
 
-            void assignIcon(C3D_Tex *_icon);
+            void assignIcon(C3D_Tex *_icon, bool isDSIcon = false);
             void freeIcon() { if(icon.tex && bhaveIcon) { C3D_TexDelete(icon.tex); } }
 
         private:
@@ -70,11 +77,11 @@ namespace data
             uint32_t high, low, unique, extdata;
             std::string prodCode, idStr, titleUTF8;
             std::u16string title, titleSafe, publisher;
-            CardType spiCardType;
             FS_MediaType m;
             bool fav = false;
             bool bhaveIcon = false;
             titleSaveTypes types;
+            titleExtInfos extInfo;
             C2D_Image icon = {NULL, NULL};
     };
 

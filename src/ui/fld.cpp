@@ -30,7 +30,7 @@ static void fldMenuNew_t(void *a)
     else
         newFolder = util::safeString(util::toUtf16(util::getString("输入新备份名称", true)));
 
-    if(!newFolder.empty() && std::get<bool>(cfg::config["zip"]))
+    if(!newFolder.empty() && std::get<bool>(cfg::config["zip"]) && !data::curData.getExtInfos().isDSCard)
     {
         std::u16string fullOut = targetDir + newFolder + util::toUtf16(".zip");
         std::u16string svOut = fullOut + util::toUtf16(".sv");
@@ -40,14 +40,25 @@ static void fldMenuNew_t(void *a)
     else if(!newFolder.empty())
     {
         std::u16string fullOut = targetDir + newFolder;
-        std::u16string svOut = fullOut + util::toUtf16(".sv");
-        fs::exportSv(fs::getSaveMode(), svOut, data::curData); // export secure value if found
+        if (!data::curData.getExtInfos().isDSCard)
+        {
+            std::u16string svOut = fullOut + util::toUtf16(".sv");
+            fs::exportSv(fs::getSaveMode(), svOut, data::curData); // export secure value if found
 
-        FS_Path crDir = fsMakePath(PATH_UTF16, fullOut.c_str());
-        FSUSER_CreateDirectory(fs::getSDMCArch(), crDir, 0);
-        fullOut += util::toUtf16("/");
+            FS_Path crDir = fsMakePath(PATH_UTF16, fullOut.c_str());
+            FSUSER_CreateDirectory(fs::getSDMCArch(), crDir, 0);
+            fullOut += util::toUtf16("/");
 
-        fs::copyDirToDirThreaded(fs::getSaveArch(), util::toUtf16("/"), fs::getSDMCArch(), fullOut, false);
+            fs::copyDirToDirThreaded(fs::getSaveArch(), util::toUtf16("/"), fs::getSDMCArch(), fullOut, false);
+        } else {
+            t->status->setStatus("正在导出 DS 卡带存档数据...");
+            std::u16string savPath = fullOut + util::toUtf16(".sav");
+            CardType cardType = data::curData.getExtInfos().spiCardType;
+            if (cardType != NO_CHIP)
+                fs::backupSPI(savPath, cardType);
+            else
+                ui::showMessage("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!");
+        }
     }
 
     t->finished = true;
@@ -78,13 +89,22 @@ void fldMenuOverwrite_t(void *a)
     else
     {
         std::u16string overwrite = targetDir + in->name;
-        std::u16string svOut = overwrite + util::toUtf16(".sv");
-        fs::exportSv(fs::getSaveMode(), svOut, data::curData); // export secure value if found
-
         FS_Path targetPath = fsMakePath(PATH_UTF16, overwrite.c_str());
         FSUSER_DeleteFile(fs::getSDMCArch(), targetPath);
 
-        fs::copyArchToZipThreaded(fs::getSaveArch(), util::toUtf16("/"), overwrite);
+        if (!data::curData.getExtInfos().isDSCard) {
+            std::u16string svOut = overwrite + util::toUtf16(".sv");
+            fs::exportSv(fs::getSaveMode(), svOut, data::curData); // export secure value if found
+
+            fs::copyArchToZipThreaded(fs::getSaveArch(), util::toUtf16("/"), overwrite);
+        } else {
+            t->status->setStatus("正在导出 DS 卡带存档数据...");
+            CardType cardType = data::curData.getExtInfos().spiCardType;
+            if (cardType != NO_CHIP)
+                fs::backupSPI(overwrite, cardType);
+            else
+                ui::showMessage("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!");
+        }
     }
     t->finished = true;
 }
@@ -138,11 +158,20 @@ void fldMenuRestore_t(void *a)
     }
     else
     {
-        fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
-        fs::commitData(fs::getSaveMode());
+        if (!data::curData.getExtInfos().isDSCard) {
+            fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
+            fs::commitData(fs::getSaveMode());
 
-        std::u16string rest = targetDir + in->name;
-        fs::copyZipToArchThreaded(fs::getSaveArch(), rest);
+            std::u16string rest = targetDir + in->name;
+            fs::copyZipToArchThreaded(fs::getSaveArch(), rest);
+        } else {
+            t->status->setStatus("正在恢复数据到 DS 游戏卡带...");
+            CardType cardType = data::curData.getExtInfos().spiCardType;
+            if (cardType != NO_CHIP)
+                fs::restoreSPI(targetDir + in->name, cardType);
+            else
+                ui::showMessage("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!");
+        }
     }
     t->finished = true;
 }
@@ -200,7 +229,7 @@ void fldMenuUpload(void *a)
     if(fs::gDrive && !in->isDir)
         ui::newThread(fldMenuUpload_t, a, NULL);
     else if (in->isDir)
-        ui::showMessage("云端存储: 仅支持上传压缩包存档");
+        ui::showMessage("云端存储: 仅支持上传压缩包或SAV存档文件");
     else
         ui::showMessage("云端存储: 服务尚未初始化");
 }

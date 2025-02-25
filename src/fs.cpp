@@ -144,7 +144,7 @@ FS_ArchiveID fs::getSaveMode()
 
 bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_Archive& arch)
 {
-    Result res = 0;
+    Result res = -1;
     saveMode = (FS_ArchiveID) mode;
 
     switch(mode)
@@ -190,6 +190,16 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_
                 uint32_t path[3] = {MEDIATYPE_NAND, dat.getExtData(), 0x00048000};
                 FS_Path binPath  = {PATH_BINARY, 0xC, path};
                 res = FSUSER_OpenArchive(&arch, ARCHIVE_SHARED_EXTDATA, binPath);
+            }
+            break;
+
+        case ARCHIVE_NAND_TWL_FS:
+            {
+                char* saveDir = new char[32];
+                sprintf(saveDir, "/title/%08lx/%08lx/data", (dat.getHigh() & 0x00000FFF) | 0x00030000, dat.getLow());
+                FS_Path targetPath = fsMakePath(PATH_ASCII, saveDir);
+                res = FSUSER_OpenArchive(&arch, ARCHIVE_NAND_TWL_FS, targetPath);
+                delete[] saveDir;
             }
             break;
     }
@@ -403,8 +413,6 @@ size_t fs::fsfile::read(void *buf, const uint32_t& max)
     {
         if(readOut > max)
             readOut = max;
-
-        //std::memset(buf, 0x00, max);
     }
     offset += readOut;
     return (size_t)readOut;
@@ -549,7 +557,9 @@ void fs::dirList::rescan()
             fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
                                     util::toUtf8(std::u16string((char16_t *)ent.name)),
                                     ent.attributes == FS_ATTRIBUTE_DIRECTORY};
-            if (newEntry.isDir || util::endsWith(newEntry.nameUTF8, ".zip"))
+            if (newEntry.isDir
+                || util::endsWith(newEntry.nameUTF8, ".zip")
+                || util::endsWith(newEntry.nameUTF8, ".sav"))
                 entry.push_back(newEntry);
         }
     }
@@ -578,7 +588,9 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
             fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
                                     util::toUtf8(std::u16string((char16_t *)ent.name)),
                                     ent.attributes == FS_ATTRIBUTE_DIRECTORY};
-            if (newEntry.isDir || util::endsWith(newEntry.nameUTF8, ".zip"))
+            if (newEntry.isDir
+                || util::endsWith(newEntry.nameUTF8, ".zip")
+                || util::endsWith(newEntry.nameUTF8, ".sav"))
                 entry.push_back(newEntry);
         }
     }
@@ -838,6 +850,7 @@ void backupTitles_t(void *a)
 
     for(unsigned i = 0; i < vect.size(); i++)
     {
+        if (vect[i].getExtInfos().isDSCard) continue;
         std::string copyStr = "正在处理 '" + util::toUtf8(vect[i].getTitle()) + "'...";
         ui::prog->setText(copyStr);
         ui::prog->update(i);
@@ -888,4 +901,62 @@ void fs::backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode)
     send->vect = &vect;
     send->mode = mode;
     ui::newThread(backupTitles_t, send, ui::progressBarDrawFunc, ZIP_THRD_STACK_SIZE);
+}
+
+void fs::backupSPI(const std::u16string& savPath, const CardType& cardType)
+{
+    u32 saveSize = SPIGetCapacity(cardType);
+    u32 sectorSize = (saveSize < 0x10000) ? saveSize : 0x10000;
+    u8* saveFile = new u8[saveSize];
+
+    Result res;
+    for (u32 i = 0; i < saveSize / sectorSize; ++i) {
+        res = SPIReadSaveData(cardType, sectorSize * i, saveFile + sectorSize * i, sectorSize);
+        if (R_FAILED(res)) break;
+    }
+    if (R_FAILED(res)) {
+        delete[] saveFile;
+        ui::showMessage("读取 DS 卡带存档数据时发生错误!");
+        return;
+    }
+
+    fs::fsfile savFile(fs::getSDMCArch(), savPath, FS_OPEN_CREATE | FS_OPEN_WRITE);
+    if (savFile.isOpen())
+    {
+        savFile.write(saveFile, saveSize);
+        savFile.close();
+        ui::fldRefresh();
+    }
+
+    delete[] saveFile;
+}
+
+void fs::restoreSPI(const std::u16string& savPath, const CardType& cardType)
+{
+    u32 saveSize = SPIGetCapacity(cardType);
+    u32 pageSize = SPIGetPageSize(cardType);
+    u8* saveFile = new u8[saveSize];
+
+    u32 readSize = 0;
+    fs::fsfile savFile(fs::getSDMCArch(), savPath, FS_OPEN_READ);
+    if (savFile.isOpen())
+        readSize = savFile.read(saveFile, saveSize);
+
+    if (!savFile.isOpen() || readSize != saveSize)
+    {
+        delete[] saveFile;
+        ui::showMessage("读取备份数据时发生错误!");
+        return;
+    }
+    savFile.close();
+
+    Result res;
+    for (u32 i = 0; i < saveSize / pageSize; ++i) {
+        res = SPIWriteSaveData(cardType, pageSize * i, saveFile + pageSize * i, pageSize);
+        if (R_FAILED(res)) break;
+    }
+
+    if (R_FAILED(res)) ui::showMessage("写入数据到游戏卡带时发生错误!");
+
+    delete[] saveFile;
 }

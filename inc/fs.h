@@ -134,6 +134,8 @@ namespace fs
     void copyZipToArchThreaded(const FS_Archive& _arch, const std::u16string& _src);
 
     void backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode);
+    void backupSPI(const std::u16string& savPath, const CardType& cardType);
+    void restoreSPI(const std::u16string& savPath, const CardType& cardType);
 }
 
 #endif // FS_H

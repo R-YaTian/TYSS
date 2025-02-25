@@ -43,7 +43,7 @@ static void ttlViewCallback(void *a)
                         uploadParent = fs::gDrive->getFolderID(t->getTitleUTF8(), fs::usrSaveDirID);
                 }
 #endif
-                if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false))
+                if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false) || t->getExtInfos().isDSCard)
                 {
                     std::u16string targetPath = util::createPath(*t, ARCHIVE_USER_SAVEDATA);
                     ui::fldInit(targetPath, uploadParent, fldCallback, NULL);
@@ -114,6 +114,11 @@ static void ttlOptResetSaveData_t(void *a)
 static void ttlOptResetSaveData(void *a)
 {
     data::titleData *t = &data::usrSaveTitles[ttlView->getSelected()];
+    if(t->getExtInfos().isDSCard)
+    {
+        ui::showMessage("DS卡带游戏不支持此操作!");
+        return;
+    }
     std::string q = "你确定要为 " + util::toUtf8(t->getTitle()) + " 重置存档数据吗?";
     ui::confirm(q, ttlOptResetSaveData_t, NULL, NULL);
 }
@@ -152,6 +157,12 @@ static void ttlOptManageCheats(void *a)
 {
     data::titleData *title = &data::usrSaveTitles[ttlView->getSelected()];
     std::string key = title->getIDStr();
+
+    if(title->getExtInfos().isDSCard)
+    {
+        ui::showMessage("DS卡带游戏不支持此操作!");
+        return;
+    }
 
     if (util::fexists("/cheats/" + key + ".txt")) {
         std::string q = "该应用的金手指文件已安装, 是否删除?";
@@ -203,7 +214,7 @@ void ui::ttlInit(void *a)
     ttlOpts->addOptEvent(1, KEY_A, ttlOptResetSaveData, NULL);
     ttlOpts->addOpt("添加到黑名单", 320);
     ttlOpts->addOptEvent(2, KEY_A, ttlOptAddtoBlackList, NULL);
-    ttlOpts->addOpt("备份所有的用户存档", 320);
+    ttlOpts->addOpt("备份所有的用户存档(DS 游戏卡带除外)", 320);
     ttlOpts->addOptEvent(3, KEY_A, ttlOptBackupAll, NULL);
 
     t->finished = true;

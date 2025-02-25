@@ -263,9 +263,18 @@ bool data::titleData::initTWL(const uint64_t& _id, const FS_MediaType& mt)
     bhaveIcon = true;
     delete[] headerData;
 
-    res = SPIGetCardType(&spiCardType, (_gameCode[0] == 'I') ? 1 : 0);
-    if (R_FAILED(res)) {
-        return false;
+    if (m == MEDIATYPE_GAME_CARD)
+    {
+        res = SPIGetCardType(&extInfo.spiCardType, (_gameCode[0] == 'I') ? 1 : 0);
+        if (R_FAILED(res)) {
+            return false;
+        }
+        extInfo.isDSCard = true;
+        types.hasUser = true;
+    } else if(fs::openArchive(*this, ARCHIVE_NAND_TWL_FS, false))
+    {
+        types.hasUser = true;
+        fs::closeSaveArch();
     }
 
     title.assign(util::toUtf16(_cardTitle));
@@ -274,7 +283,6 @@ bool data::titleData::initTWL(const uint64_t& _id, const FS_MediaType& mt)
 
     Makercode pb;
     publisher.assign(util::toUtf16(pb.findPublisher(_makerCode)));
-    types.hasUser = true;
 
     return true;
 }
@@ -312,15 +320,14 @@ void data::titleData::testMounts()
     {
         if(fs::openArchive(*this, ARCHIVE_USER_SAVEDATA, false))
         {
-               types.hasUser = true;
-               fs::closeSaveArch();
+            types.hasUser = true;
+            fs::closeSaveArch();
         }
 
         if(fs::openArchive(*this, ARCHIVE_EXTDATA, false))
         {
             types.hasExt = true;
             fs::closeSaveArch();
-
         }
     }
 
@@ -388,9 +395,9 @@ void data::titleData::drawInfo(unsigned x, unsigned y)
     gfx::drawText(media, 8,64, GFX_DEPTH_DEFAULT, 0.5f, 0xFFFFFFFF);
 }
 
-void data::titleData::assignIcon(C3D_Tex *_icon)
+void data::titleData::assignIcon(C3D_Tex *_icon, bool isDSIcon)
 {
-    icon = {_icon, &gfx::iconSubTex};
+    icon = {_icon, isDSIcon ? &gfx::dsIconSubTex : &gfx::iconSubTex};
 }
 
 static void loadcart()
@@ -581,8 +588,13 @@ void data::loadTitles(void *a)
             if (!isBlacklisted(ids[i]))
             {
                 titleData newNandTitle;
-                if(newNandTitle.init(ids[i], MEDIATYPE_NAND) && newNandTitle.hasSaveData() && !newNandTitle.getTitle().empty())
-                    titles.push_back(newNandTitle);
+                if (((ids[i] >> 44) & 0x08) == 0x08) {
+                    if (newNandTitle.initTWL(ids[i], MEDIATYPE_NAND) &&
+                        newNandTitle.hasSaveData() && !newNandTitle.getTitle().empty())
+                        titles.push_back(newNandTitle);
+                } else if (newNandTitle.init(ids[i], MEDIATYPE_NAND) &&
+                           newNandTitle.hasSaveData() && !newNandTitle.getTitle().empty())
+                        titles.push_back(newNandTitle);
             }
         }
         delete[] ids;
@@ -1034,14 +1046,19 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path)
         else {
             cache.read(readBuff, iconSize);
 
+            bool res = false;
             C3D_Tex *icon = new C3D_Tex;
-            if(C3D_TexInit(icon, 64, 64, GPU_RGB565))
+            res = (((newID >> 44) & 0x08) == 0x08)
+                    ? C3D_TexInit(icon, 32, 32, GPU_RGB565)
+                    : C3D_TexInit(icon, 64, 64, GPU_RGB565);
+            if (res)
             {
                 uLongf sz = ICON_BUFF_SIZE;
                 uncompress((uint8_t *)icon->data, &sz, readBuff, iconSize);
-                newData.assignIcon(icon);
+                newData.assignIcon(icon, ((newID >> 44) & 0x08) == 0x08);
                 newData.setIconFlag(true);
-            }
+            } else
+                newData.setIcon(gfx::noIcon());
         }
 
         newData.initFromCache(newID, title, pub, prodCode, tmp, mediaType);

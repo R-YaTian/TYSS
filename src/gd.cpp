@@ -288,7 +288,10 @@ void drive::gd::loadDriveList()
                         newItem.parent = json_object_get_string(parent);
                     }
                 }
-                if (newItem.isDir || util::endsWith(newItem.name, ".zip") || util::endsWith(newItem.name, ".sv"))
+                if (newItem.isDir
+                    || util::endsWith(newItem.name, ".zip")
+                    || util::endsWith(newItem.name, ".sv")
+                    || util::endsWith(newItem.name, ".sav"))
                     driveList.push_back(newItem);
             }
         }
