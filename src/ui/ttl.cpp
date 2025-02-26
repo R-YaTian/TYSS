@@ -43,7 +43,9 @@ static void ttlViewCallback(void *a)
                         uploadParent = fs::gDrive->getFolderID(t->getTitleUTF8(), fs::usrSaveDirID);
                 }
 #endif
-                if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false) || t->getExtInfos().isDSCard)
+                if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false)
+                    || fs::openArchive(*t, ARCHIVE_NAND_TWL_FS, false)
+                    || t->getExtInfos().isDSCard)
                 {
                     std::u16string targetPath = util::createPath(*t, ARCHIVE_USER_SAVEDATA);
                     ui::fldInit(targetPath, uploadParent, fldCallback, NULL);
@@ -114,9 +116,9 @@ static void ttlOptResetSaveData_t(void *a)
 static void ttlOptResetSaveData(void *a)
 {
     data::titleData *t = &data::usrSaveTitles[ttlView->getSelected()];
-    if(t->getExtInfos().isDSCard)
+    if(t->getExtInfos().isDSCard || (t->getHigh() & 0x8000) == 0x8000)
     {
-        ui::showMessage("DS卡带游戏不支持此操作!");
+        ui::showMessage("DS卡带游戏以及 DSiWare 不支持此操作!");
         return;
     }
     std::string q = "你确定要为 " + util::toUtf8(t->getTitle()) + " 重置存档数据吗?";
@@ -158,9 +160,9 @@ static void ttlOptManageCheats(void *a)
     data::titleData *title = &data::usrSaveTitles[ttlView->getSelected()];
     std::string key = title->getIDStr();
 
-    if(title->getExtInfos().isDSCard)
+    if(title->getExtInfos().isDSCard || (title->getHigh() & 0x8000) == 0x8000)
     {
-        ui::showMessage("DS卡带游戏不支持此操作!");
+        ui::showMessage("DS卡带游戏以及 DSiWare 不支持此操作!");
         return;
     }
 

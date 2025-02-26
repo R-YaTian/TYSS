@@ -16,6 +16,7 @@
 
 static FS_Archive sdmcArch, saveArch;
 static FS_ArchiveID saveMode = (FS_ArchiveID)0;
+static std::u16string dataPath;
 
 typedef struct 
 {
@@ -195,12 +196,15 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_
 
         case ARCHIVE_NAND_TWL_FS:
             {
-                char* saveDir = new char[32];
-                sprintf(saveDir, "/title/%08lx/%08lx/data", (dat.getHigh() & 0x00000FFF) | 0x00030000, dat.getLow());
                 res = FSUSER_OpenArchive(&arch, ARCHIVE_NAND_TWL_FS, fsMakePath(PATH_EMPTY, ""));
                 if (R_SUCCEEDED(res))
-                    res = FSUSER_OpenDirectory(NULL, arch, fsMakePath(PATH_UTF16, util::toUtf16(saveDir).data()));
-                delete[] saveDir;
+                {
+                    char* saveDir = new char[32];
+                    sprintf(saveDir, "/title/%08lx/%08lx/data", (dat.getHigh() & 0x00000FFF) | 0x00030000, dat.getLow());
+                    dataPath = util::toUtf16(saveDir);
+                    res = FSUSER_OpenDirectory(NULL, arch, fsMakePath(PATH_UTF16, dataPath.data()));
+                    delete[] saveDir;
+                }
             }
             break;
     }
@@ -222,7 +226,7 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error)
 
 void fs::commitData(const uint32_t& mode)
 {
-    if(mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
+    if(mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA && mode != ARCHIVE_NAND_TWL_FS)
     {
         Result res = FSUSER_ControlArchive(saveArch, ARCHIVE_ACTION_COMMIT_SAVE_DATA, NULL, 0, NULL, 0);
         if(R_FAILED(res))
@@ -232,7 +236,11 @@ void fs::commitData(const uint32_t& mode)
 
 void fs::deleteSv(const uint32_t& mode, const data::titleData& dat)
 {
-    if(dat.getMedia() != MEDIATYPE_GAME_CARD && mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
+    if(dat.getMedia() != MEDIATYPE_GAME_CARD
+        && mode != ARCHIVE_EXTDATA
+        && mode != ARCHIVE_BOSS_EXTDATA
+        && mode != ARCHIVE_SHARED_EXTDATA
+        && mode != ARCHIVE_NAND_TWL_FS)
     {
         Result res = 0;
         u64 in = ((u64)SECUREVALUE_SLOT_SD << 32) | (dat.getUnique() << 8);
@@ -246,7 +254,11 @@ void fs::deleteSv(const uint32_t& mode, const data::titleData& dat)
 
 void fs::exportSv(const uint32_t& mode, const std::u16string& _dst, const data::titleData& dat)
 {
-    if(dat.getMedia() != MEDIATYPE_GAME_CARD && mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
+    if(dat.getMedia() != MEDIATYPE_GAME_CARD
+        && mode != ARCHIVE_EXTDATA
+        && mode != ARCHIVE_BOSS_EXTDATA
+        && mode != ARCHIVE_SHARED_EXTDATA
+        && mode != ARCHIVE_NAND_TWL_FS)
     {
         Result res = 0;
         bool exists = false;
@@ -266,7 +278,11 @@ void fs::exportSv(const uint32_t& mode, const std::u16string& _dst, const data::
 
 void fs::importSv(const uint32_t& mode, const std::u16string& _src, const data::titleData& dat)
 {
-    if(dat.getMedia() != MEDIATYPE_GAME_CARD && mode != ARCHIVE_EXTDATA && mode != ARCHIVE_BOSS_EXTDATA && mode != ARCHIVE_SHARED_EXTDATA)
+    if(dat.getMedia() != MEDIATYPE_GAME_CARD
+        && mode != ARCHIVE_EXTDATA
+        && mode != ARCHIVE_BOSS_EXTDATA
+        && mode != ARCHIVE_SHARED_EXTDATA
+        && mode != ARCHIVE_NAND_TWL_FS)
     {
         if (!fsfexists(getSDMCArch(), _src)) return; // do nothing if not found
         fs::fsfile src(getSDMCArch(), _src, FS_OPEN_READ);
@@ -652,7 +668,15 @@ void fs::copyFileThreaded(const FS_Archive& _srcArch, const std::u16string& _src
 
 void fs::copyDirToDir(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t)
 {
-    fs::dirList srcList(_srcArch, _src);
+    std::u16string srcPath = _src;
+    std::u16string dstPath = _dst;
+    if (saveMode == ARCHIVE_NAND_TWL_FS)
+    {
+        if (saveArch == _srcArch) srcPath = dataPath + _src;
+        else if (saveArch == _dstArch) dstPath = dataPath + _dst;
+    }
+
+    fs::dirList srcList(_srcArch, srcPath);
     for(unsigned i = 0; i < srcList.getCount(); i++)
     {
         if(srcList.isDir(i))
@@ -664,8 +688,8 @@ void fs::copyDirToDir(const FS_Archive& _srcArch, const std::u16string& _src, co
         }
         else
         {
-            std::u16string fullSrc = _src + srcList.getItem(i);
-            std::u16string fullDst = _dst + srcList.getItem(i);
+            std::u16string fullSrc = srcPath + srcList.getItem(i);
+            std::u16string fullDst = dstPath + srcList.getItem(i);
             fs::copyFile(_srcArch, fullSrc, _dstArch, fullDst, commit, t);
         }
     }
@@ -698,7 +722,11 @@ void fs::copyDirToDirThreaded(const FS_Archive& _srcArch, const std::u16string& 
 
 void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipFile _zip, const std::u16string* _dir, threadInfo *t)
 {
-    fs::dirList *archList = new fs::dirList(_arch, _src);
+    std::u16string srcPath = _src;
+    if (saveMode == ARCHIVE_NAND_TWL_FS)
+        srcPath = dataPath + _src;
+
+    fs::dirList *archList = new fs::dirList(_arch, srcPath);
     for(unsigned i = 0; i < archList->getCount(); i++)
     {
         if(archList->isDir(i))
@@ -724,7 +752,7 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
             int openZip = zipOpenNewFileInZip64(_zip, filename.c_str(), &inf, NULL, 0, NULL, 0, NULL, Z_DEFLATED, std::get<int>(cfg::config["deflateLevel"]), 0);
             if(openZip == 0)
             {
-                fs::fsfile readFile(_arch, _src + archList->getItem(i), FS_OPEN_READ);
+                fs::fsfile readFile(_arch, srcPath + archList->getItem(i), FS_OPEN_READ);
                 size_t readIn = 0;
                 uint32_t size = 0;
                 size = readFile.getSize() > buff_size ? buff_size : readFile.getSize();
@@ -785,6 +813,7 @@ void fs::copyZipToArch(const FS_Archive& arch, unzFile _unz, threadInfo *t)
             {
                 std::u16string nameUTF16 = util::toUtf16(filename);
                 std::u16string dstPathUTF16 = util::toUtf16("/") + nameUTF16;
+                if (saveMode == ARCHIVE_NAND_TWL_FS) dstPathUTF16 = dataPath + dstPathUTF16;
                 size_t pos = nameUTF16.find_last_of(L'/');
                 if (pos != std::u16string::npos)
                 {

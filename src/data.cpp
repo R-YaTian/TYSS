@@ -121,6 +121,11 @@ struct
 
 static bool isBlacklisted(const uint64_t& id)
 {
+    u32 idHigh = (u32) (id >> 32); 
+
+    if (idHigh == 0x0004000E || idHigh == 0x0004800F)
+        return true;
+
     for(unsigned i = 0; i < blacklist.size(); i++)
     {
         if(id == blacklist[i])
@@ -281,7 +286,10 @@ bool data::titleData::initTWL(const uint64_t& _id, const FS_MediaType& mt)
         types.hasUser = true;
     } else if(fs::openArchive(*this, ARCHIVE_NAND_TWL_FS, false))
     {
-        types.hasUser = true;
+        if (high == 0x00048004)
+            types.hasUser = true;
+        else if (high == 0x00048005)
+            types.hasSys = true;
         fs::closeSaveArch();
     }
 
@@ -597,12 +605,13 @@ void data::loadTitles(void *a)
             {
                 titleData newNandTitle;
                 if (((ids[i] >> 44) & 0x08) == 0x08) {
-                    if (newNandTitle.initTWL(ids[i], MEDIATYPE_NAND) &&
-                        newNandTitle.hasSaveData() && !newNandTitle.getTitle().empty())
+                    if (newNandTitle.initTWL(ids[i], MEDIATYPE_NAND)
+                        && newNandTitle.hasSaveData()
+                        && !newNandTitle.getTitle().empty())
                         titles.push_back(newNandTitle);
                 } else if (newNandTitle.init(ids[i], MEDIATYPE_NAND) &&
                            newNandTitle.hasSaveData() && !newNandTitle.getTitle().empty())
-                        titles.push_back(newNandTitle);
+                    titles.push_back(newNandTitle);
             }
         }
         delete[] ids;
