@@ -666,11 +666,11 @@ void fs::copyFileThreaded(const FS_Archive& _srcArch, const std::u16string& _src
     ui::newThread(copyFile_t, send, NULL);
 }
 
-void fs::copyDirToDir(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t)
+void fs::copyDirToDir(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t, bool isRecursion)
 {
     std::u16string srcPath = _src;
     std::u16string dstPath = _dst;
-    if (saveMode == ARCHIVE_NAND_TWL_FS)
+    if (!isRecursion && saveMode == ARCHIVE_NAND_TWL_FS)
     {
         if (saveArch == _srcArch) srcPath = dataPath + _src;
         else if (saveArch == _dstArch) dstPath = dataPath + _dst;
@@ -681,10 +681,10 @@ void fs::copyDirToDir(const FS_Archive& _srcArch, const std::u16string& _src, co
     {
         if(srcList.isDir(i))
         {
-            std::u16string newSrc = _src + srcList.getItem(i) + util::toUtf16("/");
-            std::u16string newDst = _dst + srcList.getItem(i) + util::toUtf16("/");
+            std::u16string newSrc = srcPath + srcList.getItem(i) + util::toUtf16("/");
+            std::u16string newDst = dstPath + srcList.getItem(i) + util::toUtf16("/");
             fs::createDir(_dstArch, newDst.substr(0, newDst.length() - 1));
-            fs::copyDirToDir(_srcArch, newSrc, _dstArch, newDst, commit, t);
+            fs::copyDirToDir(_srcArch, newSrc, _dstArch, newDst, commit, t, true);
         }
         else
         {
@@ -720,10 +720,10 @@ void fs::copyDirToDirThreaded(const FS_Archive& _srcArch, const std::u16string& 
     ui::newThread(copyDirToDir_t, send, NULL);
 }
 
-void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipFile _zip, const std::u16string* _dir, threadInfo *t)
+void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipFile _zip, const std::u16string* _dir, threadInfo *t, bool isRecursion)
 {
     std::u16string srcPath = _src;
-    if (saveMode == ARCHIVE_NAND_TWL_FS)
+    if (!isRecursion && saveMode == ARCHIVE_NAND_TWL_FS)
         srcPath = dataPath + _src;
 
     fs::dirList *archList = new fs::dirList(_arch, srcPath);
@@ -731,12 +731,12 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
     {
         if(archList->isDir(i))
         {
-            std::u16string newSrc = _src + archList->getItem(i) + util::toUtf16("/");
+            std::u16string newSrc = srcPath + archList->getItem(i) + util::toUtf16("/");
             std::u16string newDir = archList->getItem(i) + util::toUtf16("/");
             if (_dir) newDir = *_dir + newDir; // Join existing path
             std::string dirname = util::toUtf8(newDir); // We should add the folder to zip first
             zipOpenNewFileInZip64(_zip, dirname.c_str(), NULL, NULL, 0, NULL, 0, NULL, Z_DEFLATED, std::get<int>(cfg::config["deflateLevel"]), 0);
-            fs::copyArchToZip(_arch, newSrc, _zip, &newDir, t);
+            fs::copyArchToZip(_arch, newSrc, _zip, &newDir, t, true);
         }
         else
         {

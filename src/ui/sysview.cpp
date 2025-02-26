@@ -41,7 +41,8 @@ static void sysViewCallback(void *a)
                         uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::sysSaveDirID);
                 }
 #endif
-                if(fs::openArchive(*t, ARCHIVE_SYSTEM_SAVEDATA, false))
+                if(fs::openArchive(*t, ARCHIVE_SYSTEM_SAVEDATA, false)
+                    || fs::openArchive(*t, ARCHIVE_NAND_TWL_FS, false))
                 {
                     std::u16string targetDir = util::createPath(*t, ARCHIVE_SYSTEM_SAVEDATA);
                     ui::fldInit(targetDir, uploadParent, fldCallback, NULL);
