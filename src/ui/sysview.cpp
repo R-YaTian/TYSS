@@ -113,8 +113,21 @@ static void sysOptBackupAll_t(void *a)
 
 static void sysOptBackupAll(void *a)
 {
-    std::string q = "你确定要备份此页所有的存档吗?\n这或许需要耗费一定时间, 视 Title 数量而定。\n请耐心等待!";
+    std::string q = "你确定要备份此页所有的系统存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!";
     ui::confirm(q, sysOptBackupAll_t, NULL, NULL);
+}
+
+static void sysOptBackupAllDSiWare_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    fs::backupTitles(data::sysDataTitles, ARCHIVE_NAND_TWL_FS);
+    t->finished = true;
+}
+
+static void sysOptBackupAllDSiWare(void *a)
+{
+    std::string q = "你确定要备份此页所有的DSiWare存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!";
+    ui::confirm(q, sysOptBackupAllDSiWare_t, NULL, NULL);
 }
 
 void ui::sysInit(void *a)
@@ -128,6 +141,8 @@ void ui::sysInit(void *a)
     sysOpts->addOptEvent(0, KEY_A, sysOptAddtoBlackList, NULL);
     sysOpts->addOpt("备份所有的系统存档", 320);
     sysOpts->addOptEvent(1, KEY_A, sysOptBackupAll, NULL);
+    sysOpts->addOpt("备份所有的 DSiWare 存档", 320);
+    sysOpts->addOptEvent(4, KEY_A, sysOptBackupAllDSiWare, NULL);
 
     t->finished = true;
 }

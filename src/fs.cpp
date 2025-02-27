@@ -881,6 +881,8 @@ void backupTitles_t(void *a)
     for(unsigned i = 0; i < vect.size(); i++)
     {
         if (vect[i].getExtInfos().isDSCard) continue;
+        if (mode != ARCHIVE_NAND_TWL_FS && (vect[i].getHigh() & 0x8000) == 0x8000) continue;
+        if (mode == ARCHIVE_NAND_TWL_FS && (vect[i].getHigh() & 0x8000) != 0x8000) continue;
         std::string copyStr = "正在处理 '" + util::toUtf8(vect[i].getTitle()) + "'...";
         ui::prog->setText(copyStr);
         ui::prog->update(i);
