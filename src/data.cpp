@@ -651,6 +651,7 @@ void data::loadTitles(void *a)
         ui::extRefresh();
         ui::sysRefresh();
         ui::bossViewRefresh();
+        if (cartValid) cartValid = false;
     }
     t->finished = true;
 }

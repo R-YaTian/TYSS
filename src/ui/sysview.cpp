@@ -142,7 +142,7 @@ void ui::sysInit(void *a)
     sysOpts->addOpt("备份所有的系统存档", 320);
     sysOpts->addOptEvent(1, KEY_A, sysOptBackupAll, NULL);
     sysOpts->addOpt("备份所有的 DSiWare 存档", 320);
-    sysOpts->addOptEvent(4, KEY_A, sysOptBackupAllDSiWare, NULL);
+    sysOpts->addOptEvent(2, KEY_A, sysOptBackupAllDSiWare, NULL);
 
     t->finished = true;
 }
