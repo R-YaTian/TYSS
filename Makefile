@@ -39,9 +39,10 @@ INCLUDES	:=	inc inc/ui
 GRAPHICS	:=	gfx
 ROMFS		:=  romfs
 GFXBUILD	:=	$(ROMFS)/gfx
-APP_TITLE   := JKSM
-APP_AUTHOR  := JK
-APP_DESCRIPTION := 3DS Save Manager
+ICON		:= icon.png
+APP_TITLE   := TYSS
+APP_AUTHOR  := R-YaTian
+APP_DESCRIPTION := 3DS Save Studio
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -181,11 +182,11 @@ $(TARGET)-strip.elf: $(BUILD)
 	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf
 
 cia: $(TARGET)-strip.elf
-	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon icon -banner banner -DAPP_SYSTEM_MODE="64MB"
+	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner banner -DAPP_SYSTEM_MODE="64MB"
 	@echo Built JKSM.cia
 
 mode3: $(TARGET)-strip.elf
-	@makerom -f cia -o $(TARGET)_mode3.cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon icon -banner banner -DAPP_SYSTEM_MODE="80MB"
+	@makerom -f cia -o $(TARGET)_mode3.cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner banner -DAPP_SYSTEM_MODE="80MB"
 	@echo Built JKSM_mode3.cia
 
 send:
