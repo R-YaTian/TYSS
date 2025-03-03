@@ -1,3 +1,21 @@
+/*
+ *  This file is part of TYSS.
+ *  Copyright (C) 2024-2025 R-YaTian
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 #include <3ds.h>
 #include <citro2d.h>
 #include <cstdio>
@@ -32,7 +50,7 @@ ui::progressBar *ui::prog;
 static ui::threadProcMngr *thrdMgr;
 static ui::button *ok, *yes, *no;
 
-const std::string TITLE_TEXT = "JKSM 简中加强版 - 02.18.2025 ";
+const std::string TITLE_TEXT = "TY Save Studio - 03.03.2025 ";
 
 uint32_t ui::down = 0, ui::held = 0;
 touchPosition ui::p;

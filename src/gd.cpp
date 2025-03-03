@@ -1,3 +1,21 @@
+/*
+ *  This file is part of TYSS.
+ *  Copyright (C) 2024-2025 R-YaTian
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 #include <stdio.h>
 #include <curl/curl.h>
 #include <json-c/json.h>
@@ -11,7 +29,7 @@
 #include "sys.h"
 
 /*
-Google Drive code for JKSV.
+Google Drive code for TYSS.
 Modified 3DS version
 Original author: J-D-K
 Continued by: R-YaTian
@@ -23,7 +41,7 @@ Continued by: R-YaTian
 #define tokenCheckURL "https://oauth2.googleapis.com/tokeninfo"
 #define driveURL "https://www.googleapis.com/drive/v3/files"
 #define driveUploadURL "https://www.googleapis.com/upload/drive/v3/files"
-#define userAgent "JKSM"
+#define userAgent "TYSS"
 
 drive::gd::gd(const std::string &_clientID, const std::string& _secretID, const std::string& _authCode, const std::string& _rToken)
 {
@@ -316,7 +334,7 @@ void drive::gd::getListWithParent(const std::string& _parent, std::vector<drive:
 
 void drive::gd::debugWriteList()
 {
-    fs::fsfile list(fs::getSDMCArch(), "/JKSV/drive_list.txt", FS_OPEN_CREATE | FS_OPEN_WRITE);
+    fs::fsfile list(fs::getSDMCArch(), "/TYSS/drive_list.txt", FS_OPEN_CREATE | FS_OPEN_WRITE);
     for(auto& di : driveList)
     {
         list.writef("%s\n\t%s\n", di.name.c_str(), di.id.c_str());

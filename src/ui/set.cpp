@@ -108,7 +108,7 @@ static void setMenuHackPlayCoin(void *a)
 
 static void setMenuClearFavList(void *a)
 {
-    remove("/JKSV/favorites.txt");
+    remove("/TYSS/favorites.txt");
     ui::newThread(data::clearFav, NULL, NULL);
 }
 
@@ -120,7 +120,7 @@ static void setMenuClearBlackList(void *a)
 
 static void setMenuReloadTitles(void *a)
 {
-    remove("/JKSV/cache.bin");
+    remove("/TYSS/cache.bin");
     ui::newThread(data::loadTitles, NULL, NULL);
 }
 

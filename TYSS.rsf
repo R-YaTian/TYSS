@@ -1,6 +1,6 @@
 BasicInfo:
-  Title                   : "JKSM"
-  ProductCode             : "CTR-HB-JKSM"
+  Title                   : "TYSS"
+  ProductCode             : "CTR-HB-TYSS"
   Logo                    : Nintendo
 
 RomFs:
@@ -8,7 +8,7 @@ RomFs:
 
 TitleInfo:
   Category                : Application
-  UniqueId                : 0x2c232
+  UniqueId                : 0xB5493
 
 Option:
   UseOnSD                 : true # true if App is to be installed to SD

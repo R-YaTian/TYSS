@@ -1,3 +1,21 @@
+/*
+ *  This file is part of TYSS.
+ *  Copyright (C) 2024-2025 R-YaTian
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 #include <3ds.h>
 #include <string>
 #include <vector>
@@ -197,7 +215,7 @@ void fldMenuUpload_t(void *a)
     t->status->setStatus("正在上传 " + utf8Name + "...");
 
     FS_Path srcPath = fsMakePath(PATH_UTF16, src.c_str());
-    FS_Path tmpPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
+    FS_Path tmpPath = fsMakePath(PATH_ASCII, "/TYSS/tmp.zip");
     FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), tmpPath);
 
     std::string ttlUTF8 = data::curData.getTitleUTF8();
@@ -205,7 +223,7 @@ void fldMenuUpload_t(void *a)
         fs::gDrive->createDir(ttlUTF8, fs::currentDirID);
     uploadParent = fs::gDrive->getFolderID(ttlUTF8,  fs::currentDirID);
 
-    FILE *upload = fopen("/JKSV/tmp.zip", "rb");
+    FILE *upload = fopen("/TYSS/tmp.zip", "rb");
     if(fs::gDrive->fileExists(utf8Name, uploadParent))
     {
         std::string fileID = fs::gDrive->getFileID(utf8Name, uploadParent);
@@ -243,12 +261,12 @@ void fldMenuDriveDownload_t(void *a)
 
     std::u16string target = targetDir + util::toUtf16(in->name);
     FS_Path targetPath = fsMakePath(PATH_UTF16, target.c_str());
-    FS_Path tmpPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
+    FS_Path tmpPath = fsMakePath(PATH_ASCII, "/TYSS/tmp.zip");
 
     if(fs::fsfexists(fs::getSDMCArch(), target))
         FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_UTF16, target.c_str()));
 
-    FILE *tmp = fopen("/JKSV/tmp.zip", "wb");
+    FILE *tmp = fopen("/TYSS/tmp.zip", "wb");
     fs::gDrive->downloadFile(in->id, tmp);
     fclose(tmp);
 
@@ -291,17 +309,17 @@ void fldMenuDriveRestore_t(void *a)
     drive::gdItem *in = (drive::gdItem *)t->argPtr;
     t->status->setStatus("正在下载 " + in->name + "...");
 
-    FILE *tmp = fopen("/JKSV/tmp.zip", "wb");
+    FILE *tmp = fopen("/TYSS/tmp.zip", "wb");
     fs::gDrive->downloadFile(in->id, tmp);
     fclose(tmp);
 
     t->status->setStatus("正在解压存档到存档位...");
-    unzFile unz = unzOpen64("/JKSV/tmp.zip");
+    unzFile unz = unzOpen64("/TYSS/tmp.zip");
     fs::copyZipToArch(fs::getSaveArch(), unz, NULL);
     unzClose(unz);
 
     // Todo: SV logic
-    FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_ASCII, "/JKSV/tmp.zip"));
+    FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_ASCII, "/TYSS/tmp.zip"));
 
     t->finished = true;
 }

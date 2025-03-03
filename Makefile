@@ -31,18 +31,17 @@ include $(DEVKITARM)/3ds_rules
 #     - icon.png
 #     - <libctru folder>/default_icon.png
 #---------------------------------------------------------------------------------
-TARGET		:=	JKSM
+TARGET		:=	TYSS
 BUILD		:=	build
 SOURCES		:=	src src/ui
-#DATA		:=	data
 INCLUDES	:=	inc inc/ui
 GRAPHICS	:=	gfx
-ROMFS		:=  romfs
+ROMFS		:=	romfs
 GFXBUILD	:=	$(ROMFS)/gfx
-ICON		:= icon.png
-APP_TITLE   := TYSS
-APP_AUTHOR  := R-YaTian
-APP_DESCRIPTION := 3DS Save Studio
+ICON		:=	res/icon.png
+APP_TITLE   :=	TYSS
+APP_AUTHOR  :=	R-YaTian
+APP_DESCRIPTION :=	3DS Save Studio
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -182,12 +181,12 @@ $(TARGET)-strip.elf: $(BUILD)
 	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf
 
 cia: $(TARGET)-strip.elf
-	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner banner -DAPP_SYSTEM_MODE="64MB"
-	@echo Built JKSM.cia
+	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner $(TARGET).bnr -DAPP_SYSTEM_MODE="64MB"
+	@echo Built TYSS.cia
 
 mode3: $(TARGET)-strip.elf
-	@makerom -f cia -o $(TARGET)_mode3.cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner banner -DAPP_SYSTEM_MODE="80MB"
-	@echo Built JKSM_mode3.cia
+	@makerom -f cia -o $(TARGET)_mode3.cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner $(TARGET).bnr -DAPP_SYSTEM_MODE="80MB"
+	@echo Built TYSS_mode3.cia
 
 send:
 	@3dslink $(TARGET).3dsx

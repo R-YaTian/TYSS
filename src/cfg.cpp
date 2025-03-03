@@ -1,3 +1,21 @@
+/*
+ *  This file is part of TYSS.
+ *  Copyright (C) 2024-2025 R-YaTian
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 #include <string>
 #include <unordered_map>
 
@@ -19,7 +37,7 @@ void cfg::initToDefault()
 
 void cfg::load()
 {
-    FILE *cfgIn = fopen("/JKSV/cfg.bin", "rb");
+    FILE *cfgIn = fopen("/TYSS/cfg.bin", "rb");
     if(cfgIn)
     {
         bool getBool = false;
@@ -34,7 +52,7 @@ void cfg::load()
     }
 
 #ifdef ENABLE_GD
-    fs::fsfile drvCfg(fs::getSDMCArch(), "/JKSV/drive.json", FS_OPEN_READ);
+    fs::fsfile drvCfg(fs::getSDMCArch(), "/TYSS/drive.json", FS_OPEN_READ);
     if(drvCfg.isOpen())
     {
         char *jsonBuff = new char[drvCfg.getSize()];
@@ -71,7 +89,7 @@ void cfg::load()
 
 void cfg::saveCommon()
 {
-    FILE *cfgOut = fopen("/JKSV/cfg.bin", "wb");
+    FILE *cfgOut = fopen("/TYSS/cfg.bin", "wb");
     if(cfgOut)
     {
         fwrite(&std::get<bool>(cfg::config["zip"]), sizeof(bool), 1, cfgOut);
@@ -93,7 +111,7 @@ void cfg::saveGD()
         json_object_object_add(drvCfg, "driveClientSecret", drvClientSecret);
         json_object_object_add(drvCfg, "driveRefreshToken", drvRefresh);
 
-        FILE *drvOut = fopen("/JKSV/drive.json", "w");
+        FILE *drvOut = fopen("/TYSS/drive.json", "w");
         fputs(json_object_get_string(drvCfg), drvOut);
         fclose(drvOut);
 

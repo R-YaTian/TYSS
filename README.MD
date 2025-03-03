@@ -1,5 +1,5 @@
-# TYSV for 3DS
-TYSV or RYaTian's Save Manager for 3DS.
+# TYSS for 3DS
+TYSS or RYaTian's Save Studio for 3DS.
 
 * Circle Pad Left or Right Changes Save Data Type
 * While in title selection:
@@ -18,7 +18,7 @@ Follow the guide [here](./GD_INSTRUCTIONS.MD).
 
 **NOTE: Google Drive support currently requires saves created with the `Export To Zip` option turned on are uploadable for now.**
 
-**See [releases](https://github.com/R-YaTian/JKSM/releases) for the latest version.** 
+**See [releases](https://github.com/R-YaTian/TYSS/releases) for the latest version.** 
 
 ## Building:
 * Setup [devkitPro](https://www.3dbrew.org/wiki/Setting_up_Development_Environment)

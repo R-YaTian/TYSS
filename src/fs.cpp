@@ -1,3 +1,21 @@
+/*
+ *  This file is part of TYSS.
+ *  Copyright (C) 2024-2025 R-YaTian
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 #include <3ds.h>
 #include <string>
 #include <algorithm>
@@ -43,12 +61,12 @@ void fs::init()
 {
     FSUSER_OpenArchive(&sdmcArch, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""));
 
-    createDir("/JKSV");
-    createDir("/JKSV/Saves");
-    createDir("/JKSV/SysSave");
-    createDir("/JKSV/ExtData");
-    createDir("/JKSV/Boss");
-    createDir("/JKSV/Shared");
+    createDir("/TYSS");
+    createDir("/TYSS/Saves");
+    createDir("/TYSS/SysSave");
+    createDir("/TYSS/ExtData");
+    createDir("/TYSS/Boss");
+    createDir("/TYSS/Shared");
 }
 
 void fs::exit()
@@ -59,7 +77,7 @@ void fs::exit()
 
 #ifdef ENABLE_GD
 drive::gd *fs::gDrive = NULL;
-std::string fs::jksmDirID, fs::usrSaveDirID, fs::extDataDirID, fs::sysSaveDirID, fs::bossExtDirID, fs::sharedExtID;
+std::string fs::tyssDirID, fs::usrSaveDirID, fs::extDataDirID, fs::sysSaveDirID, fs::bossExtDirID, fs::sharedExtID;
 std::string fs::currentDirID;
 
 void fs::driveInit(void *a)
@@ -75,35 +93,35 @@ void fs::driveInit(void *a)
 
         gDrive->loadDriveList();
 
-        if(!gDrive->dirExists(DRIVE_JKSM_DIR))
-            gDrive->createDir(DRIVE_JKSM_DIR, "");
+        if(!gDrive->dirExists(DRIVE_TYSS_DIR))
+            gDrive->createDir(DRIVE_TYSS_DIR, "");
 
-        jksmDirID = gDrive->getFolderID(DRIVE_JKSM_DIR);
+        tyssDirID = gDrive->getFolderID(DRIVE_TYSS_DIR);
 
-        if(!gDrive->dirExists(DRIVE_USER_SAVE_DIR, jksmDirID))
-            gDrive->createDir(DRIVE_USER_SAVE_DIR, jksmDirID);
+        if(!gDrive->dirExists(DRIVE_USER_SAVE_DIR, tyssDirID))
+            gDrive->createDir(DRIVE_USER_SAVE_DIR, tyssDirID);
 
-        usrSaveDirID = gDrive->getFolderID(DRIVE_USER_SAVE_DIR, jksmDirID);
+        usrSaveDirID = gDrive->getFolderID(DRIVE_USER_SAVE_DIR, tyssDirID);
 
-        if(!gDrive->dirExists(DRIVE_EXTDATA_DIR, jksmDirID))
-            gDrive->createDir(DRIVE_EXTDATA_DIR, jksmDirID);
+        if(!gDrive->dirExists(DRIVE_EXTDATA_DIR, tyssDirID))
+            gDrive->createDir(DRIVE_EXTDATA_DIR, tyssDirID);
 
-        extDataDirID = gDrive->getFolderID(DRIVE_EXTDATA_DIR, jksmDirID);
+        extDataDirID = gDrive->getFolderID(DRIVE_EXTDATA_DIR, tyssDirID);
 
-        if(!gDrive->dirExists(DRIVE_SYSTEM_DIR, jksmDirID))
-            gDrive->createDir(DRIVE_SYSTEM_DIR, jksmDirID);
+        if(!gDrive->dirExists(DRIVE_SYSTEM_DIR, tyssDirID))
+            gDrive->createDir(DRIVE_SYSTEM_DIR, tyssDirID);
 
-        sysSaveDirID = gDrive->getFolderID(DRIVE_SYSTEM_DIR, jksmDirID);
+        sysSaveDirID = gDrive->getFolderID(DRIVE_SYSTEM_DIR, tyssDirID);
 
-        if(!gDrive->dirExists(DRIVE_BOSS_DIR, jksmDirID))
-            gDrive->createDir(DRIVE_BOSS_DIR, jksmDirID);
+        if(!gDrive->dirExists(DRIVE_BOSS_DIR, tyssDirID))
+            gDrive->createDir(DRIVE_BOSS_DIR, tyssDirID);
 
-        bossExtDirID = gDrive->getFolderID(DRIVE_BOSS_DIR, jksmDirID);
+        bossExtDirID = gDrive->getFolderID(DRIVE_BOSS_DIR, tyssDirID);
 
-        if(!gDrive->dirExists(DRIVE_SHARED_DIR, jksmDirID))
-            gDrive->createDir(DRIVE_SHARED_DIR, jksmDirID);
+        if(!gDrive->dirExists(DRIVE_SHARED_DIR, tyssDirID))
+            gDrive->createDir(DRIVE_SHARED_DIR, tyssDirID);
 
-        sharedExtID = gDrive->getFolderID(DRIVE_SHARED_DIR, jksmDirID);
+        sharedExtID = gDrive->getFolderID(DRIVE_SHARED_DIR, tyssDirID);
 
         ui::showMessage("云端存储: 服务初始化完成!");
     } else {
@@ -774,11 +792,11 @@ void copyArchToZip_t(void *a)
     cpyArgs *cpy = (cpyArgs *)t->argPtr;
     t->status->setStatus("正在压缩存档位到 zip 文件...");
 
-    zipFile zip = zipOpen64("/JKSV/tmp.zip", 0);
+    zipFile zip = zipOpen64("/TYSS/tmp.zip", 0);
     fs::copyArchToZip(cpy->srcArch, util::toUtf16("/"), zip, NULL, t);
     zipClose(zip, NULL);
 
-    FS_Path srcPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
+    FS_Path srcPath = fsMakePath(PATH_ASCII, "/TYSS/tmp.zip");
     FS_Path dstPath = fsMakePath(PATH_UTF16, cpy->dst.c_str());
     FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), dstPath);
 
@@ -842,11 +860,11 @@ void copyZipToArch_t(void *a)
     t->status->setStatus("正在解压数据到存档位...");
 
     FS_Path srcPath = fsMakePath(PATH_UTF16, cpy->src.c_str());
-    FS_Path dstPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
+    FS_Path dstPath = fsMakePath(PATH_ASCII, "/TYSS/tmp.zip");
 
     FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), dstPath);
 
-    unzFile unz = unzOpen64("/JKSV/tmp.zip");
+    unzFile unz = unzOpen64("/TYSS/tmp.zip");
     fs::copyZipToArch(cpy->dstArch, unz, t);
     unzClose(unz);
 
@@ -899,11 +917,11 @@ void backupTitles_t(void *a)
                 std::u16string svOut = fullOut + util::toUtf16(".sv");
                 fs::exportSv(mode, svOut, vect[i]); // export secure value if found
 
-                zipFile zip = zipOpen64("/JKSV/tmp.zip", 0);
+                zipFile zip = zipOpen64("/TYSS/tmp.zip", 0);
                 fs::copyArchToZip(_arch, util::toUtf16("/"), zip, NULL, NULL);
                 zipClose(zip, NULL);
 
-                FS_Path srcPath = fsMakePath(PATH_ASCII, "/JKSV/tmp.zip");
+                FS_Path srcPath = fsMakePath(PATH_ASCII, "/TYSS/tmp.zip");
                 FS_Path dstPath = fsMakePath(PATH_UTF16, fullOut.c_str());
                 FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), dstPath);
             }

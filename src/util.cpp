@@ -1,3 +1,21 @@
+/*
+ *  This file is part of TYSS.
+ *  Copyright (C) 2024-2025 R-YaTian
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 #include <3ds.h>
 #include <cstring>
 #include <cstdlib>
@@ -46,25 +64,25 @@ std::u16string util::createPath(data::titleData &dat, const uint32_t &mode)
     {
         case ARCHIVE_USER_SAVEDATA:
         case ARCHIVE_SAVEDATA:
-            ret = toUtf16("/JKSV/Saves/") + dat.getTitleSafe() + toUtf16("/");
+            ret = toUtf16("/TYSS/Saves/") + dat.getTitleSafe() + toUtf16("/");
             break;
 
         case ARCHIVE_SYSTEM_SAVEDATA:
-            ret = toUtf16("/JKSV/SysSave/") + dat.getTitleSafe() + toUtf16("/");
+            ret = toUtf16("/TYSS/SysSave/") + dat.getTitleSafe() + toUtf16("/");
             break;
 
         case ARCHIVE_EXTDATA:
-            ret = toUtf16("/JKSV/ExtData/") + dat.getTitleSafe() + toUtf16("/");
+            ret = toUtf16("/TYSS/ExtData/") + dat.getTitleSafe() + toUtf16("/");
             break;
 
         case ARCHIVE_BOSS_EXTDATA:
-            ret = toUtf16("/JKSV/Boss/") + dat.getTitleSafe() + toUtf16("/");
+            ret = toUtf16("/TYSS/Boss/") + dat.getTitleSafe() + toUtf16("/");
             break;
 
         case ARCHIVE_SHARED_EXTDATA:
             char tmp[16];
             sprintf(tmp, "%08X", (unsigned)dat.getExtData());
-            ret = toUtf16("/JKSV/Shared/") + toUtf16(tmp) + toUtf16("/");
+            ret = toUtf16("/TYSS/Shared/") + toUtf16(tmp) + toUtf16("/");
             break;
     }
     return ret;
@@ -183,25 +201,25 @@ void util::createTitleDir(data::titleData &dat, const uint32_t &mode)
     {
         case ARCHIVE_USER_SAVEDATA:
         case ARCHIVE_SAVEDATA:
-            cr = toUtf16("/JKSV/Saves/") + dat.getTitleSafe();
+            cr = toUtf16("/TYSS/Saves/") + dat.getTitleSafe();
             break;
 
         case ARCHIVE_SYSTEM_SAVEDATA:
-            cr = toUtf16("/JKSV/SysSave/") + dat.getTitleSafe();
+            cr = toUtf16("/TYSS/SysSave/") + dat.getTitleSafe();
             break;
 
         case ARCHIVE_EXTDATA:
-            cr = toUtf16("/JKSV/ExtData/") + dat.getTitleSafe();
+            cr = toUtf16("/TYSS/ExtData/") + dat.getTitleSafe();
             break;
 
         case ARCHIVE_BOSS_EXTDATA:
-            cr = toUtf16("/JKSV/Boss/") + dat.getTitleSafe();
+            cr = toUtf16("/TYSS/Boss/") + dat.getTitleSafe();
             break;
 
         case ARCHIVE_SHARED_EXTDATA:
             char tmp[16];
             sprintf(tmp, "%08X", (unsigned)dat.getExtData());
-            cr = toUtf16("/JKSV/Shared/") + toUtf16(tmp);
+            cr = toUtf16("/TYSS/Shared/") + toUtf16(tmp);
             break;
     }
     FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, cr.data()), 0);
