@@ -63,6 +63,7 @@ namespace fs
     bool openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_Archive& arch);
     bool openArchive(data::titleData& dat, const uint32_t& mode, bool error);
     void closeSaveArch();
+    void closePxiSaveArch();
     void commitData(const uint32_t& mode);
     void deleteSv(const uint32_t& mode, const data::titleData& dat);
     void exportSv(const uint32_t& mode, const std::u16string& _dst, const data::titleData& dat);
@@ -154,6 +155,10 @@ namespace fs
     void backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode);
     void backupSPI(const std::u16string& savPath, const CardType& cardType);
     void restoreSPI(const std::u16string& savPath, const CardType& cardType);
+}
+
+extern "C" {
+    Result svcControlService(uint32_t op, uint32_t* outHandle, const char* name);
 }
 
 #endif // FS_H

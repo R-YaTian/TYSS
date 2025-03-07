@@ -235,7 +235,7 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt)
         title.assign(util::toUtf16(idStr));
         titleUTF8 = idStr;
         titleSafe.assign(util::toUtf16(idStr));
-        publisher.assign(util::toUtf16("Someone?"));
+        publisher.assign(util::toUtf16("Unknown"));
         icon = gfx::noIcon();
     }
 
@@ -337,7 +337,7 @@ bool data::titleData::initFromCache(const uint64_t& _id, const std::u16string& _
     titleSafe.assign(util::safeString(title));
     publisher = _pub;
     if(publisher.empty())
-        publisher = util::toUtf16("Someone?");
+        publisher = util::toUtf16("Unknown");
     prodCode.assign(code);
     types = _st;
 

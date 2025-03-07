@@ -35,6 +35,8 @@
 static FS_Archive sdmcArch, saveArch;
 static FS_ArchiveID saveMode = (FS_ArchiveID)0;
 static std::u16string dataPath;
+static Handle fsPxiHandle;
+static const u32 pxiPath[5] = { 1,1,3,0,0 };
 
 typedef struct 
 {
@@ -60,6 +62,7 @@ void fs::createDir(const std::string& path)
 void fs::init()
 {
     FSUSER_OpenArchive(&sdmcArch, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""));
+    svcControlService(0, &fsPxiHandle, "PxiFS0");
 
     createDir("/TYSS");
     createDir("/TYSS/Saves");
@@ -156,6 +159,11 @@ void fs::closeSaveArch()
     FSUSER_CloseArchive(saveArch);
 }
 
+void fs::closePxiSaveArch()
+{
+    FSPXI_CloseArchive(fsPxiHandle, saveArch);
+}
+
 FS_ArchiveID fs::getSaveMode()
 {
     return saveMode;
@@ -222,6 +230,19 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_
                     dataPath = util::toUtf16(saveDir);
                     res = FSUSER_OpenDirectory(NULL, arch, fsMakePath(PATH_UTF16, dataPath.data()));
                     delete[] saveDir;
+                }
+            }
+            break;
+
+        case ARCHIVE_SAVEDATA_AND_CONTENT:
+            {
+                uint32_t path[4] = {dat.getLow(), dat.getHigh(), dat.getMedia(), 1};
+                FS_Path binPath  = {PATH_BINARY, 16, path};
+                res = FSPXI_OpenArchive(fsPxiHandle, &arch, ARCHIVE_SAVEDATA_AND_CONTENT, binPath);
+                if (R_SUCCEEDED(res))
+                {
+                    FSPXI_File hnd;
+                    res = FSPXI_OpenFile(fsPxiHandle, &hnd, arch, {PATH_BINARY, 20, pxiPath}, FS_OPEN_READ, 0);
                 }
             }
             break;
@@ -1009,4 +1030,11 @@ void fs::restoreSPI(const std::u16string& savPath, const CardType& cardType)
     if (R_FAILED(res)) ui::showMessage("写入数据到游戏卡带时发生错误!");
 
     delete[] saveFile;
+}
+
+__attribute__((naked)) Result svcControlService(uint32_t op, uint32_t* outHandle, const char* name) {
+    __asm__ volatile (
+        "svc #0xB0 \n"  // call SVC 0xB0
+        "bx lr \n"      // return
+    );
 }
