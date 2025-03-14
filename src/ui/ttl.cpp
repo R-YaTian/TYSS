@@ -63,6 +63,7 @@ static void ttlViewCallback(void *a)
 #endif
                 if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false)
                     || fs::openArchive(*t, ARCHIVE_NAND_TWL_FS, false)
+                    || (t->getProdCode().compare(0, 4, "AGB-") == 0 && fs::openArchive(*t, ARCHIVE_SAVEDATA_AND_CONTENT, false))
                     || t->getExtInfos().isDSCard)
                 {
                     std::u16string targetPath = util::createPath(*t, ARCHIVE_USER_SAVEDATA);
