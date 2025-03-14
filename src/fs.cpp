@@ -239,11 +239,6 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_
                 uint32_t path[4] = {dat.getLow(), dat.getHigh(), dat.getMedia(), 1};
                 FS_Path binPath  = {PATH_BINARY, 16, path};
                 res = FSPXI_OpenArchive(fsPxiHandle, &arch, ARCHIVE_SAVEDATA_AND_CONTENT, binPath);
-                if (R_SUCCEEDED(res))
-                {
-                    FSPXI_File hnd;
-                    res = FSPXI_OpenFile(fsPxiHandle, &hnd, arch, {PATH_BINARY, 20, pxiPath}, FS_OPEN_READ, 0);
-                }
             }
             break;
     }

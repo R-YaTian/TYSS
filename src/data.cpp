@@ -188,7 +188,7 @@ void data::exit()
         t.freeIcon();
 }
 
-bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt)
+bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt, bool isAGB)
 {
     m = mt;
     id = _id;
@@ -209,7 +209,13 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt)
     if(mt != MEDIATYPE_GAME_CARD && isFavorite(id))
         fav = true;
 
-    testMounts();
+    if (!isAGB)
+        testMounts();
+    else if(fs::openArchive(*this, ARCHIVE_SAVEDATA_AND_CONTENT, false))
+    {
+        types.hasUser = true;
+        fs::closePxiSaveArch();
+    }
 
     smdh_s *smdh = loadSMDH(low, high, m);
     if(smdh != NULL && hasSaveData())
@@ -605,9 +611,16 @@ void data::loadTitles(void *a)
         {
             if(checkHigh(ids[i]) && !isBlacklisted(ids[i]))
             {
+                char tmp[16];
+                AM_GetTitleProductCode(MEDIATYPE_SD, ids[i], tmp);
                 titleData newTitle;
-                if(newTitle.init(ids[i], MEDIATYPE_SD) && newTitle.hasSaveData())
-                    titles.push_back(newTitle);
+                if (strncmp(tmp, "AGB-", 4) == 0) {
+                    if(newTitle.init(ids[i], MEDIATYPE_SD, true) && newTitle.hasSaveData())
+                        titles.push_back(newTitle);
+                } else {
+                    if(newTitle.init(ids[i], MEDIATYPE_SD) && newTitle.hasSaveData())
+                        titles.push_back(newTitle);
+                }
             }
         }
         delete[] ids;
