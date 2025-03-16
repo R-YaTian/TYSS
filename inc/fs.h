@@ -73,6 +73,7 @@ namespace fs
     bool fsfexists(const FS_Archive& _arch, const std::u16string& _path);
     inline void fcreate(const std::string& path){ FSUSER_CreateFile(fs::getSDMCArch(), fsMakePath(PATH_ASCII, path.c_str()), 0, 0); }
     inline void fdelete(const std::string& path){ FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_ASCII, path.c_str())); }
+    bool delPxiFile(const FS_Archive& _arch);
 
     //Causes a hang for large saves, so threaded
     void delDirRec(const FS_Archive& _arch, const std::u16string& _path);
@@ -108,10 +109,11 @@ namespace fs
             bool isOpen(){ return open; }
 
         private:
-            Handle fHandle;
+            u64 fHandle;
             Result error;
             uint64_t fSize, offset = 0;
             bool open = false;
+            bool isPxi = false;
     };
 
     typedef struct
@@ -136,14 +138,14 @@ namespace fs
             dirItem *getDirItemAt(int i) { return &entry[i]; }
 
         private:
-            Handle d;
-            FS_Archive a;
+            Handle dirHandle;
+            FS_Archive dirArch;
             std::u16string path;
             std::vector<dirItem> entry;
     };
 
-    void copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t);
-    void copyFileThreaded(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit);
+    void copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, bool isPxi, threadInfo *t);
+    void copyFileThreaded(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, bool isPxi = false);
     void copyDirToDir(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t, bool isRecursion = false);
     void copyDirToDirThreaded(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit);
 

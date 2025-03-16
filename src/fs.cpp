@@ -45,7 +45,8 @@ typedef struct
     zipFile zip = NULL;
     unzFile unz = NULL;
     uint64_t offset = 0;
-    bool commit = false;  
+    bool commit = false;
+    bool isPxi = false;
 } cpyArgs;
 
 typedef struct
@@ -75,7 +76,8 @@ void fs::init()
 void fs::exit()
 {
     FSUSER_CloseArchive(sdmcArch);
-    FSUSER_CloseArchive(saveArch);
+    // FSUSER_CloseArchive(saveArch);
+    svcCloseHandle(fsPxiHandle);
 }
 
 #ifdef ENABLE_GD
@@ -228,7 +230,12 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_
                     char* saveDir = new char[32];
                     sprintf(saveDir, "/title/%08lx/%08lx/data", (dat.getHigh() & 0x00000FFF) | 0x00030000, dat.getLow());
                     dataPath = util::toUtf16(saveDir);
-                    res = FSUSER_OpenDirectory(NULL, arch, fsMakePath(PATH_UTF16, dataPath.data()));
+                    Handle tmp;
+                    res = FSUSER_OpenDirectory(&tmp, arch, fsMakePath(PATH_UTF16, dataPath.data()));
+                    if (R_FAILED(res))
+                        FSUSER_CloseArchive(arch);
+                    else
+                        FSDIR_Close(tmp);
                     delete[] saveDir;
                 }
             }
@@ -239,6 +246,15 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_
                 uint32_t path[4] = {dat.getLow(), dat.getHigh(), dat.getMedia(), 1};
                 FS_Path binPath  = {PATH_BINARY, 16, path};
                 res = FSPXI_OpenArchive(fsPxiHandle, &arch, ARCHIVE_SAVEDATA_AND_CONTENT, binPath);
+                if (R_SUCCEEDED(res))
+                {
+                    FSPXI_File tmp;
+                    res = FSPXI_OpenFile(fsPxiHandle, &tmp, arch, {PATH_BINARY, 20, pxiPath}, FS_OPEN_READ, 0);
+                    if (R_FAILED(res))
+                        FSPXI_CloseArchive(fsPxiHandle, arch);
+                    else
+                        FSPXI_CloseFile(fsPxiHandle, tmp);
+                }
             }
             break;
     }
@@ -350,6 +366,13 @@ bool fs::fsfexists(const FS_Archive& _arch, const std::u16string& _path)
     return R_SUCCEEDED(res);
 }
 
+bool fs::delPxiFile(const FS_Archive& _arch)
+{
+    Result res = FSPXI_DeleteFile(fsPxiHandle, _arch, {PATH_BINARY, 20, pxiPath});
+    FSPXI_CloseArchive(fsPxiHandle, _arch);
+    return R_SUCCEEDED(res);
+}
+
 void fs::delDirRec(const FS_Archive& _arch, const std::u16string& path)
 {
     FS_Path delPath = fsMakePath(PATH_UTF16, path.c_str());
@@ -380,10 +403,18 @@ fs::fsfile::fsfile(const FS_Archive& _arch, const std::string& _path, const uint
         FSUSER_DeleteFile(_arch, delPath);
     }
 
-    error = FSUSER_OpenFile(&fHandle, _arch, fsMakePath(PATH_ASCII, _path.c_str()), openFlags, 0);
+    if (_arch != getSDMCArch() && saveMode == ARCHIVE_SAVEDATA_AND_CONTENT)
+        error = FSPXI_OpenFile(fsPxiHandle, &fHandle, _arch, {PATH_BINARY, 20, pxiPath}, openFlags, 0);
+    else
+        error = FSUSER_OpenFile((Handle*) &fHandle, _arch, fsMakePath(PATH_ASCII, _path.c_str()), openFlags, 0);
+
     if(R_SUCCEEDED(error))
     {
-        FSFILE_GetSize(fHandle, &fSize);
+        if (_arch != getSDMCArch() && saveMode == ARCHIVE_SAVEDATA_AND_CONTENT) {
+            isPxi = true;
+            FSPXI_GetFileSize(fsPxiHandle, fHandle, &fSize);
+        } else
+            FSFILE_GetSize((Handle) fHandle, &fSize);
         open = true;
     }
 }
@@ -396,11 +427,21 @@ fs::fsfile::fsfile(const FS_Archive& _arch, const std::string& _path, const uint
         FSUSER_DeleteFile(_arch, delPath);
     }
 
-    FSUSER_CreateFile(_arch, fsMakePath(PATH_ASCII, _path.c_str()), 0, crSize);
-    error = FSUSER_OpenFile(&fHandle, _arch, fsMakePath(PATH_ASCII, _path.c_str()), openFlags, 0);
+    if (_arch != getSDMCArch() && saveMode == ARCHIVE_SAVEDATA_AND_CONTENT) {
+        FSPXI_CreateFile(fsPxiHandle, _arch, {PATH_BINARY, 20, pxiPath}, 0, crSize);
+        error = FSPXI_OpenFile(fsPxiHandle, &fHandle, _arch, {PATH_BINARY, 20, pxiPath}, openFlags, 0);
+    } else {
+        FSUSER_CreateFile(_arch, fsMakePath(PATH_ASCII, _path.c_str()), 0, crSize);
+        error = FSUSER_OpenFile((Handle*) &fHandle, _arch, fsMakePath(PATH_ASCII, _path.c_str()), openFlags, 0);
+    }
+
     if(R_SUCCEEDED(error))
     {
-        FSFILE_GetSize(fHandle, &fSize);
+        if (_arch != getSDMCArch() && saveMode == ARCHIVE_SAVEDATA_AND_CONTENT) {
+            isPxi = true;
+            FSPXI_GetFileSize(fsPxiHandle, fHandle, &fSize);
+        } else
+            FSFILE_GetSize((Handle) fHandle, &fSize);
         open = true;
     }
 }
@@ -413,10 +454,18 @@ fs::fsfile::fsfile(const FS_Archive& _arch, const std::u16string& _path, const u
         FSUSER_DeleteFile(_arch, delPath);
     }
 
-    error = FSUSER_OpenFile(&fHandle, _arch, fsMakePath(PATH_UTF16, _path.c_str()), openFlags, 0);
+    if (_arch != getSDMCArch() && saveMode == ARCHIVE_SAVEDATA_AND_CONTENT)
+        error = FSPXI_OpenFile(fsPxiHandle, &fHandle, _arch, {PATH_BINARY, 20, pxiPath}, openFlags, 0);
+    else
+        error = FSUSER_OpenFile((Handle*) &fHandle, _arch, fsMakePath(PATH_UTF16, _path.c_str()), openFlags, 0);
+
     if(R_SUCCEEDED(error))
     {
-        FSFILE_GetSize(fHandle, &fSize);
+        if (_arch != getSDMCArch() && saveMode == ARCHIVE_SAVEDATA_AND_CONTENT) {
+            isPxi = true;
+            FSPXI_GetFileSize(fsPxiHandle, fHandle, &fSize);
+        } else
+            FSFILE_GetSize((Handle) fHandle, &fSize);
         open = true;
     }
 }
@@ -429,11 +478,21 @@ fs::fsfile::fsfile(const FS_Archive& _arch, const std::u16string& _path, const u
         FSUSER_DeleteFile(_arch, delPath);
     }
 
-    FSUSER_CreateFile(_arch, fsMakePath(PATH_UTF16, _path.c_str()), 0, crSize);
-    error = FSUSER_OpenFile(&fHandle, _arch, fsMakePath(PATH_UTF16, _path.c_str()), openFlags, 0);
+    if (_arch != getSDMCArch() && saveMode == ARCHIVE_SAVEDATA_AND_CONTENT) {
+        FSPXI_CreateFile(fsPxiHandle, _arch, {PATH_BINARY, 20, pxiPath}, 0, crSize);
+        error = FSPXI_OpenFile(fsPxiHandle, &fHandle, _arch, {PATH_BINARY, 20, pxiPath}, openFlags, 0);
+    } else {
+        FSUSER_CreateFile(_arch, fsMakePath(PATH_UTF16, _path.c_str()), 0, crSize);
+        error = FSUSER_OpenFile((Handle*) &fHandle, _arch, fsMakePath(PATH_UTF16, _path.c_str()), openFlags, 0);
+    }
+
     if(R_SUCCEEDED(error))
     {
-        FSFILE_GetSize(fHandle, &fSize);
+        if (_arch != getSDMCArch() && saveMode == ARCHIVE_SAVEDATA_AND_CONTENT) {
+            isPxi = true;
+            FSPXI_GetFileSize(fsPxiHandle, fHandle, &fSize);
+        } else
+            FSFILE_GetSize((Handle) fHandle, &fSize);
         open = true;
     }
 }
@@ -442,7 +501,10 @@ fs::fsfile::~fsfile()
 {
     if(open)
     {
-        FSFILE_Close(fHandle);
+        if (isPxi)
+            FSPXI_CloseFile(fsPxiHandle, fHandle);
+        else
+            FSFILE_Close((Handle) fHandle);
         open = false;
     }
 }
@@ -451,7 +513,10 @@ void fs::fsfile::close()
 {
     if(open)
     {
-        FSFILE_Close(fHandle);
+        if (isPxi)
+            FSPXI_CloseFile(fsPxiHandle, fHandle);
+        else
+            FSFILE_Close((Handle) fHandle);
         open = false;
     }
 }
@@ -459,8 +524,14 @@ void fs::fsfile::close()
 size_t fs::fsfile::read(void *buf, const uint32_t& max)
 {
     uint32_t readOut = 0;
+    Result res;
 
-    if(R_FAILED(FSFILE_Read(fHandle, &readOut, offset, buf, max)))
+    if (isPxi)
+        res = FSPXI_ReadFile(fsPxiHandle, fHandle, &readOut, offset, buf, max);
+    else
+        res = FSFILE_Read((Handle) fHandle, &readOut, offset, buf, max);
+
+    if(R_FAILED(res))
     {
         if(readOut > max)
             readOut = max;
@@ -486,7 +557,10 @@ bool fs::fsfile::getLine(char *out, size_t max)
 size_t fs::fsfile::write(const void* buf, const uint32_t& size)
 {
     uint32_t writeOut = 0;
-    FSFILE_Write(fHandle, &writeOut, offset, buf, size, FS_WRITE_FLUSH);
+    if (isPxi)
+        FSPXI_WriteFile(fsPxiHandle, fHandle, &writeOut, offset, buf, size, FS_WRITE_FLUSH);
+    else
+        FSFILE_Write((Handle) fHandle, &writeOut, offset, buf, size, FS_WRITE_FLUSH);
     offset += writeOut;
     return (size_t)writeOut;
 }
@@ -504,14 +578,20 @@ void fs::fsfile::writef(const char *fmt, ...)
 uint8_t fs::fsfile::getByte()
 {
     uint8_t ret = 0;
-    FSFILE_Read(fHandle, NULL, offset, &ret, 1);
+    if (isPxi)
+        FSPXI_ReadFile(fsPxiHandle, fHandle, NULL, offset, &ret, 1);
+    else
+        FSFILE_Read((Handle) fHandle, NULL, offset, &ret, 1);
     ++offset;
     return ret;
 }
 
 void fs::fsfile::putByte(const uint8_t& put)
 {
-    FSFILE_Write(fHandle, NULL, offset, &put, 1, FS_WRITE_FLUSH);
+    if (isPxi)
+        FSPXI_WriteFile(fsPxiHandle, fHandle, NULL, offset, &put, 1, FS_WRITE_FLUSH);
+    else
+        FSFILE_Write((Handle) fHandle, NULL, offset, &put, 1, FS_WRITE_FLUSH);
     ++offset;
 }
 
@@ -561,17 +641,17 @@ struct
 
 fs::dirList::dirList(const FS_Archive& arch, const std::u16string& p)
 {
-    a = arch;
+    dirArch = arch;
 
     path = p;
 
-    FSUSER_OpenDirectory(&d, a, fsMakePath(PATH_UTF16, p.data()));
+    FSUSER_OpenDirectory(&dirHandle, dirArch, fsMakePath(PATH_UTF16, p.data()));
 
     uint32_t read = 0;
     do
     {
         FS_DirectoryEntry ent;
-        FSDIR_Read(d, &read, 1, &ent);
+        FSDIR_Read(dirHandle, &read, 1, &ent);
         if(read == 1)
         {
             fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
@@ -582,7 +662,7 @@ fs::dirList::dirList(const FS_Archive& arch, const std::u16string& p)
     }
     while(read > 0);
 
-    FSDIR_Close(d);
+    FSDIR_Close(dirHandle);
 
     std::sort(entry.begin(), entry.end(), sortDirs);
 }
@@ -596,13 +676,13 @@ void fs::dirList::rescan()
 {
     entry.clear();
 
-    FSUSER_OpenDirectory(&d, a, fsMakePath(PATH_UTF16, path.data()));
+    FSUSER_OpenDirectory(&dirHandle, dirArch, fsMakePath(PATH_UTF16, path.data()));
 
     uint32_t read = 0;
     do
     {
         FS_DirectoryEntry ent;
-        FSDIR_Read(d, &read, 1, &ent);
+        FSDIR_Read(dirHandle, &read, 1, &ent);
         if(read == 1)
         {
             fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
@@ -616,7 +696,7 @@ void fs::dirList::rescan()
     }
     while(read > 0);
 
-    FSDIR_Close(d);
+    FSDIR_Close(dirHandle);
 
     std::sort(entry.begin(), entry.end(), sortDirs);
 }
@@ -626,14 +706,14 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
     entry.clear();
 
     path = p;
-    a = arch;
+    dirArch = arch;
 
-    FSUSER_OpenDirectory(&d, a, fsMakePath(PATH_UTF16, path.data()));
+    FSUSER_OpenDirectory(&dirHandle, dirArch, fsMakePath(PATH_UTF16, path.data()));
     uint32_t read = 0;
     do
     {
         FS_DirectoryEntry ent;
-        FSDIR_Read(d, &read, 1, &ent);
+        FSDIR_Read(dirHandle, &read, 1, &ent);
         if(read == 1)
         {
             fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
@@ -647,12 +727,12 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
     }
     while(read > 0);
 
-    FSDIR_Close(d);
+    FSDIR_Close(dirHandle);
 
     std::sort(entry.begin(), entry.end(), sortDirs);
 }
 
-void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, threadInfo *t)
+void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, bool isPxi, threadInfo *t)
 {
     if(t)
         t->status->setStatus("正在复制 " + util::toUtf8(_src) +"...");
@@ -676,20 +756,21 @@ void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const 
         dst.close();
         fs::commitData(fs::getSaveMode());
     }
+    if(isPxi) ui::fldRefresh();
 }
 
 static void copyFile_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     cpyArgs *cpy = (cpyArgs *)t->argPtr;
-    fs::copyFile(cpy->srcArch, cpy->src, cpy->dstArch, cpy->dst, cpy->commit, t);
+    fs::copyFile(cpy->srcArch, cpy->src, cpy->dstArch, cpy->dst, cpy->commit, cpy->isPxi, t);
     delete cpy;
     t->argPtr = NULL;
     t->drawFunc = NULL;
     t->finished = true;
 }
 
-void fs::copyFileThreaded(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit)
+void fs::copyFileThreaded(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, bool isPxi)
 {
     cpyArgs *send = new cpyArgs;
     send->srcArch = _srcArch;
@@ -697,6 +778,7 @@ void fs::copyFileThreaded(const FS_Archive& _srcArch, const std::u16string& _src
     send->dstArch = _dstArch;
     send->dst = _dst;
     send->commit = commit;
+    send->isPxi = isPxi;
     ui::newThread(copyFile_t, send, NULL);
 }
 
@@ -724,7 +806,7 @@ void fs::copyDirToDir(const FS_Archive& _srcArch, const std::u16string& _src, co
         {
             std::u16string fullSrc = srcPath + srcList.getItem(i);
             std::u16string fullDst = dstPath + srcList.getItem(i);
-            fs::copyFile(_srcArch, fullSrc, _dstArch, fullDst, commit, t);
+            fs::copyFile(_srcArch, fullSrc, _dstArch, fullDst, commit, false, t);
         }
     }
 }

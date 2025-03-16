@@ -50,7 +50,7 @@ ui::progressBar *ui::prog;
 static ui::threadProcMngr *thrdMgr;
 static ui::button *ok, *yes, *no;
 
-const std::string TITLE_TEXT = "TY Save Studio - 03.03.2025 ";
+const std::string TITLE_TEXT = "TY Save Studio - 03.16.2025 ";
 
 uint32_t ui::down = 0, ui::held = 0;
 touchPosition ui::p;

@@ -35,7 +35,10 @@ static void fldCallback(void *)
     switch(ui::padKeysDown())
     {
         case KEY_B:
-            fs::closeSaveArch();
+            if (data::curData.getProdCode().compare(0, 4, "AGB-") == 0)
+                fs::closePxiSaveArch();
+            else
+                fs::closeSaveArch();
             fldOpen = false;
             break;
     }
@@ -122,12 +125,15 @@ static void ttlOptCallback(void *a)
 static void ttlOptResetSaveData_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    if(fs::openArchive(data::curData, ARCHIVE_USER_SAVEDATA, false))
-    {
+    if(fs::openArchive(data::curData, ARCHIVE_USER_SAVEDATA, false)) {
         t->status->setStatus("正在重置存档数据...");
         fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
         fs::commitData(fs::getSaveMode());
         fs::closeSaveArch();
+    } else if (data::curData.getProdCode().compare(0, 4, "AGB-") == 0 && fs::openArchive(data::curData, ARCHIVE_SAVEDATA_AND_CONTENT, false)) {
+        t->status->setStatus("正在重置GBAVC存档数据...");
+        bool ret = fs::delPxiFile(fs::getSaveArch());
+        ui::showMessage("GBAVC存档数据重置%s!", ret ? "成功" : "失败");
     }
     t->finished = true;
 }
@@ -179,9 +185,9 @@ static void ttlOptManageCheats(void *a)
     data::titleData *title = &data::usrSaveTitles[ttlView->getSelected()];
     std::string key = title->getIDStr();
 
-    if(title->getExtInfos().isDSCard || (title->getHigh() & 0x8000) == 0x8000)
+    if(title->getExtInfos().isDSCard || (title->getHigh() & 0x8000) == 0x8000 || title->getProdCode().compare(0, 4, "AGB-") == 0)
     {
-        ui::showMessage("DS卡带游戏以及 DSiWare 不支持此操作!");
+        ui::showMessage("GBAVC,DSiWare以及DS卡带不支持此操作!");
         return;
     }
 
