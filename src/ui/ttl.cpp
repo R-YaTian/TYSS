@@ -132,8 +132,7 @@ static void ttlOptResetSaveData_t(void *a)
         fs::closeSaveArch();
     } else if (data::curData.getProdCode().compare(0, 4, "AGB-") == 0 && fs::openArchive(data::curData, ARCHIVE_SAVEDATA_AND_CONTENT, false)) {
         t->status->setStatus("正在重置GBAVC存档数据...");
-        bool ret = fs::delPxiFile(fs::getSaveArch());
-        ui::showMessage("GBAVC存档数据重置%s!", ret ? "成功" : "失败");
+        fs::resetPxiFile(fs::getSaveArch());
     }
     t->finished = true;
 }
@@ -187,7 +186,7 @@ static void ttlOptManageCheats(void *a)
 
     if(title->getExtInfos().isDSCard || (title->getHigh() & 0x8000) == 0x8000 || title->getProdCode().compare(0, 4, "AGB-") == 0)
     {
-        ui::showMessage("GBAVC,DSiWare以及DS卡带不支持此操作!");
+        ui::showMessage("GBAVC,DSiWare及DS卡带不支持此操作!");
         return;
     }
 

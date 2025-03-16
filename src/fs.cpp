@@ -366,11 +366,16 @@ bool fs::fsfexists(const FS_Archive& _arch, const std::u16string& _path)
     return R_SUCCEEDED(res);
 }
 
-bool fs::delPxiFile(const FS_Archive& _arch)
+void fs::resetPxiFile(const FS_Archive& _arch)
 {
-    Result res = FSPXI_DeleteFile(fsPxiHandle, _arch, {PATH_BINARY, 20, pxiPath});
+    fs::fsfile pxiFile(_arch, util::toUtf16("/"), FS_OPEN_WRITE);
+    size_t size = pxiFile.getSize();
+    uint8_t *buffer = new uint8_t[size];
+    memset(buffer, 0xFF, size);
+    pxiFile.write(buffer, size);
+    pxiFile.close();
+    delete[] buffer;
     FSPXI_CloseArchive(fsPxiHandle, _arch);
-    return R_SUCCEEDED(res);
 }
 
 void fs::delDirRec(const FS_Archive& _arch, const std::u16string& path)

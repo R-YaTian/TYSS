@@ -73,7 +73,7 @@ namespace fs
     bool fsfexists(const FS_Archive& _arch, const std::u16string& _path);
     inline void fcreate(const std::string& path){ FSUSER_CreateFile(fs::getSDMCArch(), fsMakePath(PATH_ASCII, path.c_str()), 0, 0); }
     inline void fdelete(const std::string& path){ FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_ASCII, path.c_str())); }
-    bool delPxiFile(const FS_Archive& _arch);
+    void resetPxiFile(const FS_Archive& _arch);
 
     //Causes a hang for large saves, so threaded
     void delDirRec(const FS_Archive& _arch, const std::u16string& _path);
