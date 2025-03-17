@@ -123,6 +123,11 @@ struct
             return a.getFav() > b.getFav();
         }
 
+        bool a_is_agb = a.getProdCode().compare(0, 4, "AGB-") == 0;
+        bool b_is_agb = b.getProdCode().compare(0, 4, "AGB-") == 0;
+        if (a_is_agb != b_is_agb)
+            return !a_is_agb;
+
         unsigned aLen = a.getTitleUTF8().length();
         unsigned bLen = b.getTitleUTF8().length();
         unsigned minLen = std::min(aLen, bLen);
