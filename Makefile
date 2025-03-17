@@ -181,11 +181,11 @@ $(TARGET)-strip.elf: $(BUILD)
 	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf
 
 cia: $(TARGET)-strip.elf
-	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner $(TARGET).bnr -DAPP_SYSTEM_MODE="64MB"
+	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf res/$(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner res/$(TARGET).bnr -DAPP_SYSTEM_MODE="64MB"
 	@echo Built TYSS.cia
 
 mode3: $(TARGET)-strip.elf
-	@makerom -f cia -o $(TARGET)_mode3.cia -elf $(TARGET)-strip.elf -rsf $(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner $(TARGET).bnr -DAPP_SYSTEM_MODE="80MB"
+	@makerom -f cia -o $(TARGET)_mode3.cia -elf $(TARGET)-strip.elf -rsf res/$(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner res/$(TARGET).bnr -DAPP_SYSTEM_MODE="80MB"
 	@echo Built TYSS_mode3.cia
 
 send:
