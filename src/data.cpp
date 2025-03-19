@@ -123,8 +123,8 @@ struct
             return a.getFav() > b.getFav();
         }
 
-        bool a_is_agb = a.getProdCode().compare(0, 4, "AGB-") == 0;
-        bool b_is_agb = b.getProdCode().compare(0, 4, "AGB-") == 0;
+        bool a_is_agb = a.isAGB();
+        bool b_is_agb = b.isAGB();
         if (a_is_agb != b_is_agb)
             return !a_is_agb;
 
@@ -619,7 +619,7 @@ void data::loadTitles(void *a)
                 char tmp[16];
                 AM_GetTitleProductCode(MEDIATYPE_SD, ids[i], tmp);
                 titleData newTitle;
-                if (strncmp(tmp, "AGB-", 4) == 0) {
+                if (strncmp(tmp, "AGB-", 4) == 0 || strncmp(tmp, "GBA-", 4) == 0) {
                     if(newTitle.init(ids[i], MEDIATYPE_SD, true) && newTitle.hasSaveData())
                         titles.push_back(newTitle);
                 } else {

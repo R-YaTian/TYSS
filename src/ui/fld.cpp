@@ -51,7 +51,7 @@ static void fldMenuNew_t(void *a)
     if(!newFolder.empty()
         && std::get<bool>(cfg::config["zip"])
         && !data::curData.getExtInfos().isDSCard
-        && !(data::curData.getProdCode().compare(0, 4, "AGB-") == 0))
+        && !data::curData.isAGB())
     {
         std::u16string fullOut = targetDir + newFolder + util::toUtf16(".zip");
         std::u16string svOut = fullOut + util::toUtf16(".sv");
@@ -61,7 +61,7 @@ static void fldMenuNew_t(void *a)
     else if(!newFolder.empty())
     {
         std::u16string fullOut = targetDir + newFolder;
-        if (data::curData.getProdCode().compare(0, 4, "AGB-") == 0) {
+        if (data::curData.isAGB()) {
             std::u16string savPath = fullOut + util::toUtf16(".sav");
             fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16(" GBAVC 存档数据"), fs::getSDMCArch(), savPath, false, true);
         } else if (!data::curData.getExtInfos().isDSCard) {
@@ -115,7 +115,7 @@ void fldMenuOverwrite_t(void *a)
         FS_Path targetPath = fsMakePath(PATH_UTF16, overwrite.c_str());
         FSUSER_DeleteFile(fs::getSDMCArch(), targetPath);
 
-        if (data::curData.getProdCode().compare(0, 4, "AGB-") == 0) {
+        if (data::curData.isAGB()) {
             fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16(" GBAVC 存档数据"), fs::getSDMCArch(), overwrite, false, true);
         } else if (!data::curData.getExtInfos().isDSCard) {
             std::u16string svOut = overwrite + util::toUtf16(".sv");
@@ -183,7 +183,7 @@ void fldMenuRestore_t(void *a)
     }
     else
     {
-        if (data::curData.getProdCode().compare(0, 4, "AGB-") == 0) {
+        if (data::curData.isAGB()) {
             fs::copyFileThreaded(fs::getSDMCArch(), targetDir + in->name, fs::getSaveArch(), util::toUtf16("/"), false, true);
         } else if (!data::curData.getExtInfos().isDSCard) {
             fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));

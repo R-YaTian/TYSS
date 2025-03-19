@@ -371,7 +371,7 @@ void fs::resetPxiFile(const FS_Archive& _arch)
     fs::fsfile pxiFile(_arch, util::toUtf16("/"), FS_OPEN_WRITE);
     size_t size = pxiFile.getSize();
     uint8_t *buffer = new uint8_t[size];
-    memset(buffer, 0xFF, size);
+    memset(buffer, 0, size);
     pxiFile.write(buffer, size);
     pxiFile.close();
     delete[] buffer;

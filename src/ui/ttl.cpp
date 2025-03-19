@@ -35,7 +35,7 @@ static void fldCallback(void *)
     switch(ui::padKeysDown())
     {
         case KEY_B:
-            if (data::curData.getProdCode().compare(0, 4, "AGB-") == 0)
+            if (data::curData.isAGB())
                 fs::closePxiSaveArch();
             else
                 fs::closeSaveArch();
@@ -66,7 +66,7 @@ static void ttlViewCallback(void *a)
 #endif
                 if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false)
                     || fs::openArchive(*t, ARCHIVE_NAND_TWL_FS, false)
-                    || (t->getProdCode().compare(0, 4, "AGB-") == 0 && fs::openArchive(*t, ARCHIVE_SAVEDATA_AND_CONTENT, false))
+                    || (t->isAGB() && fs::openArchive(*t, ARCHIVE_SAVEDATA_AND_CONTENT, false))
                     || t->getExtInfos().isDSCard)
                 {
                     std::u16string targetPath = util::createPath(*t, ARCHIVE_USER_SAVEDATA);
@@ -130,7 +130,7 @@ static void ttlOptResetSaveData_t(void *a)
         fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
         fs::commitData(fs::getSaveMode());
         fs::closeSaveArch();
-    } else if (data::curData.getProdCode().compare(0, 4, "AGB-") == 0 && fs::openArchive(data::curData, ARCHIVE_SAVEDATA_AND_CONTENT, false)) {
+    } else if (data::curData.isAGB() && fs::openArchive(data::curData, ARCHIVE_SAVEDATA_AND_CONTENT, false)) {
         t->status->setStatus("正在重置GBAVC存档数据...");
         fs::resetPxiFile(fs::getSaveArch());
     }
@@ -184,7 +184,7 @@ static void ttlOptManageCheats(void *a)
     data::titleData *title = &data::usrSaveTitles[ttlView->getSelected()];
     std::string key = title->getIDStr();
 
-    if(title->getExtInfos().isDSCard || (title->getHigh() & 0x8000) == 0x8000 || title->getProdCode().compare(0, 4, "AGB-") == 0)
+    if(title->getExtInfos().isDSCard || (title->getHigh() & 0x8000) == 0x8000 || title->isAGB())
     {
         ui::showMessage("GBAVC,DSiWare及DS卡带不支持此操作!");
         return;
