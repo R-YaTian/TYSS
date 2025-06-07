@@ -219,6 +219,6 @@ void ui::sysDrawBot()
     {
         if (!data::sysDataTitles.empty())
             data::sysDataTitles[sysView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 视图类型", ui::SCREEN_BOT, false);
     }
 }

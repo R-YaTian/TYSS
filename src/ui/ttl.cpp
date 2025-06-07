@@ -145,7 +145,7 @@ static void ttlOptResetSaveData(void *a)
         ui::showMessage("DS卡带游戏以及 DSiWare 不支持此操作!");
         return;
     }
-    std::string q = "你确定要为 " + util::toUtf8(t->getTitle()) + " 重置存档数据吗?";
+    std::string q = "你确定要为 " + util::toUtf8(t->getTitle()) + " 重置存档数据吗?\n注意: GBAVC存档重置后需运行一次游戏才能\n再次管理存档!";
     ui::confirm(q, ttlOptResetSaveData_t, NULL, NULL);
 }
 
@@ -317,6 +317,6 @@ void ui::ttlDrawBot()
     {
         if (!data::usrSaveTitles.empty())
             data::usrSaveTitles[ttlView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 存档类型", ui::SCREEN_BOT, true);
+        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 视图类型", ui::SCREEN_BOT, true);
     }
 }
