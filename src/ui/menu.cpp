@@ -125,7 +125,7 @@ void ui::menu::update()
         if (selected == 0)
             start = 0;
     }
-    else if (down & KEY_RIGHT)
+    else if (down & KEY_DRIGHT)
     {
         selected += 12;
         if (selected > size)
@@ -133,7 +133,7 @@ void ui::menu::update()
         if ((selected - 11) > start)
             start = selected - 11;
     }
-    else if (down & KEY_LEFT)
+    else if (down & KEY_DLEFT)
     {
         selected -= 12;
         if (selected < 0)

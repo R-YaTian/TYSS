@@ -225,24 +225,6 @@ void util::createTitleDir(data::titleData &dat, const uint32_t &mode)
     FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, cr.data()), 0);
 }
 
-void util::copyDirlistToMenu(fs::dirList &d, ui::menu &m)
-{
-    m.reset();
-
-    m.addOpt(".", 320);
-    m.addOpt("..", 320);
-
-    for (unsigned i = 0; i < d.getCount(); i++)
-    {
-        if (d.isDir(i))
-            m.addOpt("D " + toUtf8(d.getItem(i)), 320);
-        else
-            m.addOpt("F " + toUtf8(d.getItem(i)), 320);
-    }
-
-    m.adjust();
-}
-
 bool util::touchPressed(const touchPosition &p)
 {
     return p.px != 0 && p.py != 0;

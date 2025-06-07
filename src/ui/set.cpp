@@ -57,7 +57,7 @@ static void setMenuClearStepHistory(void *a)
 
 static void setMenuClearSoftwareLibraryAndPlayHistory(void *a)
 {
-    std::string q = "确定要清除游玩时间历史记录及软件图鉴吗?";
+    std::string q = "确定要清除游玩时间历史记录及软件图鉴?";
     ui::confirm(q, misc::clearSoftwareLibraryAndPlayHistory, NULL, NULL);
 }
 
@@ -265,7 +265,7 @@ void ui::setUpdate()
             case KEY_CPAD_RIGHT:
                 ui::state = USR;
                 break;
-            
+
             case KEY_Y:
                 setSubMenuOpen = true;
                 break;

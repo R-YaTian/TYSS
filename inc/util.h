@@ -45,8 +45,6 @@ namespace util
 
     void createTitleDir(data::titleData& dat, const uint32_t& mode);
 
-    void copyDirlistToMenu(fs::dirList& d, ui::menu& m);
-
     bool touchPressed(const touchPosition& p);
 
     bool fexists(const std::string& path);
