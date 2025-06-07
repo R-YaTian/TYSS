@@ -177,9 +177,11 @@ void ui::bossViewUpdate()
         bossView->update();
 }
 
-void ui::bossViewRefresh()
+void ui::bossViewRefresh(int op)
 {
     bossView->refresh(data::bossDataTitles);
+    if (op == SEL_BACK_TO_TOP) bossView->setSelected(0);
+    else if (op == SEL_AUTO) bossView->setSelected(bossView->getSelected() == 0 ? 0 : bossView->getSelected() - 1);
 }
 
 void ui::bossViewDrawTop()

@@ -24,7 +24,7 @@ namespace ui
     void bossViewExit();
     void bossViewOptBack();
     void bossViewUpdate();
-    void bossViewRefresh();
+    void bossViewRefresh(int op = 0);
     void bossViewDrawTop();
     void bossViewDrawBot();
 }

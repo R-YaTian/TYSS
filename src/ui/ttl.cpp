@@ -274,11 +274,11 @@ void ui::ttlOptBack()
     ui::ttlUpdate();
 }
 
-void ui::ttlRefresh(int selFlag)
+void ui::ttlRefresh(int op)
 {
     ttlView->refresh(data::usrSaveTitles);
-    if (selFlag == 1) ttlView->setSelected(0);
-    else if (selFlag == 2) ttlView->setSelected(ttlView->getSelected() == 0 ? 0 : ttlView->getSelected() - 1);
+    if (op == SEL_BACK_TO_TOP) ttlView->setSelected(0);
+    else if (op == SEL_AUTO) ttlView->setSelected(ttlView->getSelected() == 0 ? 0 : ttlView->getSelected() - 1);
 }
 
 void ui::ttlUpdate()

@@ -465,13 +465,13 @@ static void loadcart()
                         if(tmp.hasUser)
                         {
                             data::usrSaveTitles.insert(data::usrSaveTitles.begin(), cartData);
-                            ui::ttlRefresh(1);
+                            ui::ttlRefresh(SEL_BACK_TO_TOP);
                         }
 
                         if(tmp.hasExt)
                         {
                             data::extDataTitles.insert(data::extDataTitles.begin(), cartData);
-                            ui::extRefresh(1);
+                            ui::extRefresh(SEL_BACK_TO_TOP);
                         }
 
                         cartValid = true;
@@ -485,7 +485,7 @@ static void loadcart()
             if(cartData.initTWL(0, MEDIATYPE_GAME_CARD))
             {
                 data::usrSaveTitles.insert(data::usrSaveTitles.begin(), cartData);
-                ui::ttlRefresh(1);
+                ui::ttlRefresh(SEL_BACK_TO_TOP);
                 cartValid = true;
             } else
                 cartValid = false;
@@ -528,14 +528,14 @@ void data::cartCheck()
         {
             data::usrSaveTitles[0].freeIcon();
             data::usrSaveTitles.erase(data::usrSaveTitles.begin());
-            ui::ttlRefresh(2);
+            ui::ttlRefresh(SEL_AUTO);
         }
 
         if(!data::extDataTitles.empty() && data::extDataTitles[0].getMedia() == MEDIATYPE_GAME_CARD)
         {
             data::extDataTitles[0].freeIcon();
             data::extDataTitles.erase(data::extDataTitles.begin());
-            ui::extRefresh(2);
+            ui::extRefresh(SEL_AUTO);
         }
 
         cartValid = false;
@@ -683,10 +683,10 @@ void data::loadTitles(void *a)
     if (!titleLoaded)
         titleLoaded = true;
     else {
-        ui::ttlRefresh();
-        ui::extRefresh();
-        ui::sysRefresh();
-        ui::bossViewRefresh();
+        ui::ttlRefresh(SEL_BACK_TO_TOP);
+        ui::extRefresh(SEL_BACK_TO_TOP);
+        ui::sysRefresh(SEL_BACK_TO_TOP);
+        ui::bossViewRefresh(SEL_BACK_TO_TOP);
         if (cartValid) cartValid = false;
     }
     t->finished = true;

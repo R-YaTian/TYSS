@@ -188,9 +188,11 @@ void ui::sysUpdate()
         sysView->update();
 }
 
-void ui::sysRefresh()
+void ui::sysRefresh(int op)
 {
     sysView->refresh(data::sysDataTitles);
+    if (op == SEL_BACK_TO_TOP) sysView->setSelected(0);
+    else if (op == SEL_AUTO) sysView->setSelected(sysView->getSelected() == 0 ? 0 : sysView->getSelected() - 1);
 }
 
 void ui::sysDrawTop()

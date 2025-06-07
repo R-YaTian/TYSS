@@ -48,6 +48,13 @@ enum states
     SET
 };
 
+enum selop
+{
+    SEL_NO_OP = 0,
+    SEL_BACK_TO_TOP = 1,
+    SEL_AUTO = 2
+};
+
 extern const std::string TITLE_TEXT;
 
 #ifdef ENABLE_GD

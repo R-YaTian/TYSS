@@ -24,7 +24,7 @@ namespace ui
     void extExit();
     void extOptBack();
     void extUpdate();
-    void extRefresh(int selFlag = 0);
+    void extRefresh(int op = 0);
     void extDrawTop();
     void extDrawBot();
 }

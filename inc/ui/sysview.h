@@ -24,7 +24,7 @@ namespace ui
     void sysExit();
     void sysOptBack();
     void sysUpdate();
-    void sysRefresh();
+    void sysRefresh(int op = 0);
     void sysDrawTop();
     void sysDrawBot();
 }

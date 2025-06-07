@@ -187,11 +187,11 @@ void ui::extUpdate()
         extView->update();
 }
 
-void ui::extRefresh(int selFlag)
+void ui::extRefresh(int op)
 {
     extView->refresh(data::extDataTitles);
-    if (selFlag == 1) extView->setSelected(0);
-    else if (selFlag == 2) extView->setSelected(extView->getSelected() == 0 ? 0 : extView->getSelected() - 1);
+    if (op == SEL_BACK_TO_TOP) extView->setSelected(0);
+    else if (op == SEL_AUTO) extView->setSelected(extView->getSelected() == 0 ? 0 : extView->getSelected() - 1);
 }
 
 void ui::extDrawTop()
