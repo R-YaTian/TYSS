@@ -75,7 +75,7 @@ Result drive::gd::setupProxy(void)
         if (R_FAILED(res)) return res;
 
         char *proxyHost = new char[0x100];
-        res = util::ACU_GetProxyHost(proxyHost);
+        res = ACU_GetProxyHost(proxyHost);
         if (R_SUCCEEDED(res))
             proxyURL = "http://" + std::string(proxyHost) + ":" + std::to_string(proxyPort);
 

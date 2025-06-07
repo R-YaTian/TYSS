@@ -54,16 +54,10 @@ void misc::clearStepHistory(void *a)
     t->status->setStatus("正在清除步数历史记录...");
 
     Result ret;
-    Handle ptmSysmHandle;
-    srvGetServiceHandle(&ptmSysmHandle, "ptm:sysm");
 
-    u32 *cmdbuf = getThreadCommandBuffer();
-
-    cmdbuf[0] = IPC_MakeHeader(0x805,0,0); // 0x8050000
-
-    ret = svcSendSyncRequest(ptmSysmHandle);
-
-    svcCloseHandle(ptmSysmHandle);
+    ptmSysmInit();
+    ret = PTMSYSM_ClearStepHistory();
+    ptmSysmExit();
 
     if (R_FAILED(ret))
         ui::showMessage("清除步数历史记录失败!\n错误: 0x%08X", (unsigned) ret);
@@ -104,12 +98,9 @@ void misc::clearSoftwareLibraryAndPlayHistory(void *a)
             return;
         }
 
-        u32 *cmdbuf = getThreadCommandBuffer();
-        Handle ptmSysmHandle;
-        srvGetServiceHandle(&ptmSysmHandle, "ptm:sysm");
-        cmdbuf[0] = IPC_MakeHeader(0x80A,0,0); // 0x80A0000
-        res = svcSendSyncRequest(ptmSysmHandle);
-        svcCloseHandle(ptmSysmHandle);
+        ptmSysmInit();
+        res = PTMSYSM_ClearPlayHistory();
+        ptmSysmExit();
 
         if (R_FAILED(res))
             ui::showMessage("清除游玩时间历史记录失败!\n错误: 0x%08X", (unsigned) res);
@@ -328,16 +319,15 @@ void misc::hackStepCount(void *a)
     }
 
     Result ret;
-    Handle ptmSysmHandle;
-    srvGetServiceHandle(&ptmSysmHandle, "ptm:sysm");
-
     u16 stepCount;
-    ret = util::getStepCount(ptmSysmHandle, &stepCount);
+
+    ptmuInit();
+    ret = PTMU_GetStepHistory(2, &stepCount);
+    ptmuExit();
 
     if (R_FAILED(ret))
     {
         ui::showMessage("获取当前小时步数失败!\n错误: 0x%08X", (unsigned) ret);
-        svcCloseHandle(ptmSysmHandle);
         t->finished = true;
         return;
     } else {
@@ -346,7 +336,10 @@ void misc::hackStepCount(void *a)
 
     stepValue = stepValue - stepCount;
     stepCount = util::getInt("输入 0-18000 之间的数值", stepCount, 18000);
-    ret = util::setStepCount(ptmSysmHandle, stepCount);
+
+    ptmSysmInit();
+    ret = PTMSYSM_SetStepHistory(2, &stepCount);
+    ptmSysmExit();
 
     if (R_FAILED(ret)) {
         ui::showMessage("修改当前小时步数失败!\n错误: 0x%08X", (unsigned) ret);
@@ -354,6 +347,5 @@ void misc::hackStepCount(void *a)
         ui::showMessage("修改当前小时步数成功!\n今日总步数: %d", stepValue + stepCount);
     }
 
-    svcCloseHandle(ptmSysmHandle);
     t->finished = true;
 }
