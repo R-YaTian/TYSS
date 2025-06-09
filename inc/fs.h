@@ -106,6 +106,7 @@ namespace fs
             Result getError(){ return error; }
             uint64_t getOffset(){ return offset; }
             uint64_t getSize(){ return fSize; }
+            u64 getHandle(){ return fHandle; }
             bool isOpen(){ return open; }
 
         private:
@@ -157,6 +158,7 @@ namespace fs
     void backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode);
     void backupSPI(const std::u16string& savPath, const CardType& cardType);
     void restoreSPI(const std::u16string& savPath, const CardType& cardType);
+    bool pxiFileToSaveFile(const std::u16string& _src, const std::u16string& _dst);
 }
 
 extern "C" {

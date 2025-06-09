@@ -29,6 +29,7 @@
 #include "data.h"
 #include "type.h"
 #include "cfg.h"
+#include "crypto.h"
 
 #define buff_size 0x8000
 
@@ -1119,4 +1120,161 @@ __attribute__((naked)) Result svcControlService(uint32_t op, uint32_t* outHandle
         "svc #0xB0 \n"  // call SVC 0xB0
         "bx lr \n"      // return
     );
+}
+
+// The following routine use code modify from PKSM:
+bool fs::pxiFileToSaveFile(const std::u16string& _src, const std::u16string& _dst)
+{
+    std::shared_ptr<u8[]> data;
+    size_t size;
+    fs::fsfile in(getSaveArch(), _src, FS_OPEN_READ);
+
+    static constexpr u8 FULL_FS[0x20] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    std::unique_ptr<crypto::AGBSaveHeader> header1 = std::make_unique<crypto::AGBSaveHeader>();
+    in.read(header1.get(), sizeof(crypto::AGBSaveHeader));
+    if (!memcmp(header1.get(), FULL_FS, sizeof(FULL_FS)))
+    {
+        // If the first header is garbage FF, we have to search for the second. It can
+        // only be at one of these possible sizes + 0x200 (for the size of the first
+        // header)
+        static constexpr u32 POSSIBLE_SAVE_SIZES[] = {
+            0x400,   // 8kbit
+            0x2000,  // 64kbit
+            0x8000,  // 256kbit
+            0x10000, // 512kbit
+            0x20000, // 1024kbit/1Mbit
+        };
+        bool found = false;
+        for (const auto& size : POSSIBLE_SAVE_SIZES)
+        {
+            // Go to the possible offset
+            in.seek(size + sizeof(crypto::AGBSaveHeader), fs::seek_beg);
+            // Read what may be a header
+            in.read(header1.get(), sizeof(crypto::AGBSaveHeader));
+            // If it's a header, we found it! Break.
+            if (!memcmp(header1->magic, ".SAV", 4))
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+        {
+            // Seek back to the beginning of this header
+            in.seek(-0x200, fs::seek_cur);
+            std::array<u8, 32> hash = crypto::calcAGBSaveSHA256(in, *header1);
+            std::array<u8, 16> cmac = crypto::calcAGBSaveCMAC(fsPxiHandle, in.getHandle(), *header1, hash);
+            bool invalid = (bool)memcmp(cmac.data(), header1->cmac, cmac.size());
+
+            if (invalid)
+            {
+                in.close();
+                return false;
+            }
+            else
+            {
+                size = header1->saveSize;
+                data = std::shared_ptr<u8[]>(new u8[size]);
+                // Always 0x200 after the second header
+                in.seek(sizeof(crypto::AGBSaveHeader) * 2 + size, fs::seek_beg);
+                in.read(data.get(), size);
+                in.close();
+            }
+        }
+        // Reached end of file? No header present at all? Something weird happened; we
+        // can't handle that
+        else
+        {
+            in.close();
+            return false;
+        }
+    }
+    // Both headers are initialized. Compare CMACs and such
+    else
+    {
+        std::unique_ptr<crypto::AGBSaveHeader> header2 = std::make_unique<crypto::AGBSaveHeader>();
+        in.seek(header1->saveSize, fs::seek_cur);
+        in.read(header2.get(), sizeof(crypto::AGBSaveHeader));
+
+        // Check the first CMAC
+        in.seek(0, fs::seek_beg);
+        std::array<u8, 32> hash = crypto::calcAGBSaveSHA256(in, *header1);
+        std::array<u8, 16> cmac = crypto::calcAGBSaveCMAC(fsPxiHandle, in.getHandle(), *header1, hash);
+        bool firstInvalid       = (bool)memcmp(cmac.data(), header1->cmac, cmac.size());
+
+        // Check the second CMAC
+        in.seek(sizeof(crypto::AGBSaveHeader) + header1->saveSize, fs::seek_beg);
+        hash               = crypto::calcAGBSaveSHA256(in, *header2);
+        cmac               = crypto::calcAGBSaveCMAC(fsPxiHandle, in.getHandle(), *header2, hash);
+        bool secondInvalid = (bool)memcmp(cmac.data(), header2->cmac, cmac.size());
+
+        if (firstInvalid)
+        {
+            // Both CMACs are invalid.
+            if (secondInvalid)
+            {
+                in.close();
+                return false;
+            }
+            // The second CMAC is the only valid one. Use it
+            else
+            {
+                size = header2->saveSize;
+                data = std::shared_ptr<u8[]>(new u8[size]);
+                // Always 0x200 after the second header
+                in.seek(sizeof(crypto::AGBSaveHeader) * 2 + size, fs::seek_beg);
+                in.read(data.get(), size);
+                in.close();
+            }
+        }
+        else
+        {
+            // The first CMAC is the only valid one. Use it
+            if (secondInvalid)
+            {
+                size = header1->saveSize;
+                data = std::shared_ptr<u8[]>(new u8[size]);
+                // Always 0x200 after the first header
+                in.seek(sizeof(crypto::AGBSaveHeader), fs::seek_beg);
+                in.read(data.get(), size);
+                in.close();
+            }
+            else
+            {
+                // Will include rollover (header1->savesMade == 0xFFFFFFFF)
+                // This is proper logic according to
+                // https://github.com/d0k3/GodMode9/issues/494
+                if (header2->savesMade == header1->savesMade + 1)
+                {
+                    size = header2->saveSize;
+                    data = std::shared_ptr<u8[]>(new u8[size]);
+                    // Always 0x200 after the second header
+                    in.seek(sizeof(crypto::AGBSaveHeader) * 2 + size, fs::seek_beg);
+                    in.read(data.get(), size);
+                    in.close();
+                }
+                else
+                {
+                    size = header1->saveSize;
+                    data = std::shared_ptr<u8[]>(new u8[size]);
+                    // Always 0x200 after the first header
+                    in.seek(sizeof(crypto::AGBSaveHeader), fs::seek_beg);
+                    in.read(data.get(), size);
+                    in.close();
+                }
+            }
+        }
+    }
+    // Now we have the SAV data, save it to sdmc
+    fs::fsfile savFile(fs::getSDMCArch(), _dst, FS_OPEN_CREATE | FS_OPEN_WRITE);
+    if (savFile.isOpen())
+    {
+        savFile.write(data.get(), size);
+        savFile.close();
+        ui::fldRefresh();
+        return true;
+    }
+    return false;
 }
