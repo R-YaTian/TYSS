@@ -63,8 +63,8 @@ static void fldMenuNew_t(void *a)
         std::u16string fullOut = targetDir + newFolder;
         if (data::curData.isAGB()) {
             t->status->setStatus("正在备份 GBAVC 存档数据...");
-            std::u16string savPath = fullOut + util::toUtf16(".sav");
-            bool res = fs::pxiFileToSaveFile(util::toUtf16(""), savPath);
+            std::u16string savPath = fullOut + util::toUtf16(".bin");
+            bool res = fs::pxiFileToSaveFile(fullOut);
             if (!res)
                 ui::showMessage("GBAVC 存档数据无效, 备份失败!");
             else

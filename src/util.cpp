@@ -242,7 +242,3 @@ bool util::fexists(const std::string &path)
     FSFILE_Close(tmp);
     return ret;
 }
-
-bool util::endsWith(const std::string& str, const std::string& suffix) {
-    return str.size() >= suffix.size() && str.rfind(suffix) == (str.size() - suffix.size());
-}

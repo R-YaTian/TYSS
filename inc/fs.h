@@ -158,7 +158,8 @@ namespace fs
     void backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode);
     void backupSPI(const std::u16string& savPath, const CardType& cardType);
     void restoreSPI(const std::u16string& savPath, const CardType& cardType);
-    bool pxiFileToSaveFile(const std::u16string& _src, const std::u16string& _dst);
+    bool pxiFileToSaveFile(const std::u16string& _dst);
+    bool saveFileToPxiFile(const std::u16string& _src);
 }
 
 extern "C" {

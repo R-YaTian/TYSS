@@ -54,6 +54,27 @@
 #include <3ds/types.h>
 #include "fs.h"
 
+#define getbe16(d) \
+    (((d)[0]<<8) | (d)[1])
+#define getbe32(d) \
+    ((((u32) getbe16(d))<<16) | ((u32) getbe16((d)+2)))
+#define getbe64(d) \
+    ((((u64) getbe32(d))<<32) | ((u64) getbe32((d)+4)))
+
+// see: http://3dbrew.org/wiki/3DS_Virtual_Console#Footer
+#define GBASAVE_EEPROM_512  (512)
+#define GBASAVE_EEPROM_8K   (8 * 1024)
+#define GBASAVE_SRAM_32K    (32 * 1024)
+#define GBASAVE_FLASH_64K   (64 * 1024)
+#define GBASAVE_FLASH_128K  (128 * 1024)
+
+#define GBASAVE_VALID(size) \
+   (((size) == GBASAVE_EEPROM_512) || \
+    ((size) == GBASAVE_EEPROM_8K)  || \
+    ((size) == GBASAVE_SRAM_32K)   || \
+    ((size) == GBASAVE_FLASH_64K)  || \
+    ((size) == GBASAVE_FLASH_128K))
+
 namespace crypto
 {
     // This SHA256 implementation is Brad Conte's. It has been modified to have a C++-style

@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
+#pragma once
 #ifndef UTIL_H
 #define UTIL_H
 
@@ -49,7 +50,33 @@ namespace util
 
     bool fexists(const std::string& path);
 
-    bool endsWith(const std::string& str, const std::string& suffix);
+    template <typename CharT>
+    inline CharT asciiToLower(CharT ch) {
+        return (ch >= CharT('A') && ch <= CharT('Z')) ? ch + CharT(32) : ch;
+    }
+
+    template <typename StringT>
+    bool endsWith(const StringT& str, const StringT& suffix) {
+        using CharT = typename StringT::value_type;
+
+        if (str.size() < suffix.size()) return false;
+
+        size_t offset = str.size() - suffix.size();
+        for (size_t i = 0; i < suffix.size(); ++i) {
+            CharT c1 = asciiToLower(str[offset + i]);
+            CharT c2 = asciiToLower(suffix[i]);
+            if (c1 != c2) return false;
+        }
+        return true;
+    }
+
+    template <typename StringT>
+    StringT removeSuffix(const StringT& str, const StringT& suffix) {
+        if (endsWith(str, suffix)) {
+            return str.substr(0, str.size() - suffix.size());
+        }
+        return str;
+    }
 
     inline void stripChar(char _c, std::string& _s)
     {
