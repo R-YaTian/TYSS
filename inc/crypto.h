@@ -122,9 +122,9 @@ namespace crypto
     };
 
     [[nodiscard]] std::array<u8, 32> sha256(std::span<const u8> data);
-    std::array<u8, 32> calcAGBSaveSHA256(fs::fsfile& file, const AGBSaveHeader& header);
+    std::array<u8, 32> calcAGBSaveSHA256(fs::fsfile& file, u32 saveSize);
     std::array<u8, 0x10> calcAGBSaveCMAC(
-        Handle fspxiHandle, const FSPXI_File& file, const AGBSaveHeader& header, const std::array<u8, 32> hashData);
+        Handle fspxiHandle, const FSPXI_File& file, const std::array<u8, 32> hashData);
 }
 
 #endif

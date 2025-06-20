@@ -122,7 +122,17 @@ void fldMenuOverwrite_t(void *a)
         FSUSER_DeleteFile(fs::getSDMCArch(), targetPath);
 
         if (data::curData.isAGB()) {
-            fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16(" GBAVC 存档数据"), fs::getSDMCArch(), overwrite, false, true);
+            if (util::endsWith(overwrite, util::toUtf16(".bin")))
+                fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16(" GBAVC 存档数据"), fs::getSDMCArch(), overwrite, false, true);
+            else {
+                t->status->setStatus("正在备份 GBAVC 存档数据...");
+                std::u16string savPath = util::removeSuffix(overwrite, util::toUtf16(".sav"));
+                bool res = fs::pxiFileToSaveFile(savPath);
+                if (!res)
+                    ui::showMessage("GBAVC 存档数据无效, 备份失败!");
+                else
+                    ui::showMessage("GBAVC 存档数据备份成功!");
+            }
         } else if (!data::curData.getExtInfos().isDSCard) {
             std::u16string svOut = overwrite + util::toUtf16(".sv");
             fs::exportSv(fs::getSaveMode(), svOut, data::curData); // export secure value if found
@@ -190,7 +200,17 @@ void fldMenuRestore_t(void *a)
     else
     {
         if (data::curData.isAGB()) {
-            fs::copyFileThreaded(fs::getSDMCArch(), targetDir + in->name, fs::getSaveArch(), util::toUtf16("/"), false, true);
+            std::u16string savPath = targetDir + in->name;
+            if (util::endsWith(savPath, util::toUtf16(".bin")))
+                fs::copyFileThreaded(fs::getSDMCArch(), savPath, fs::getSaveArch(), util::toUtf16("/"), false, true);
+            else {
+                t->status->setStatus("正在恢复 GBAVC 存档数据...");
+                bool res = fs::saveFileToPxiFile(savPath);
+                if (!res)
+                    ui::showMessage("GBAVC 存档数据无效, 恢复失败!");
+                else
+                    ui::showMessage("GBAVC 存档数据恢复成功!");
+            }
         } else if (!data::curData.getExtInfos().isDSCard) {
             fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
             fs::commitData(fs::getSaveMode());

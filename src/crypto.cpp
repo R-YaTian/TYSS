@@ -220,13 +220,13 @@ namespace crypto
     }
 
     // On return, will be at the end of the save described by the header.
-    std::array<u8, 32> calcAGBSaveSHA256(fs::fsfile& file, const AGBSaveHeader& header)
+    std::array<u8, 32> calcAGBSaveSHA256(fs::fsfile& file, u32 saveSize)
     {
         static constexpr size_t READBLOCK_SIZE = 0x1000;
 
         SHA256 context;
         file.seek(0x30, fs::fsSeek::seek_beg);
-        size_t sha_end_idx              = header.saveSize + 0x200 - 0x30;
+        size_t sha_end_idx              = saveSize + 0x200 - 0x30;
         std::unique_ptr<u8[]> readblock = std::unique_ptr<u8[]>(new u8[READBLOCK_SIZE]);
         size_t read                     = 0;
         for (size_t i = 0; i < sha_end_idx; i += read)
@@ -244,7 +244,7 @@ namespace crypto
     // SHA256(0x30..0x200 + the entire save itself)))) FSPXI_CalcSavegameMAC does the AES-CMAC,
     // CTR-SIGN, and the CTR-SAV0 step
     std::array<u8, 0x10> calcAGBSaveCMAC(
-        Handle fspxiHandle, const FSPXI_File& file, const AGBSaveHeader& header, const std::array<u8, 32> hashData)
+        Handle fspxiHandle, const FSPXI_File& file, const std::array<u8, 32> hashData)
     {
         std::array<u8, 0x10> prev;
         std::array<u8, 0x10> ret;
