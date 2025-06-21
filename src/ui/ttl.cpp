@@ -25,6 +25,7 @@
 #include "fs.h"
 #include "util.h"
 #include "cheatmanager.h"
+#include "cfg.h"
 
 static ui::titleview *ttlView;
 static ui::menu *ttlOpts;
@@ -310,7 +311,7 @@ void ui::ttlDrawBot()
     }
     else if(ttlOptsOpen)
     {
-        ttlOpts->draw(0, 2, 0xFFFFFFFF, 320, false);
+        ttlOpts->draw(0, 2, 0xFFFFFFFF, 320, std::get<bool>(cfg::config["lightback"]));
         ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
     }
     else

@@ -454,5 +454,5 @@ void ui::fldUpdate()
 
 void ui::fldDraw()
 {
-    fldMenu.draw(0, 2, 0xFFFFFFFF, 320, false);
+    fldMenu.draw(0, 2, 0xFFFFFFFF, 320, std::get<bool>(cfg::config["lightback"]));
 }

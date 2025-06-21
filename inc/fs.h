@@ -51,7 +51,7 @@ namespace fs
 
     enum fsSeek
     {
-        seek_beg,
+        seek_set,
         seek_cur,
         seek_end
     };

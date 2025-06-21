@@ -1039,9 +1039,9 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path)
     fs::fsfile cache(fs::getSDMCArch(), path, FS_OPEN_READ);
     //Check revision
     uint8_t rev = 0;
-    cache.seek(2, fs::seek_beg);
+    cache.seek(2, fs::seek_set);
     rev = cache.getByte();
-    cache.seek(0, fs::seek_beg);
+    cache.seek(0, fs::seek_set);
 
     if(rev != 0x06)
         return false;

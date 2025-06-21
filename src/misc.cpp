@@ -32,7 +32,7 @@ void misc::setPC()
         fs::fsfile playCoin(fs::getSaveArch(), "/gamecoin.dat", FS_OPEN_READ | FS_OPEN_WRITE);
 
         int coinAmount = 0;
-        playCoin.seek(0x4, fs::seek_beg);
+        playCoin.seek(0x4, fs::seek_set);
         coinAmount = playCoin.getByte() | playCoin.getByte() << 8;
 
         coinAmount = util::getInt("输入 0-300 之间的数值", coinAmount, 300);
@@ -274,13 +274,13 @@ void misc::unpackWrappedSoftware(void *a)
         u8* flags = new u8[0x168];
         u32 readSize = 0;
 
-        svHomemenu.seek(0xB48, fs::seek_beg);
+        svHomemenu.seek(0xB48, fs::seek_set);
         readSize = svHomemenu.read(flags, 0x168);
 
         if (readSize == 0x168) {
             u32 writeSize = 0;
             memset(flags, 0, 0x168);
-            svHomemenu.seek(0xB48, fs::seek_beg);
+            svHomemenu.seek(0xB48, fs::seek_set);
             writeSize = svHomemenu.write(flags, 0x168);
             if (writeSize < 0x168)
                 ui::showMessage("主菜单数据写入失败,无法完成操作!");
@@ -311,7 +311,7 @@ void misc::hackStepCount(void *a)
     {
         fs::fsfile gamecoin(fs::getSaveArch(), "/gamecoin.dat", FS_OPEN_READ);
 
-        gamecoin.seek(0xC, fs::seek_beg);
+        gamecoin.seek(0xC, fs::seek_set);
         stepValue = gamecoin.getByte() | gamecoin.getByte() << 8 | gamecoin.getByte() << 16;
         gamecoin.close();
 

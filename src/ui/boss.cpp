@@ -22,6 +22,7 @@
 #include "data.h"
 #include "fs.h"
 #include "util.h"
+#include "cfg.h"
 
 static ui::titleview *bossView;
 static ui::menu *bossViewOpts;
@@ -203,7 +204,7 @@ void ui::bossViewDrawBot()
     }
     else if(bossViewOptsOpen)
     {
-        bossViewOpts->draw(0, 2, 0xFFFFFFFF, 320, false);
+        bossViewOpts->draw(0, 2, 0xFFFFFFFF, 320, std::get<bool>(cfg::config["lightback"]));
         ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
     }
     else

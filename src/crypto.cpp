@@ -225,7 +225,7 @@ namespace crypto
         static constexpr size_t READBLOCK_SIZE = 0x1000;
 
         SHA256 context;
-        file.seek(0x30, fs::fsSeek::seek_beg);
+        file.seek(0x30, fs::seek_set);
         size_t sha_end_idx              = saveSize + 0x200 - 0x30;
         std::unique_ptr<u8[]> readblock = std::unique_ptr<u8[]>(new u8[READBLOCK_SIZE]);
         size_t read                     = 0;

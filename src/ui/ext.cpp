@@ -22,6 +22,7 @@
 #include "data.h"
 #include "fs.h"
 #include "util.h"
+#include "cfg.h"
 
 static ui::titleview *extView;
 static bool fldOpen = false, extOptsOpen = false;
@@ -213,7 +214,7 @@ void ui::extDrawBot()
     }
     else if(extOptsOpen)
     {
-        extOpts->draw(0, 2, 0xFFFFFFFF, 320, false);
+        extOpts->draw(0, 2, 0xFFFFFFFF, 320, std::get<bool>(cfg::config["lightback"]));
         ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
     }
     else

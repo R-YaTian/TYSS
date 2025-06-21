@@ -28,6 +28,11 @@ static void toggleDeflateLevel(void *b)
         *in = 1;
 }
 
+static std::string getLightDarkText(const bool& g)
+{
+    return g ? "浅色" : "暗黑";
+}
+
 static std::string getBoolText(const bool& g)
 {
     return g ? "开" : "关";
@@ -144,7 +149,7 @@ static void setMenuReloadDriveList(void *a)
 }
 #endif
 
-static void setMenuToggleZIP_t(void *a)
+static void setMenuToggleBOOL_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在保存设置...");
@@ -156,9 +161,9 @@ static void setMenuToggleZIP_t(void *a)
     t->finished = true;
 }
 
-static void setMenuToggleZIP(void *a)
+static void setMenuToggleBOOL(void *a)
 {
-    ui::newThread(setMenuToggleZIP_t, a, NULL);
+    ui::newThread(setMenuToggleBOOL_t, a, NULL);
 }
 
 static void setMenuToggleDeflateLevel_t(void *a)
@@ -197,16 +202,19 @@ void ui::setInit(void *a)
     setMenu.addOptEvent(0, KEY_A, setMenuReloadTitles, NULL);
 
     setMenu.addOpt("导出到 ZIP", 320);
-    setMenu.addOptEvent(1, KEY_A, setMenuToggleZIP, &std::get<bool>(cfg::config["zip"]));
+    setMenu.addOptEvent(1, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["zip"]));
 
     setMenu.addOpt("ZIP 压缩等级", 320);
     setMenu.addOptEvent(2, KEY_A, setMenuToggleDeflateLevel, &std::get<int>(cfg::config["deflateLevel"]));
 
+    setMenu.addOpt("界面主题色", 320);
+    setMenu.addOptEvent(3, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["lightback"]));
+
     setMenu.addOpt("重置收藏列表", 320);
-    setMenu.addOptEvent(3, KEY_A, setMenuClearFavList, NULL);
+    setMenu.addOptEvent(4, KEY_A, setMenuClearFavList, NULL);
 
     setMenu.addOpt("重置黑名单", 320);
-    setMenu.addOptEvent(4, KEY_A, setMenuClearBlackList, NULL);
+    setMenu.addOptEvent(5, KEY_A, setMenuClearBlackList, NULL);
 
 #ifdef ENABLE_GD
     setMenu.addOpt("重载云端存储列表", 320);
@@ -273,6 +281,7 @@ void ui::setUpdate()
 
         setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(std::get<bool>(cfg::config["zip"])));
         setMenu.editOpt(2, getDeflateLevelText(std::get<int>(cfg::config["deflateLevel"])));
+        setMenu.editOpt(3, "界面主题色: " + getLightDarkText(std::get<bool>(cfg::config["lightback"])));
 
         setMenu.update();
     } else {
@@ -285,10 +294,10 @@ void ui::setDrawTop()
     if (!setSubMenuOpen)
     {
         ui::drawUIBar(TITLE_TEXT + "- 设置与杂项", ui::SCREEN_TOP, true);
-        setMenu.draw(0, 22, 0xFFFFFFFF, 400, false);
+        setMenu.draw(0, 22, 0xFFFFFFFF, 400, std::get<bool>(cfg::config["lightback"]));
     } else {
         ui::drawUIBar(TITLE_TEXT + "- 工具箱", ui::SCREEN_TOP, true);
-        setSubMenu.draw(0, 22, 0xFFFFFFFF, 400, false);
+        setSubMenu.draw(0, 22, 0xFFFFFFFF, 400, std::get<bool>(cfg::config["lightback"]));
     }
 }
 
