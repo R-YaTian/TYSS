@@ -46,16 +46,16 @@ C2D_Image gfx::dsIcon(void)
     return C2D_SpriteSheetGetImage(spritesheet, sprites_dsicon_idx);
 }
 
-void gfx::setColor(bool lightback)
+void gfx::setColor(bool light)
 {
-    clearClr = (lightback ? 0xFFFFFFFF : 0xFF2D2D2D);
-    txtCont = (lightback ? 0xFF333333 : 0xFFFFFFFF);
-    rectLt = (lightback ? 0xFFDFDFDF : 0xFF505050);
-    rectSh = (lightback ? 0xFFCACACA : 0xFF202020);
-    rectSel = (lightback ? 0xFFF0E8E7 : 0xFF272221);
-    divClr = (lightback ? 0x88555555 : 0x881D1D1D);
-    btnClr = (lightback ? 0xFFDBDBDB : 0xFF545454);
-    btnSel = (lightback ? 0xFFBBBBBB : 0xFF747474);
+    clearClr = (light ? 0xFFFFFFFF : 0xFF2D2D2D);
+    txtCont = (light ? 0xFF333333 : 0xFFFFFFFF);
+    rectLt = (light ? 0xFFDFDFDF : 0xFF505050);
+    rectSh = (light ? 0xFFCACACA : 0xFF202020);
+    rectSel = (light ? 0xFFF0E8E7 : 0xFF272221);
+    divClr = (light ? 0x88555555 : 0x881D1D1D);
+    btnClr = (light ? 0xFFDBDBDB : 0xFF545454);
+    btnSel = (light ? 0xFFBBBBBB : 0xFF747474);
 }
 
 void gfx::init()

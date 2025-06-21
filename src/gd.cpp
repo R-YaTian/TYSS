@@ -309,7 +309,8 @@ void drive::gd::loadDriveList()
                 if (newItem.isDir
                     || util::endsWith(newItem.name, std::string(".zip"))
                     || util::endsWith(newItem.name, std::string(".sv"))
-                    || util::endsWith(newItem.name, std::string(".sav")))
+                    || util::endsWith(newItem.name, std::string(".sav"))
+                    || util::endsWith(newItem.name, std::string(".bin")))
                     driveList.push_back(newItem);
             }
         }

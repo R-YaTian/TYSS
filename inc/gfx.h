@@ -33,7 +33,7 @@ namespace gfx
 {
     void init();
     void exit();
-    void setColor(bool lightback = false);
+    void setColor(bool light = false);
 
     extern C3D_RenderTarget *top, *bot;
     extern Tex3DS_SubTexture iconSubTex;

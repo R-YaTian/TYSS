@@ -64,13 +64,16 @@ static void fldMenuNew_t(void *a)
         std::u16string fullOut = targetDir + newFolder;
         if (data::curData.isAGB()) {
             t->status->setStatus("正在备份 GBAVC 存档数据...");
-            std::u16string savPath = fullOut + util::toUtf16(".bin");
             bool res = fs::pxiFileToSaveFile(fullOut);
             if (!res)
                 ui::showMessage("GBAVC 存档数据无效, 备份失败!");
-            else
+            else {
                 ui::showMessage("GBAVC 存档数据备份成功!");
-            // fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16("原始 GBAVC 存档数据"), fs::getSDMCArch(), savPath, false, true);
+                if (std::get<bool>(cfg::config["rawvcsave"])) {
+                    std::u16string savPath = fullOut + util::toUtf16(".bin");
+                    fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16("原始 GBAVC 存档数据"), fs::getSDMCArch(), savPath, false, true);
+                }
+            }
         } else if (!data::curData.getExtInfos().isDSCard) {
             std::u16string svOut = fullOut + util::toUtf16(".sv");
             fs::exportSv(fs::getSaveMode(), svOut, data::curData); // export secure value if found
@@ -124,7 +127,7 @@ void fldMenuOverwrite_t(void *a)
 
         if (data::curData.isAGB()) {
             if (util::endsWith(overwrite, util::toUtf16(".bin")))
-                fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16(" GBAVC 存档数据"), fs::getSDMCArch(), overwrite, false, true);
+                fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16("原始 GBAVC 存档数据"), fs::getSDMCArch(), overwrite, false, true);
             else {
                 t->status->setStatus("正在备份 GBAVC 存档数据...");
                 std::u16string savPath = util::removeSuffix(overwrite, util::toUtf16(".sav"));
@@ -257,7 +260,7 @@ void fldMenuUpload_t(void *a)
     std::string ttlUTF8 = data::curData.getTitleUTF8();
     if(!fs::gDrive->dirExists(ttlUTF8, fs::currentDirID))
         fs::gDrive->createDir(ttlUTF8, fs::currentDirID);
-    uploadParent = fs::gDrive->getFolderID(ttlUTF8,  fs::currentDirID);
+    uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::currentDirID);
 
     FILE *upload = fopen("/TYSS/tmp.zip", "rb");
     if(fs::gDrive->fileExists(utf8Name, uploadParent))

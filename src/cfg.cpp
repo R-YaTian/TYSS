@@ -34,6 +34,7 @@ void cfg::initToDefault()
     cfg::config["zip"] = false;
     cfg::config["deflateLevel"] = 1;
     cfg::config["lightback"] = false;
+    cfg::config["rawvcsave"] = false;
 }
 
 void cfg::load()
@@ -51,6 +52,9 @@ void cfg::load()
 
         fread(&getBool, sizeof(bool), 1, cfgIn);
         cfg::config["lightback"] = getBool;
+
+        fread(&getBool, sizeof(bool), 1, cfgIn);
+        cfg::config["rawvcsave"] = getBool;
 
         fclose(cfgIn);
     }
@@ -99,6 +103,7 @@ void cfg::saveCommon()
         fwrite(&std::get<bool>(cfg::config["zip"]), sizeof(bool), 1, cfgOut);
         fwrite(&std::get<int>(cfg::config["deflateLevel"]), sizeof(int), 1, cfgOut);
         fwrite(&std::get<bool>(cfg::config["lightback"]), sizeof(bool), 1, cfgOut);
+        fwrite(&std::get<bool>(cfg::config["rawvcsave"]), sizeof(bool), 1, cfgOut);
         fclose(cfgOut);
     }
 }

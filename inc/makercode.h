@@ -24,9 +24,9 @@
 
 class Makercode {
 public:
-    // 构造函数，初始化字典
+    // Init dict
     Makercode() {
-        // 在构造函数中初始化所有键值对
+        // Init all known publishers
         publisher["01"] = "Nintendo";
         publisher["02"] = "Rocket Games";
         publisher["03"] = "Imagineer Zoom";
@@ -123,7 +123,7 @@ public:
     }
 
 private:
-    // 存储字典的 unordered_map
+    // Publisher dict (Use unordered_map)
     std::unordered_map<std::string, std::string> publisher;
 };
 

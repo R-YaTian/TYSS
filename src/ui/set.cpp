@@ -211,11 +211,14 @@ void ui::setInit(void *a)
     setMenu.addOpt("界面主题色", 320);
     setMenu.addOptEvent(3, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["lightback"]));
 
+    setMenu.addOpt("GBAVC存档备份成功时保留原始数据", 320);
+    setMenu.addOptEvent(4, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["rawvcsave"]));
+
     setMenu.addOpt("重置收藏列表", 320);
-    setMenu.addOptEvent(4, KEY_A, setMenuClearFavList, NULL);
+    setMenu.addOptEvent(5, KEY_A, setMenuClearFavList, NULL);
 
     setMenu.addOpt("重置黑名单", 320);
-    setMenu.addOptEvent(5, KEY_A, setMenuClearBlackList, NULL);
+    setMenu.addOptEvent(6, KEY_A, setMenuClearBlackList, NULL);
 
 #ifdef ENABLE_GD
     setMenu.addOpt("重载云端存储列表", 320);
@@ -283,6 +286,7 @@ void ui::setUpdate()
         setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(std::get<bool>(cfg::config["zip"])));
         setMenu.editOpt(2, getDeflateLevelText(std::get<int>(cfg::config["deflateLevel"])));
         setMenu.editOpt(3, "界面主题色: " + getLightDarkText(std::get<bool>(cfg::config["lightback"])));
+        setMenu.editOpt(4, "GBAVC存档备份成功时保留原始数据: " + getBoolText(std::get<bool>(cfg::config["rawvcsave"])));
 
         setMenu.update();
     } else {
@@ -313,18 +317,24 @@ void ui::setDrawBottom()
                 setOptsDesc = "清除 Title 缓存并重新扫描应用列表。\n这或许需要耗费一定时间, 视 Title 数量而定。";
                 break;
             case 1:
-                setOptsDesc = "备份存档时是否使用 ZIP 压缩存储。";
+                setOptsDesc = "备份存档时是否使用 ZIP 压缩存储。\n注:仅支持3DS应用(下载版与卡带)及DSiWare存档\n当备份DS游戏卡带或GBAVC存档时,无论是否开启\n该项设置,存档都将直接转储为.sav或.bin格式!";
                 break;
             case 2:
                 setOptsDesc = "选择 ZIP 压缩等级。\n(等级越高, 速度越慢, 压缩率越高)";
                 break;
             case 3:
-                setOptsDesc = "这将会清空收藏列表, 请谨慎操作。";
+                setOptsDesc = "选择 UI 界面主题色。\n(浅色/暗黑)";
                 break;
             case 4:
-                setOptsDesc = "清空黑名单列表, 将会自动执行一次重载 Titles.";
+                setOptsDesc = "当GBAVC存档备份成功时保留一份原始(.bin)数据。\n一般情况下不需要开启此项,因为原始数据不可用于\nGBAVC虚拟主机之外的任何地方(GBA模拟器等等)\n注:覆盖备份文件或还原数据时,将根据后缀自动判断";
                 break;
             case 5:
+                setOptsDesc = "这将会清空收藏列表, 请谨慎操作。";
+                break;
+            case 6:
+                setOptsDesc = "清空黑名单列表, 将会自动执行一次重载 Titles.";
+                break;
+            case 7:
                 setOptsDesc = "从云端同步存档文件列表。\n这或许需要耗费一定时间, 视网络环境而定。";
                 break;
         }

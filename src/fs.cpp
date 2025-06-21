@@ -696,7 +696,8 @@ void fs::dirList::rescan()
                                     ent.attributes == FS_ATTRIBUTE_DIRECTORY};
             if (newEntry.isDir
                 || util::endsWith(newEntry.nameUTF8, std::string(".zip"))
-                || util::endsWith(newEntry.nameUTF8, std::string(".sav")))
+                || util::endsWith(newEntry.nameUTF8, std::string(".sav"))
+                || util::endsWith(newEntry.nameUTF8, std::string(".bin")))
                 entry.push_back(newEntry);
         }
     }
@@ -727,7 +728,8 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
                                     ent.attributes == FS_ATTRIBUTE_DIRECTORY};
             if (newEntry.isDir
                 || util::endsWith(newEntry.nameUTF8, std::string(".zip"))
-                || util::endsWith(newEntry.nameUTF8, std::string(".sav")))
+                || util::endsWith(newEntry.nameUTF8, std::string(".sav"))
+                || util::endsWith(newEntry.nameUTF8, std::string(".bin")))
                 entry.push_back(newEntry);
         }
     }
