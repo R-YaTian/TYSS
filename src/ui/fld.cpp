@@ -25,6 +25,7 @@
 #include "util.h"
 #include "type.h"
 #include "cfg.h"
+#include "gfx.h"
 
 static ui::menu fldMenu;
 static fs::dirList fldList;
@@ -454,5 +455,5 @@ void ui::fldUpdate()
 
 void ui::fldDraw()
 {
-    fldMenu.draw(0, 2, 0xFFFFFFFF, 320, std::get<bool>(cfg::config["lightback"]));
+    fldMenu.draw(0, 2, gfx::txtCont, 320);
 }

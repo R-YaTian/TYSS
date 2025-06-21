@@ -155,6 +155,7 @@ static void setMenuToggleBOOL_t(void *a)
     t->status->setStatus("正在保存设置...");
     toggleBool(t->argPtr);
     cfg::saveCommon();
+    gfx::setColor(std::get<bool>(cfg::config["lightback"]));
     t->lock();
     t->argPtr = NULL;
     t->unlock();
@@ -294,10 +295,10 @@ void ui::setDrawTop()
     if (!setSubMenuOpen)
     {
         ui::drawUIBar(TITLE_TEXT + "- 设置与杂项", ui::SCREEN_TOP, true);
-        setMenu.draw(0, 22, 0xFFFFFFFF, 400, std::get<bool>(cfg::config["lightback"]));
+        setMenu.draw(0, 22, gfx::txtCont, 400);
     } else {
         ui::drawUIBar(TITLE_TEXT + "- 工具箱", ui::SCREEN_TOP, true);
-        setSubMenu.draw(0, 22, 0xFFFFFFFF, 400, std::get<bool>(cfg::config["lightback"]));
+        setSubMenu.draw(0, 22, gfx::txtCont, 400);
     }
 }
 
@@ -364,5 +365,5 @@ void ui::setDrawBottom()
         }
         ui::drawUIBar("\ue000 选择 \ue001 退出工具箱", ui::SCREEN_BOT, false);
     }
-    gfx::drawTextWrap(setOptsDesc, 8, 8, GFX_DEPTH_DEFAULT, 0.5f, 304, 0xFFFFFFFF);
+    gfx::drawTextWrap(setOptsDesc, 8, 8, GFX_DEPTH_DEFAULT, 0.5f, 304, gfx::txtCont);
 }

@@ -34,6 +34,8 @@ C3D_RenderTarget *gfx::top, *gfx::bot;
 Tex3DS_SubTexture gfx::iconSubTex = {48, 48, 0.0f, 0.75f, 0.75f, 0.0f};
 Tex3DS_SubTexture gfx::dsIconSubTex = {32, 32, 0.0f, 1.0f, 1.0f, 0.0f};
 
+u32 gfx::clearClr, gfx::txtCont, gfx::rectLt, gfx::rectSh, gfx::rectSel, gfx::divClr, gfx::btnClr, gfx::btnSel;
+
 C2D_Image gfx::noIcon(void)
 {
     return C2D_SpriteSheetGetImage(spritesheet, sprites_noicon_idx);
@@ -42,6 +44,18 @@ C2D_Image gfx::noIcon(void)
 C2D_Image gfx::dsIcon(void)
 {
     return C2D_SpriteSheetGetImage(spritesheet, sprites_dsicon_idx);
+}
+
+void gfx::setColor(bool lightback)
+{
+    clearClr = (lightback ? 0xFFFFFFFF : 0xFF2D2D2D);
+    txtCont = (lightback ? 0xFF333333 : 0xFFFFFFFF);
+    rectLt = (lightback ? 0xFFDFDFDF : 0xFF505050);
+    rectSh = (lightback ? 0xFFCACACA : 0xFF202020);
+    rectSel = (lightback ? 0xFFF0E8E7 : 0xFF272221);
+    divClr = (lightback ? 0x88555555 : 0x881D1D1D);
+    btnClr = (lightback ? 0xFFDBDBDB : 0xFF545454);
+    btnSel = (lightback ? 0xFFBBBBBB : 0xFF747474);
 }
 
 void gfx::init()
@@ -191,9 +205,9 @@ size_t gfx::getTextWidth(const std::string& str)
     return (size_t)ret;
 }
 
-void gfx::drawBoundingBox(const int& x, const int& y, const int& w, const int& h, const float& depth, const uint32_t& clr, bool light)
+void gfx::drawBoundingBox(const int& x, const int& y, const int& w, const int& h, const float& depth, const uint32_t& clr)
 {
-    C2D_DrawRectSolid(x, y + 1, depth, w, h - 2, light ? 0xFFFDFDFD : 0xFF272221);
+    C2D_DrawRectSolid(x, y + 1, depth, w, h - 2, rectSel);
     C2D_DrawRectSolid(x + 1, y, depth, w - 2, 2, clr);
     C2D_DrawRectSolid(x, y + 1, depth, 2, h - 2, clr);
     C2D_DrawRectSolid(x + 1, (y + h - 2), depth, w - 2, 2, clr);

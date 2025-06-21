@@ -76,9 +76,9 @@ bool ui::button::wasOver()
 void ui::button::draw()
 {
     if (pressed)
-        C2D_DrawRectSolid(x, y, GFX_DEPTH_DEFAULT, w, h, 0xFFBBBBBB);
+        C2D_DrawRectSolid(x, y, GFX_DEPTH_DEFAULT, w, h, gfx::btnSel);
     else
-        C2D_DrawRectSolid(x, y, GFX_DEPTH_DEFAULT, w, h, 0xFFDBDBDB);
+        C2D_DrawRectSolid(x, y, GFX_DEPTH_DEFAULT, w, h, gfx::btnClr);
 
-    gfx::drawText(text, tx, ty, GFX_DEPTH_DEFAULT, 0.5f, 0xFF000000);
+    gfx::drawText(text, tx, ty, GFX_DEPTH_DEFAULT, 0.5f, gfx::txtCont);
 }

@@ -155,7 +155,7 @@ void ui::menu::update()
         (*(cb))(args);
 }
 
-void ui::menu::draw(const int &x, const int &y, const uint32_t &baseClr, const uint32_t &rectWidth, bool lightBack)
+void ui::menu::draw(const int &x, const int &y, const uint32_t &baseClr, const uint32_t &rectWidth)
 {
     if (opt.empty())
         return;
@@ -185,7 +185,7 @@ void ui::menu::draw(const int &x, const int &y, const uint32_t &baseClr, const u
     {
         if (i == selected)
         {
-            gfx::drawBoundingBox(x, (y - 2) + ((i - start) * 18), rectWidth, 18, GFX_DEPTH_DEFAULT, rectClr, lightBack);
+            gfx::drawBoundingBox(x, (y - 2) + ((i - start) * 18), rectWidth, 18, GFX_DEPTH_DEFAULT, rectClr);
             C2D_DrawRectSolid(x + 4, y + 1 + ((i - start) * 18), GFX_DEPTH_DEFAULT, 2, 12, 0xFFC5FF00);
         }
 

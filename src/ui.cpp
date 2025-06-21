@@ -34,6 +34,7 @@
 #include "fs.h"
 #include "sys.h"
 #include "smdh.h"
+#include "cfg.h"
 
 #include "ui/ttlview.h"
 #include "ui/ttl.h"
@@ -50,7 +51,7 @@ ui::progressBar *ui::prog;
 static ui::threadProcMngr *thrdMgr;
 static ui::button *ok, *yes, *no;
 
-const std::string TITLE_TEXT = "TY Save Studio - 03.16.2025 ";
+const std::string TITLE_TEXT = "TY Save Studio - 06.21.2025 ";
 
 uint32_t ui::down = 0, ui::held = 0;
 touchPosition ui::p;
@@ -62,6 +63,8 @@ void ui::init()
     yes = new ui::button("是 \ue000", 32, 184, 120, 32);
     no  = new ui::button("否 \ue001", 168, 184, 120, 32);
     prog = new ui::progressBar(100);
+
+    gfx::setColor(std::get<bool>(cfg::config["lightback"]));
 }
 
 void ui::exit()
@@ -85,16 +88,16 @@ void ui::drawUIBar(const std::string& txt, int screen, bool center)
     {
         case ui::SCREEN_TOP://top
             topX = 200 - (gfx::getTextWidth(txt) / 2);
-            C2D_DrawRectSolid(0, 0, GFX_DEPTH_DEFAULT, 400, 16, 0xFF505050);
-            C2D_DrawRectSolid(0, 16, GFX_DEPTH_DEFAULT, 400, 1, 0x881D1D1D);
-            gfx::drawText(txt, topX, 0, GFX_DEPTH_DEFAULT, 0.5f, 0xFFFFFFFF);
+            C2D_DrawRectSolid(0, 0, GFX_DEPTH_DEFAULT, 400, 16, gfx::rectLt);
+            C2D_DrawRectSolid(0, 16, GFX_DEPTH_DEFAULT, 400, 1, gfx::divClr);
+            gfx::drawText(txt, topX, 0, GFX_DEPTH_DEFAULT, 0.5f, gfx::txtCont);
             break;
 
         case ui::SCREEN_BOT://bottom
             botX = 160 - (gfx::getTextWidth(txt) / 2);
-            C2D_DrawRectSolid(0, 224, GFX_DEPTH_DEFAULT, 320, 16, 0xFF505050);
-            C2D_DrawRectSolid(0, 223, GFX_DEPTH_DEFAULT, 320, 1, 0x881D1D1D);
-            gfx::drawText(txt, botX, 224, GFX_DEPTH_DEFAULT, 0.5f, 0xFFFFFFFF);
+            C2D_DrawRectSolid(0, 224, GFX_DEPTH_DEFAULT, 320, 16, gfx::rectLt);
+            C2D_DrawRectSolid(0, 223, GFX_DEPTH_DEFAULT, 320, 1, gfx::divClr);
+            gfx::drawText(txt, botX, 224, GFX_DEPTH_DEFAULT, 0.5f, gfx::txtCont);
             break;
     }
 }
@@ -262,8 +265,10 @@ void ui::progressBar::update(const uint32_t& _prog)
 void ui::progressBar::draw()
 {
     if (!text.empty()) gfx::drawTextWrap(text, 16, 96, GFX_DEPTH_DEFAULT, 0.5f, 288, 0xFFFFFFFF);
-    C2D_DrawRectSolid(0, 208, GFX_DEPTH_DEFAULT, 320, 16, 0xFF000000);
-    C2D_DrawRectSolid(0, 208, GFX_DEPTH_DEFAULT, width, 16, 0xFF00FF00);
+
+    C2D_DrawRectSolid(0, 207, GFX_DEPTH_DEFAULT, 320, 16, 0x882A2A2A);
+    C2D_DrawRectSolid(0, 207, GFX_DEPTH_DEFAULT, width, 16, 0xFFAAAAAA);
+    C2D_DrawRectSolid(0, 207, GFX_DEPTH_DEFAULT, width, 1, 0xEEFFFFFF);
 }
 
 void ui::progressBarDrawFunc(void *a)
@@ -302,8 +307,8 @@ static void messageDrawFunc(void *a)
     if(t->argPtr && t->running)
     {
         ui::confArgs *in = (ui::confArgs *)t->argPtr;
-        C2D_DrawRectSolid(24, 24, GFX_DEPTH_DEFAULT, 272, 200, 0xFFE7E7E7);
-        gfx::drawTextWrap(in->q, 32, 32, GFX_DEPTH_DEFAULT, 0.5f, 256, 0xFF000000);
+        C2D_DrawRectSolid(24, 24, GFX_DEPTH_DEFAULT, 272, 200, gfx::clearClr);
+        gfx::drawTextWrap(in->q, 32, 32, GFX_DEPTH_DEFAULT, 0.5f, 256, gfx::txtCont);
         ok->draw();
     }
 }
@@ -354,8 +359,8 @@ static void confirmDrawFunc(void *a)
     if(t->argPtr && t->running)
     {
         ui::confArgs *in = (ui::confArgs *)t->argPtr;
-        C2D_DrawRectSolid(24, 24, GFX_DEPTH_DEFAULT, 272, 200, 0xFFE7E7E7);
-        gfx::drawTextWrap(in->q, 32, 32, GFX_DEPTH_DEFAULT, 0.5f, 256, 0xFF000000);
+        C2D_DrawRectSolid(24, 24, GFX_DEPTH_DEFAULT, 272, 200, gfx::clearClr);
+        gfx::drawTextWrap(in->q, 32, 32, GFX_DEPTH_DEFAULT, 0.5f, 256, gfx::txtCont);
         yes->draw();
         no->draw();
     }

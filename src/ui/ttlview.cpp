@@ -28,7 +28,7 @@ void ui::titleTile::draw(int x, int y, bool sel, uint8_t clrShft)
     if(sel)
     {
         uint32_t bbClr = 0xFF << 24 | (uint8_t)(0xC5 + (clrShft / 2)) << 16 | (uint8_t)(0x88 + clrShft) << 8 | 0x00;
-        gfx::drawBoundingBox(x - 3, y - 3, 54, 54, GFX_DEPTH_DEFAULT, bbClr, false);
+        gfx::drawBoundingBox(x - 3, y - 3, 54, 54, GFX_DEPTH_DEFAULT, bbClr);
     }
 
     if (icon->subtex->width == 32) {

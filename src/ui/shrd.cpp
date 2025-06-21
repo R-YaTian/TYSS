@@ -181,7 +181,7 @@ void ui::shrdDrawBot()
                 sharedDesc = "FE: 包含 versionList.dat, 用于 7.0.0-13 系统引入的主页菜单软件更新通知.";
                 break;
         }
-        gfx::drawTextWrap("3DBREW: " + sharedDesc, 8, 8, GFX_DEPTH_DEFAULT, 0.5f, 304, 0xFFFFFFFF);
+        gfx::drawTextWrap("3DBREW: " + sharedDesc, 8, 8, GFX_DEPTH_DEFAULT, 0.5f, 304, gfx::txtCont);
         ui::drawUIBar("\ue000 打开 \ue002 备份所有 \ue01A\ue077\ue019 视图类型", ui::SCREEN_BOT, false);
     }
 }

@@ -33,10 +33,12 @@ namespace gfx
 {
     void init();
     void exit();
+    void setColor(bool lightback = false);
 
     extern C3D_RenderTarget *top, *bot;
     extern Tex3DS_SubTexture iconSubTex;
     extern Tex3DS_SubTexture dsIconSubTex;
+    extern u32 clearClr, txtCont, rectLt, rectSh, rectSel, divClr, btnClr, btnSel;
 
     C2D_Image noIcon(void);
     C2D_Image dsIcon(void);
@@ -44,8 +46,8 @@ namespace gfx
     inline void frameBegin()
     {
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-        C2D_TargetClear(top, 0xFF2D2D2D);
-        C2D_TargetClear(bot, 0xFF2D2D2D);
+        C2D_TargetClear(top, clearClr);
+        C2D_TargetClear(bot, clearClr);
     }
 
     inline void frameEnd()
@@ -68,7 +70,7 @@ namespace gfx
     void drawU16Text(const std::u16string& str, const int& x, const int& y, const float& depth, const uint32_t& clr);
     size_t getTextWidth(const std::string& str);
 
-    void drawBoundingBox(const int& x, const int& y, const int& w, const int& h, const float& depth, const uint32_t& clr, bool light);
+    void drawBoundingBox(const int& x, const int& y, const int& w, const int& h, const float& depth, const uint32_t& clr);
 }
 
 #endif // GFX_H

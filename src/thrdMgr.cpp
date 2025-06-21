@@ -107,7 +107,7 @@ void ui::threadProcMngr::drawBot()
 
     uint32_t glyphCol = 0xFF << 24 | (uint8_t)(0xC5 + (clrShft / 2)) << 16 | (uint8_t)(0x88 + clrShft) << 8 | 0x00;
     gfx::drawText(ui::loadGlyphArray[lgFrame], 4, 222, GFX_DEPTH_DEFAULT, 0.65f, glyphCol);
-    
+
     threadInfo *t = threads[0];
     t->lock();
     if(t->running)

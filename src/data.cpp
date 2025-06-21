@@ -427,17 +427,17 @@ void data::titleData::drawInfo(unsigned x, unsigned y)
             break;
     }
 
-    C2D_DrawRectSolid(0, 0, GFX_DEPTH_DEFAULT, 320.0f, 16.0f, 0xFF505050);
-    C2D_DrawRectSolid(0, 16, GFX_DEPTH_DEFAULT, 320.0f, 16.0f, 0xFF202020);
-    C2D_DrawRectSolid(0, 32, GFX_DEPTH_DEFAULT, 320.0f, 16.0f, 0xFF505050);
-    C2D_DrawRectSolid(0, 48, GFX_DEPTH_DEFAULT, 320.0f, 16.0f, 0xFF202020);
-    C2D_DrawRectSolid(0, 64, GFX_DEPTH_DEFAULT, 320.0f, 16.0f, 0xFF505050);
+    C2D_DrawRectSolid(0, 0, GFX_DEPTH_DEFAULT, 320.0f, 16.0f, gfx::rectLt);
+    C2D_DrawRectSolid(0, 16, GFX_DEPTH_DEFAULT, 320.0f, 16.0f, gfx::rectSh);
+    C2D_DrawRectSolid(0, 32, GFX_DEPTH_DEFAULT, 320.0f, 16.0f, gfx::rectLt);
+    C2D_DrawRectSolid(0, 48, GFX_DEPTH_DEFAULT, 320.0f, 16.0f, gfx::rectSh);
+    C2D_DrawRectSolid(0, 64, GFX_DEPTH_DEFAULT, 320.0f, 16.0f, gfx::rectLt);
 
-    gfx::drawU16Text(title, 8, 0, GFX_DEPTH_DEFAULT, 0xFFFFFFFF);
-    gfx::drawU16Text(publisher, 8, 16, GFX_DEPTH_DEFAULT, 0xFFFFFFFF);
-    gfx::drawText(idStr, 8, 32, GFX_DEPTH_DEFAULT, 0.5f, 0xFFFFFFFF);
-    gfx::drawText(prodCode, 8, 48, GFX_DEPTH_DEFAULT, 0.5f, 0xFFFFFFFF);
-    gfx::drawText(media, 8,64, GFX_DEPTH_DEFAULT, 0.5f, 0xFFFFFFFF);
+    gfx::drawU16Text(title, 8, 0, GFX_DEPTH_DEFAULT, gfx::txtCont);
+    gfx::drawU16Text(publisher, 8, 16, GFX_DEPTH_DEFAULT, gfx::txtCont);
+    gfx::drawText(idStr, 8, 32, GFX_DEPTH_DEFAULT, 0.5f, gfx::txtCont);
+    gfx::drawText(prodCode, 8, 48, GFX_DEPTH_DEFAULT, 0.5f, gfx::txtCont);
+    gfx::drawText(media, 8,64, GFX_DEPTH_DEFAULT, 0.5f, gfx::txtCont);
 }
 
 void data::titleData::assignIcon(C3D_Tex *_icon, bool isDSIcon)
