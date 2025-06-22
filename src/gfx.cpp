@@ -48,7 +48,7 @@ C2D_Image gfx::dsIcon(void)
 
 void gfx::setColor(bool light)
 {
-    clearClr = (light ? 0xFFFFFFFF : 0xFF2D2D2D);
+    clearClr = (light ? 0xFFEFEFEF : 0xFF2D2D2D);
     txtCont = (light ? 0xFF333333 : 0xFFFFFFFF);
     rectLt = (light ? 0xFFDFDFDF : 0xFF505050);
     rectSh = (light ? 0xFFCACACA : 0xFF202020);

@@ -746,6 +746,18 @@ void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const 
         t->status->setStatus("正在复制 " + util::toUtf8(_src) +"...");
 
     fs::fsfile src(_srcArch, _src, FS_OPEN_READ);
+
+    if (isPxi && saveArch == _dstArch && src.isOpen())
+    {
+        fs::fsfile tmp(_dstArch, _dst, FS_OPEN_READ);
+        if (src.getSize() != tmp.getSize())
+        {
+            ui::showMessage("原始GBAVC存档数据大小不符,无法恢复!");
+            return;
+        }
+        tmp.close();
+    }
+
     fs::fsfile dst(_dstArch, _dst, FS_OPEN_WRITE, src.getSize());
     if(!src.isOpen() || !dst.isOpen())
         return;
