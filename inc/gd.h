@@ -19,11 +19,9 @@
 #pragma once
 
 #include <curl/curl.h>
-#include <json-c/json.h>
 
 #include <string>
 #include <vector>
-#include <unordered_map>
 
 #include "curlfuncs.h"
 

@@ -250,7 +250,6 @@ void fldMenuUpload_t(void *a)
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
     std::u16string src = targetDir + in->name;
     std::string utf8Name = in->nameUTF8;
-    std::string srcSv = util::toUtf8(targetDir) + utf8Name + ".sv";
     t->status->setStatus("正在上传 " + utf8Name + "...");
 
     FS_Path srcPath = fsMakePath(PATH_UTF16, src.c_str());
@@ -272,8 +271,30 @@ void fldMenuUpload_t(void *a)
         fs::gDrive->uploadFile(utf8Name, uploadParent, upload);
 
     fclose(upload);
-
     FSUSER_RenameFile(fs::getSDMCArch(), tmpPath, fs::getSDMCArch(), srcPath);
+
+    // Upload sv file (if found)
+    std::u16string srcSV = targetDir + util::removeSuffix(in->name, util::toUtf16(".sav")) + util::toUtf16(".sv");
+    if (fs::fsfexists(fs::getSDMCArch(), srcSV))
+    {
+        std::string utf8NameSV = util::removeSuffix(utf8Name, std::string(".sav")) + ".sv";
+        t->status->setStatus("正在上传 " + utf8NameSV + "...");
+
+        FS_Path srcPathSV = fsMakePath(PATH_UTF16, srcSV.c_str());
+        FS_Path tmpSV = fsMakePath(PATH_ASCII, "/TYSS/tmp.sv");
+        FSUSER_RenameFile(fs::getSDMCArch(), srcPathSV, fs::getSDMCArch(), tmpSV);
+
+        upload = fopen("/TYSS/tmp.sv", "rb");
+        if(fs::gDrive->fileExists(utf8NameSV, uploadParent))
+        {
+            std::string fileID = fs::gDrive->getFileID(utf8NameSV, uploadParent);
+            fs::gDrive->updateFile(fileID, upload);
+        } else
+            fs::gDrive->uploadFile(utf8NameSV, uploadParent, upload);
+        
+        fclose(upload);
+        FSUSER_RenameFile(fs::getSDMCArch(), tmpSV, fs::getSDMCArch(), srcPathSV);
+    }
 
     ui::fldRefresh();
 
@@ -286,7 +307,7 @@ void fldMenuUpload(void *a)
     if(fs::gDrive && !in->isDir)
         ui::newThread(fldMenuUpload_t, a, NULL);
     else if (in->isDir)
-        ui::showMessage("云端存储: 仅支持上传压缩包或SAV存档文件");
+        ui::showMessage("云端存储: 仅支持上传压缩包或SAV及BIN存档文件");
     else
         ui::showMessage("云端存储: 服务尚未初始化");
 }
@@ -302,14 +323,33 @@ void fldMenuDriveDownload_t(void *a)
     FS_Path targetPath = fsMakePath(PATH_UTF16, target.c_str());
     FS_Path tmpPath = fsMakePath(PATH_ASCII, "/TYSS/tmp.zip");
 
-    if(fs::fsfexists(fs::getSDMCArch(), target))
+    if (fs::fsfexists(fs::getSDMCArch(), target))
         FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_UTF16, target.c_str()));
 
     FILE *tmp = fopen("/TYSS/tmp.zip", "wb");
     fs::gDrive->downloadFile(in->id, tmp);
     fclose(tmp);
-
     FSUSER_RenameFile(fs::getSDMCArch(), tmpPath, fs::getSDMCArch(), targetPath);
+
+    // Download sv file (if found)
+    std::string svName = util::removeSuffix(in->name, std::string(".sav")) + ".sv";
+    if (fs::gDrive->fileExists(svName, in->parent))
+    {
+        t->status->setStatus("正在下载 " + svName + "...");
+
+        std::u16string targetSV = targetDir + util::toUtf16(svName);
+        FS_Path targetPathSV = fsMakePath(PATH_UTF16, targetSV.c_str());
+        FS_Path tmpPathSV = fsMakePath(PATH_ASCII, "/TYSS/tmp.sv");
+
+        if (fs::fsfexists(fs::getSDMCArch(), targetSV))
+            FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_UTF16, targetSV.c_str()));
+
+        tmp = fopen("/TYSS/tmp.sv", "wb");
+        std::string fileID = fs::gDrive->getFileID(svName, in->parent);
+        fs::gDrive->downloadFile(fileID, tmp);
+        fclose(tmp);
+        FSUSER_RenameFile(fs::getSDMCArch(), tmpPathSV, fs::getSDMCArch(), targetPathSV);
+    }
 
     ui::fldRefresh();
 
@@ -320,7 +360,7 @@ void fldMenuDriveDownload(void *a)
 {
     drive::gdItem *in = (drive::gdItem *)a;
     std::u16string checkPath = targetDir + util::toUtf16(in->name);
-    if(fs::fsfexists(fs::getSDMCArch(), checkPath))
+    if (fs::fsfexists(fs::getSDMCArch(), checkPath))
         ui::confirm("下载此存档将会替换 SD 卡中的数据.\n你确定仍要进行下载吗?", fldMenuDriveDownload_t, NULL, a);
     else
         ui::newThread(fldMenuDriveDownload_t, a, NULL);
@@ -330,8 +370,20 @@ void fldMenuDriveDelete_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     drive::gdItem *in = (drive::gdItem *)t->argPtr;
-    t->status->setStatus("正在删除 " + in->name + "...");
+    std::string tmpParent = in->parent;
+    std::string tmpName = in->name;
+    t->status->setStatus("正在删除 " + tmpName + "...");
     fs::gDrive->deleteFile(in->id);
+
+    // Delete sv file (if found)
+    std::string svName = util::removeSuffix(tmpName, std::string(".sav")) + ".sv";
+    if (fs::gDrive->fileExists(svName, tmpParent))
+    {
+        t->status->setStatus("正在删除 " + svName + "...");
+        std::string fileID = fs::gDrive->getFileID(svName, tmpParent);
+        fs::gDrive->deleteFile(fileID);
+    }
+
     ui::fldRefresh();
     t->finished = true;
 }
@@ -339,7 +391,7 @@ void fldMenuDriveDelete_t(void *a)
 void fldMenuDriveDelete(void *a)
 {
     drive::gdItem *in = (drive::gdItem *)a;
-    ui::confirm("你确定要删除云盘中的 " + in->name + " 文件吗?", fldMenuDriveDelete_t, NULL, a);
+    ui::confirm("你确定要删除云盘中的 " + in->name + " 文件吗?\n若相对应的.sv文件存在,将同时被删除!", fldMenuDriveDelete_t, NULL, a);
 }
 
 void fldMenuDriveRestore_t(void *a)
@@ -352,13 +404,52 @@ void fldMenuDriveRestore_t(void *a)
     fs::gDrive->downloadFile(in->id, tmp);
     fclose(tmp);
 
-    t->status->setStatus("正在解压存档到存档位...");
-    unzFile unz = unzOpen64("/TYSS/tmp.zip");
-    fs::copyZipToArch(fs::getSaveArch(), unz, NULL);
-    unzClose(unz);
+    // Download sv file to tmp (if found)
+    bool svFound = false;
+    std::string svName = util::removeSuffix(in->name, std::string(".sav")) + ".sv";
+    if (fs::gDrive->fileExists(svName, in->parent))
+    {
+        t->status->setStatus("正在下载 " + svName + "...");
+        tmp = fopen("/TYSS/tmp.zip.sv", "wb");
+        std::string fileID = fs::gDrive->getFileID(svName, in->parent);
+        fs::gDrive->downloadFile(fileID, tmp);
+        fclose(tmp);
+        svFound = true;
+    }
 
-    // Todo: SV logic
+    if (util::endsWith(in->name, std::string(".zip")))
+    {
+        t->status->setStatus("正在解压存档到存档位...");
+        unzFile unz = unzOpen64("/TYSS/tmp.zip");
+        fs::copyZipToArch(fs::getSaveArch(), unz, NULL);
+        unzClose(unz);
+        if (svFound)
+            fs::importSv(fs::getSaveMode(), util::toUtf16("/TYSS/tmp.zip.sv"), data::curData);
+    } else if (data::curData.isAGB()) {
+        if (util::endsWith(in->name, std::string(".bin")))
+        {
+            t->status->setStatus("正在复制原始 GBAVC 存档数据到存档位...");
+            fs::copyFile(fs::getSDMCArch(), util::toUtf16("/TYSS/tmp.zip"), fs::getSaveArch(), util::toUtf16("/"), false, true, NULL);
+        } else {
+            t->status->setStatus("正在恢复 GBAVC 存档数据...");
+            bool res = fs::saveFileToPxiFile(util::toUtf16("/TYSS/tmp.zip"));
+            if (!res)
+                ui::showMessage("GBAVC 存档数据无效, 恢复失败!");
+            else
+                ui::showMessage("GBAVC 存档数据恢复成功!");
+        }
+    } else {
+        t->status->setStatus("正在恢复数据到 DS 游戏卡带...");
+        CardType cardType = data::curData.getExtInfos().spiCardType;
+        if (cardType != NO_CHIP)
+            fs::restoreSPI(util::toUtf16("/TYSS/tmp.zip"), cardType);
+        else
+            ui::showMessage("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!");
+    }
+
     FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_ASCII, "/TYSS/tmp.zip"));
+    if (svFound)
+        FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_ASCII, "/TYSS/tmp.zip.sv"));
 
     t->finished = true;
 }

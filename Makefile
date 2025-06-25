@@ -60,7 +60,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -Wno-psabi -std=gnu++23
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lbz2 -lcitro2d -lcitro3d -ljson-c -lcurl -lmbedtls -lmbedcrypto -lmbedx509 -lminizip -lctru -lz -lm
+LIBS	:= -lbz2 -lcitro2d -lcitro3d -lcurl -lmbedtls -lmbedcrypto -lmbedx509 -lminizip -lctru -lz -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -161,7 +161,7 @@ endif
 
 #---------------------------------------------------------------------------------
 all: cheats $(ROMFS_T3XFILES) $(T3XHFILES)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile CHEAT_SIZE_DECOMPRESSED=$(shell stat -t "sharkive/build/3ds.json" | awk '{print $$2}')
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile CHEAT_SIZE_DECOMPRESSED=$(shell stat -t "sharkive/build/3ds_chs.json" | awk '{print $$2}')
 
 #---------------------------------------------------------------------------------
 clean:
@@ -171,11 +171,11 @@ clean:
 cheats:
 	@mkdir -p $(BUILD) $(ROMFS)/cheats
 ifeq ($(OS),Windows_NT)
-	@cd Sharkive && py -3 joiner.py 3ds
+	@cd Sharkive && py -3 joiner.py
 else
-	@cd Sharkive && python3 joiner.py 3ds
+	@cd Sharkive && python3 joiner.py
 endif
-	@cd Sharkive/$(BUILD) && mv 3ds.json.bz2 ../../$(ROMFS)/cheats/cheats.json.bz2
+	@cd Sharkive/$(BUILD) && mv 3ds_chs.json.bz2 ../../$(ROMFS)/cheats/cheats.json.bz2
 
 $(TARGET)-strip.elf: $(BUILD)
 	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf

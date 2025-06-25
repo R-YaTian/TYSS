@@ -23,7 +23,7 @@
 #include "fs.h"
 
 #ifdef ENABLE_GD
-#include <json-c/json.h>
+#include "json.h"
 std::string cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken;
 #endif
 
@@ -63,34 +63,26 @@ void cfg::load()
     fs::fsfile drvCfg(fs::getSDMCArch(), "/TYSS/drive.json", FS_OPEN_READ);
     if(drvCfg.isOpen())
     {
-        char *jsonBuff = new char[drvCfg.getSize()];
-        drvCfg.read(jsonBuff, drvCfg.getSize());
+        u64 size = drvCfg.getSize();
+        char *jsonBuff = new char[size + 1];
+        drvCfg.read(jsonBuff, size);
+        jsonBuff[size] = '\0';
 
-        json_object *parse = json_tokener_parse(jsonBuff);
-        json_object *clientID, *secret, *auth, *refresh;
-        json_object_object_get_ex(parse, "driveClientID", &clientID);
-        json_object_object_get_ex(parse, "driveClientSecret", &secret);
-        json_object_object_get_ex(parse, "driveAuthCode", &auth);
-        json_object_object_get_ex(parse, "driveRefreshToken", &refresh);
+        nlohmann::json parse = nlohmann::json::parse(jsonBuff);
 
-        if(clientID)
-            driveClientID = json_object_get_string(clientID);
+        if(parse.contains("driveClientID"))
+            driveClientID = parse["driveClientID"];
 
-        if(secret)
-            driveClientSecret = json_object_get_string(secret);
+        if(parse.contains("driveClientSecret"))
+            driveClientSecret = parse["driveClientSecret"];
 
-        if(auth)
-            driveAuthCode = json_object_get_string(auth);
+        if(parse.contains("driveAuthCode"))
+            driveAuthCode = parse["driveAuthCode"];
 
-        if(refresh)
-            driveRefreshToken = json_object_get_string(refresh);
+        if(parse.contains("driveRefreshToken"))
+            driveRefreshToken = parse["driveRefreshToken"];
 
         delete[] jsonBuff;
-        json_object_put(clientID);
-        json_object_put(secret);
-        json_object_put(auth);
-        json_object_put(refresh);
-        json_object_put(parse);
     }
 #endif
 }
@@ -113,19 +105,15 @@ void cfg::saveGD()
 {
     if(!driveRefreshToken.empty())
     {
-        json_object *drvCfg = json_object_new_object();
-        json_object *drvClientOut = json_object_new_string(driveClientID.c_str());
-        json_object *drvClientSecret = json_object_new_string(driveClientSecret.c_str());
-        json_object *drvRefresh = json_object_new_string(driveRefreshToken.c_str());
-        json_object_object_add(drvCfg, "driveClientID", drvClientOut);
-        json_object_object_add(drvCfg, "driveClientSecret", drvClientSecret);
-        json_object_object_add(drvCfg, "driveRefreshToken", drvRefresh);
+        nlohmann::json drvCfg;
+        drvCfg["driveClientID"] = driveClientID;
+        drvCfg["driveClientSecret"] = driveClientSecret;
+        drvCfg["driveRefreshToken"] = driveRefreshToken;
+        auto json_str = drvCfg.dump();
 
         FILE *drvOut = fopen("/TYSS/drive.json", "w");
-        fputs(json_object_get_string(drvCfg), drvOut);
+        fputs(json_str.c_str(), drvOut);
         fclose(drvOut);
-
-        json_object_put(drvCfg);
     }
 }
 #endif
