@@ -35,7 +35,7 @@ Original author: J-D-K
 Continued by: R-YaTian
 */
 
-#define DRIVE_UPLOAD_BUFFER_SIZE 0x8000
+#define DRIVE_RT_BUFFER_SIZE 0x8000
 
 #define tokenURL "https://oauth2.googleapis.com/token"
 #define tokenCheckURL "https://oauth2.googleapis.com/tokeninfo"
@@ -71,7 +71,7 @@ Result drive::gd::setupProxy(void)
     if (proxyEnable)
     {
         u16 proxyPort;
-        res = ACU_GetProxyPort((u32*) &proxyPort);
+        res = ACU_GetProxyPort((u16*) &proxyPort);
         if (R_FAILED(res)) return res;
 
         char *proxyHost = new char[0x100];
@@ -522,7 +522,7 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
             curl_easy_setopt(curlUp, CURLOPT_WRITEDATA, jsonResp);
             curl_easy_setopt(curlUp, CURLOPT_READFUNCTION, curlFuncs::readDataFile);
             curl_easy_setopt(curlUp, CURLOPT_READDATA, _upload);
-            curl_easy_setopt(curlUp, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_UPLOAD_BUFFER_SIZE);
+            curl_easy_setopt(curlUp, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_RT_BUFFER_SIZE);
             curl_easy_setopt(curlUp, CURLOPT_UPLOAD, 1);
             CURLcode upError = curl_easy_perform(curlUp);
             curl_easy_cleanup(curlUp);
@@ -605,7 +605,7 @@ void drive::gd::updateFile(const std::string& _fileID, FILE *_upload)
             curl_easy_setopt(curlPatch, CURLOPT_URL, location.c_str());
             curl_easy_setopt(curlPatch, CURLOPT_READFUNCTION, curlFuncs::readDataFile);
             curl_easy_setopt(curlPatch, CURLOPT_READDATA, _upload);
-            curl_easy_setopt(curlPatch, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_UPLOAD_BUFFER_SIZE);
+            curl_easy_setopt(curlPatch, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_RT_BUFFER_SIZE);
             curl_easy_setopt(curlPatch, CURLOPT_UPLOAD, 1);
             curl_easy_perform(curlPatch);
             curl_easy_cleanup(curlPatch);
@@ -644,7 +644,7 @@ void drive::gd::downloadFile(const std::string& _fileID, FILE *_download)
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, getHeaders);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, 0x8000);
+    curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, DRIVE_RT_BUFFER_SIZE);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataFile);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, _download);
     curl_easy_perform(curl);
