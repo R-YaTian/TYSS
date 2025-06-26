@@ -225,81 +225,90 @@ void drive::gd::loadDriveList()
     if(!tokenIsValid())
         refreshToken();
 
-    // Request url with specific fields needed.
-    std::string url = driveURL;
-    url.append("?fields=files(name,id,mimeType,size,parents)&q=trashed=false\%20and\%20\%27me\%27\%20in\%20owners");
+    driveList.clear();
+    std::string nextPageToken;
 
-    // Headers needed
-    curl_slist *postHeaders = NULL;
-    postHeaders = curl_slist_append(postHeaders, std::string(HEADER_AUTHORIZATION + token).c_str());
+    do {
+        // Request url with specific fields needed.
+        std::string url = driveURL;
+        url.append("?fields=nextPageToken,files(name,id,mimeType,size,parents)&q=trashed=false\%20and\%20\%27me\%27\%20in\%20owners");
 
-    // Curl request
-    CURL *curl = curl_easy_init();
-    std::string *jsonResp = new std::string;
+        if (!nextPageToken.empty())
+            url.append("&pageToken=" + nextPageToken);
 
-    if (!proxyURL.empty())
-    {
-        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
-        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
-    }
-    curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeaders);
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
+        // Headers needed
+        curl_slist *postHeaders = NULL;
+        postHeaders = curl_slist_append(postHeaders, std::string(HEADER_AUTHORIZATION + token).c_str());
 
-    CURLcode error = curl_easy_perform(curl);
-    curl_slist_free_all(postHeaders);
-    curl_easy_cleanup(curl);
+        // Curl request
+        CURL *curl = curl_easy_init();
+        std::string *jsonResp = new std::string;
 
-    if (error == CURLE_OK)
-    {
-        nlohmann::json parse = nlohmann::json::parse(*jsonResp);
-
-        if (parse.contains("files") && parse["files"].is_array())
+        if (!proxyURL.empty())
         {
-            driveList.clear();
-            const auto& fileArray = parse["files"];
-            driveList.reserve(fileArray.size());
-
-            for (const auto& curFile : fileArray)
-            {
-                std::string name = curFile.value("name", "");
-                std::string id = curFile.value("id", "");
-                std::string mimeType = curFile.value("mimeType", "");
-                unsigned int size = 0;
-                if (curFile.contains("size") && curFile["size"].is_number())
-                    size = curFile["size"].get<unsigned int>();
-
-                drive::gdItem newItem;
-                newItem.name = name;
-                newItem.id = id;
-                newItem.size = size;
-                if (mimeType == MIMETYPE_FOLDER)
-                    newItem.isDir = true;
-
-                if (curFile.contains("parents") && curFile["parents"].is_array()) {
-                    const auto& parentArray = curFile["parents"];
-                    for (const auto& parent : parentArray) {
-                        if (parent.is_string())
-                            newItem.parent = parent.get<std::string>();
-                    }
-                }
-
-                if (newItem.isDir
-                    || util::endsWith(newItem.name, std::string(".zip"))
-                    || util::endsWith(newItem.name, std::string(".sv"))
-                    || util::endsWith(newItem.name, std::string(".sav"))
-                    || util::endsWith(newItem.name, std::string(".bin")))
-                    driveList.push_back(newItem);
-            }
+            curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+            curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
         }
-    }
+        curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeaders);
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
 
-    delete jsonResp;
+        CURLcode error = curl_easy_perform(curl);
+        curl_slist_free_all(postHeaders);
+        curl_easy_cleanup(curl);
+
+        if (error == CURLE_OK)
+        {
+            nlohmann::json parse = nlohmann::json::parse(*jsonResp);
+
+            if (parse.contains("files") && parse["files"].is_array())
+            {
+                const auto& fileArray = parse["files"];
+                for (const auto& curFile : fileArray)
+                {
+                    std::string name = curFile.value("name", "");
+                    std::string id = curFile.value("id", "");
+                    std::string mimeType = curFile.value("mimeType", "");
+                    unsigned int size = 0;
+                    if (curFile.contains("size") && curFile["size"].is_number())
+                        size = curFile["size"].get<unsigned int>();
+
+                    drive::gdItem newItem;
+                    newItem.name = name;
+                    newItem.id = id;
+                    newItem.size = size;
+                    if (mimeType == MIMETYPE_FOLDER)
+                        newItem.isDir = true;
+
+                    if (curFile.contains("parents") && curFile["parents"].is_array()) {
+                        const auto& parentArray = curFile["parents"];
+                        for (const auto& parent : parentArray) {
+                            if (parent.is_string())
+                                newItem.parent = parent.get<std::string>();
+                        }
+                    }
+
+                    if (newItem.isDir
+                        || util::endsWith(newItem.name, std::string(".zip"))
+                        || util::endsWith(newItem.name, std::string(".sv"))
+                        || util::endsWith(newItem.name, std::string(".sav"))
+                        || util::endsWith(newItem.name, std::string(".bin")))
+                        driveList.push_back(newItem);
+                }
+            }
+
+            nextPageToken.clear();
+            if (parse.contains("nextPageToken") && parse["nextPageToken"].is_string())
+                nextPageToken = parse["nextPageToken"];
+        }
+
+        delete jsonResp;
+    } while (!nextPageToken.empty());
 }
 
 void drive::gd::getListWithParent(const std::string& _parent, std::vector<drive::gdItem *>& _out)
