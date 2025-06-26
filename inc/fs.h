@@ -131,8 +131,8 @@ namespace fs
             dirList(const FS_Archive& arch, const std::u16string& path);
             ~dirList();
 
-            void rescan();
-            void reassign(const FS_Archive& arch, const std::u16string& p);
+            void scanItem(bool filter = false);
+            void reassign(const FS_Archive& arch, const std::u16string& p, bool filter = false);
             const uint32_t getCount(){ return entry.size(); }
             bool isDir(unsigned i){ return entry[i].isDir; }
             const std::u16string getItem(unsigned i){ return entry[i].name; }

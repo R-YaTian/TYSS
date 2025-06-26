@@ -465,7 +465,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
 {
     fldMenu.reset();
     fldMenu.setCallback(_func, _args);
-    fldList.reassign(fs::getSDMCArch(), _path);
+    fldList.reassign(fs::getSDMCArch(), _path, true);
     targetDir = _path;
     uploadParent = _uploadParent;
 
@@ -506,7 +506,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
 void ui::fldRefresh()
 {
     fldMenu.reset();
-    fldList.reassign(fs::getSDMCArch(), targetDir);
+    fldList.reassign(fs::getSDMCArch(), targetDir, true);
 
     fldMenu.addOpt("新建", 0);
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);

@@ -648,29 +648,9 @@ struct
 fs::dirList::dirList(const FS_Archive& arch, const std::u16string& p)
 {
     dirArch = arch;
-
     path = p;
 
-    FSUSER_OpenDirectory(&dirHandle, dirArch, fsMakePath(PATH_UTF16, p.data()));
-
-    uint32_t read = 0;
-    do
-    {
-        FS_DirectoryEntry ent;
-        FSDIR_Read(dirHandle, &read, 1, &ent);
-        if(read == 1)
-        {
-            fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
-                                    util::toUtf8(std::u16string((char16_t *)ent.name)),
-                                    ent.attributes == FS_ATTRIBUTE_DIRECTORY};
-            entry.push_back(newEntry);
-        }
-    }
-    while(read > 0);
-
-    FSDIR_Close(dirHandle);
-
-    std::sort(entry.begin(), entry.end(), sortDirs);
+    scanItem();
 }
 
 fs::dirList::~dirList()
@@ -678,10 +658,8 @@ fs::dirList::~dirList()
     entry.clear();
 }
 
-void fs::dirList::rescan()
+void fs::dirList::scanItem(bool filter)
 {
-    entry.clear();
-
     FSUSER_OpenDirectory(&dirHandle, dirArch, fsMakePath(PATH_UTF16, path.data()));
 
     uint32_t read = 0;
@@ -693,8 +671,10 @@ void fs::dirList::rescan()
         {
             fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
                                     util::toUtf8(std::u16string((char16_t *)ent.name)),
-                                    ent.attributes == FS_ATTRIBUTE_DIRECTORY};
-            if (newEntry.isDir
+                                    (ent.attributes & FS_ATTRIBUTE_DIRECTORY) != 0};
+            if (!filter)
+                entry.push_back(newEntry);
+            else if (newEntry.isDir
                 || util::endsWith(newEntry.nameUTF8, std::string(".zip"))
                 || util::endsWith(newEntry.nameUTF8, std::string(".sav"))
                 || util::endsWith(newEntry.nameUTF8, std::string(".bin")))
@@ -708,36 +688,14 @@ void fs::dirList::rescan()
     std::sort(entry.begin(), entry.end(), sortDirs);
 }
 
-void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p)
+void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p, bool filter)
 {
+    dirArch = arch;
+    path = p;
+
     entry.clear();
 
-    path = p;
-    dirArch = arch;
-
-    FSUSER_OpenDirectory(&dirHandle, dirArch, fsMakePath(PATH_UTF16, path.data()));
-    uint32_t read = 0;
-    do
-    {
-        FS_DirectoryEntry ent;
-        FSDIR_Read(dirHandle, &read, 1, &ent);
-        if(read == 1)
-        {
-            fs::dirItem newEntry = {std::u16string((char16_t *)ent.name),
-                                    util::toUtf8(std::u16string((char16_t *)ent.name)),
-                                    ent.attributes == FS_ATTRIBUTE_DIRECTORY};
-            if (newEntry.isDir
-                || util::endsWith(newEntry.nameUTF8, std::string(".zip"))
-                || util::endsWith(newEntry.nameUTF8, std::string(".sav"))
-                || util::endsWith(newEntry.nameUTF8, std::string(".bin")))
-                entry.push_back(newEntry);
-        }
-    }
-    while(read > 0);
-
-    FSDIR_Close(dirHandle);
-
-    std::sort(entry.begin(), entry.end(), sortDirs);
+    scanItem(filter);
 }
 
 void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, bool isPxi, threadInfo *t)
