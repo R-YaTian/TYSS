@@ -22,10 +22,9 @@
 #include <vector>
 
 #include "json.h"
-#include "gd.h"
+#include "drive/gd.h"
 #include "fs.h"
 #include "util.h"
-#include "curlfuncs.h"
 #include "sys.h"
 
 /*
@@ -278,7 +277,7 @@ void drive::gd::loadDriveList()
                     if (curFile.contains("size") && curFile["size"].is_number())
                         size = curFile["size"].get<unsigned int>();
 
-                    drive::gdItem newItem;
+                    drive::driveItem newItem;
                     newItem.name = name;
                     newItem.id = id;
                     newItem.size = size;
@@ -311,7 +310,7 @@ void drive::gd::loadDriveList()
     } while (!nextPageToken.empty());
 }
 
-void drive::gd::getListWithParent(const std::string& _parent, std::vector<drive::gdItem *>& _out)
+void drive::gd::getListWithParent(const std::string& _parent, std::vector<driveItem *>& _out)
 {
     _out.clear();
     if (_parent.empty()) return;
@@ -384,7 +383,7 @@ bool drive::gd::createDir(const std::string& _dirName, const std::string& _paren
         nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
         if(!respParse.contains("error"))
         {
-            drive::gdItem newDir;
+            drive::driveItem newDir;
             newDir.name = _dirName;
             newDir.id = respParse["id"];
             newDir.isDir = true;
@@ -397,46 +396,6 @@ bool drive::gd::createDir(const std::string& _dirName, const std::string& _paren
 
     delete jsonResp;
     return ret;
-}
-
-bool drive::gd::dirExists(const std::string& _dirName)
-{
-    for(unsigned i = 0; i < driveList.size(); i++)
-    {
-        if(driveList[i].isDir && driveList[i].name == _dirName)
-            return true;
-    }
-    return false;
-}
-
-bool drive::gd::dirExists(const std::string& _dirName, const std::string& _parent)
-{
-    for(unsigned i = 0; i < driveList.size(); i++)
-    {
-        if(driveList[i].isDir && driveList[i].name == _dirName && driveList[i].parent == _parent)
-            return true;
-    }
-    return false;
-}
-
-bool drive::gd::fileExists(const std::string& _filename)
-{
-    for(unsigned i = 0; i < driveList.size(); i++)
-    {
-        if(!driveList[i].isDir && driveList[i].name == _filename)
-            return true;
-    }
-    return false;
-}
-
-bool drive::gd::fileExists(const std::string& _filename, const std::string& _parent)
-{
-    for(unsigned i = 0; i < driveList.size(); i++)
-    {
-        if(!driveList[i].isDir && driveList[i].name == _filename && driveList[i].parent == _parent)
-            return true;
-    }
-    return false;
 }
 
 void drive::gd::uploadFile(const std::string& _filename, const std::string& _parent, FILE *_upload)
@@ -514,7 +473,7 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
                 nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
                 if (respParse.contains("id") && respParse.contains("name") && respParse.contains("mimeType"))
                 {
-                    drive::gdItem uploadData;
+                    drive::driveItem uploadData;
                     uploadData.id = respParse["id"].get<std::string>();
                     uploadData.name = respParse["name"].get<std::string>();
                     uploadData.isDir = false;
@@ -668,44 +627,4 @@ void drive::gd::deleteFile(const std::string& _fileID)
             }
         }
     }
-}
-
-std::string drive::gd::getFolderID(const std::string& _name)
-{
-    for(unsigned i = 0; i < driveList.size(); i++)
-    {
-        if(driveList[i].name == _name && driveList[i].isDir)
-            return driveList[i].id;
-    }
-    return "";
-}
-
-std::string drive::gd::getFolderID(const std::string& _name, const std::string& _parent)
-{
-    for(unsigned i = 0; i < driveList.size(); i++)
-    {
-        if(driveList[i].isDir && driveList[i].name == _name && driveList[i].parent == _parent)
-            return driveList[i].id;
-    }
-    return "";
-}
-
-std::string drive::gd::getFileID(const std::string& _name)
-{
-    for(unsigned i = 0; i < driveList.size(); i++)
-    {
-        if(driveList[i].name == _name && driveList[i].isDir == false)
-            return driveList[i].id;
-    }
-    return "";
-}
-
-std::string drive::gd::getFileID(const std::string& _name, const std::string& _parent)
-{
-    for(unsigned i = 0; i < driveList.size(); i++)
-    {
-        if(!driveList[i].isDir && driveList[i].name == _name && driveList[i].parent == _parent)
-            return driveList[i].id;
-    }
-    return "";
 }

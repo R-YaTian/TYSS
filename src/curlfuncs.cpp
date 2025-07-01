@@ -20,7 +20,7 @@
 #include <vector>
 #include <curl/curl.h>
 
-#include "curlfuncs.h"
+#include "drive/curlfuncs.h"
 #include "util.h"
 
 size_t curlFuncs::writeDataString(const char *buff, size_t sz, size_t cnt, void *u)

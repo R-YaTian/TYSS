@@ -242,7 +242,7 @@ void fldMenuRestore(void *a)
 }
 
 #ifdef ENABLE_GD
-std::vector<drive::gdItem *> gdList;
+std::vector<drive::driveItem *> driveList;
 
 void fldMenuUpload_t(void *a)
 {
@@ -315,7 +315,7 @@ void fldMenuUpload(void *a)
 void fldMenuDriveDownload_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    drive::gdItem *in = (drive::gdItem *)t->argPtr;
+    drive::driveItem *in = (drive::driveItem *)t->argPtr;
 
     t->status->setStatus("正在下载 " + in->name + "...");
 
@@ -358,7 +358,7 @@ void fldMenuDriveDownload_t(void *a)
 
 void fldMenuDriveDownload(void *a)
 {
-    drive::gdItem *in = (drive::gdItem *)a;
+    drive::driveItem *in = (drive::driveItem *)a;
     std::u16string checkPath = targetDir + util::toUtf16(in->name);
     if (fs::fsfexists(fs::getSDMCArch(), checkPath))
         ui::confirm("下载此存档将会替换 SD 卡中的数据.\n你确定仍要进行下载吗?", fldMenuDriveDownload_t, NULL, a);
@@ -369,7 +369,7 @@ void fldMenuDriveDownload(void *a)
 void fldMenuDriveDelete_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    drive::gdItem *in = (drive::gdItem *)t->argPtr;
+    drive::driveItem *in = (drive::driveItem *)t->argPtr;
     std::string tmpParent = in->parent;
     std::string tmpName = in->name;
     t->status->setStatus("正在删除 " + tmpName + "...");
@@ -390,14 +390,14 @@ void fldMenuDriveDelete_t(void *a)
 
 void fldMenuDriveDelete(void *a)
 {
-    drive::gdItem *in = (drive::gdItem *)a;
+    drive::driveItem *in = (drive::driveItem *)a;
     ui::confirm("你确定要删除云盘中的 " + in->name + " 文件吗?\n若相对应的.sv文件存在,将同时被删除!", fldMenuDriveDelete_t, NULL, a);
 }
 
 void fldMenuDriveRestore_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    drive::gdItem *in = (drive::gdItem *)t->argPtr;
+    drive::driveItem *in = (drive::driveItem *)t->argPtr;
     t->status->setStatus("正在下载 " + in->name + "...");
 
     FILE *tmp = fopen("/TYSS/tmp.zip", "wb");
@@ -456,7 +456,7 @@ void fldMenuDriveRestore_t(void *a)
 
 void fldMenuDriveRestore(void *a)
 {
-    drive::gdItem *in = (drive::gdItem *)a;
+    drive::driveItem *in = (drive::driveItem *)a;
     ui::confirm("你确定要下载并恢复 " + in->name + "?", fldMenuDriveRestore_t, NULL, a);
 }
 #endif
@@ -476,15 +476,15 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
 #ifdef ENABLE_GD
     if(fs::gDrive)
     {
-        fs::gDrive->getListWithParent(uploadParent, gdList);
+        fs::gDrive->getListWithParent(uploadParent, driveList);
 
-        for(unsigned i = 0; i < gdList.size(); i++, fldInd++)
+        for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt("[云] " + gdList[i]->name, 320);
+            fldMenu.addOpt("[云] " + driveList[i]->name, 320);
 
-            fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, gdList[i]);
-            fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, gdList[i]);
-            fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuDriveRestore, gdList[i]);
+            fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, driveList[i]);
+            fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, driveList[i]);
+            fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuDriveRestore, driveList[i]);
         }
     }
 #endif
@@ -515,15 +515,15 @@ void ui::fldRefresh()
 #ifdef ENABLE_GD
     if(fs::gDrive)
     {
-        fs::gDrive->getListWithParent(uploadParent, gdList);
+        fs::gDrive->getListWithParent(uploadParent, driveList);
 
-        for(unsigned i = 0; i < gdList.size(); i++, fldInd++)
+        for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt("[云] " + gdList[i]->name, 320);
+            fldMenu.addOpt("[云] " + driveList[i]->name, 320);
 
-            fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, gdList[i]);
-            fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, gdList[i]);
-            fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuDriveRestore, gdList[i]);
+            fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, driveList[i]);
+            fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, driveList[i]);
+            fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuDriveRestore, driveList[i]);
         }
     }
 #endif

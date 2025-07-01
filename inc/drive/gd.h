@@ -23,7 +23,8 @@
 #include <string>
 #include <vector>
 
-#include "curlfuncs.h"
+#include "drive/IDrive.h"
+#include "drive/curlfuncs.h"
 
 #define HEADER_CONTENT_TYPE_APP_JSON "Content-Type: application/json; charset=UTF-8"
 #define HEADER_AUTHORIZATION "Authorization: Bearer "
@@ -32,14 +33,7 @@
 
 namespace drive
 {
-    typedef struct 
-    {
-        std::string name, id, parent;
-        bool isDir = false;
-        unsigned int size;
-    } gdItem;
-
-    class gd
+    class gd : public DriveBase
     {
         public:
             gd(const std::string& _clientID, const std::string& _secretID, const std::string& _authCode, const std::string& _rToken);
@@ -50,34 +44,22 @@ namespace drive
             bool tokenIsValid();
 
             void debugWriteList();
-            void loadDriveList();
-            void getListWithParent(const std::string& _parent, std::vector<drive::gdItem *>& _out);
-            
-            bool createDir(const std::string& _dirName, const std::string& _parent);
-            bool dirExists(const std::string& _dirName);
-            bool dirExists(const std::string& _dirName, const std::string& _parent);
-            bool fileExists(const std::string& _filename);
-            bool fileExists(const std::string& _filename, const std::string& _parent);
-            void uploadFile(const std::string& _filename, const std::string& _parent, FILE *_upload);
-            void updateFile(const std::string& _fileID, FILE *_upload);
-            void downloadFile(const std::string& _fileID, FILE *_download);
-            void deleteFile(const std::string& _fileID);
+            void loadDriveList() override;
+            void getListWithParent(const std::string& _parent, std::vector<driveItem *>& _out);
+
+            bool createDir(const std::string& _dirName, const std::string& _parent) override;
+            void uploadFile(const std::string& _filename, const std::string& _parent, FILE *_upload) override;
+            void updateFile(const std::string& _fileID, FILE *_upload) override;
+            void downloadFile(const std::string& _fileID, FILE *_download) override;
+            void deleteFile(const std::string& _fileID) override;
 
             std::string getClientID() const { return clientID; }
             std::string getClientSecret() const { return secretID; }
             std::string getRefreshToken() const { return rToken; }
-            std::string getFolderID(const std::string& _name);
-            std::string getFolderID(const std::string& _name, const std::string& _parent);
-            std::string getFileID(const std::string& _name);
-            std::string getFileID(const std::string& _name, const std::string& _parent);
-
-            size_t getDriveListCount() const { return driveList.size(); }
-            drive::gdItem *getItemAt(unsigned int _ind) { return &driveList[_ind]; }
 
             Result setupProxy(void);
 
         private:
-            std::vector<gdItem> driveList;
             std::string clientID, secretID, token, rToken, proxyURL;
     };
 }

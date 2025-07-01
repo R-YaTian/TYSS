@@ -27,7 +27,8 @@
 #include "ui.h"
 
 #ifdef ENABLE_GD
-#include "gd.h"
+#include "drive/IDrive.h"
+#include "drive/gd.h"
 #endif
 
 #define DRIVE_TYSS_DIR "TYSS"
