@@ -26,9 +26,6 @@
 #include "drive/IDrive.h"
 #include "drive/curlfuncs.h"
 
-#define HEADER_CONTENT_TYPE_APP_JSON "Content-Type: application/json; charset=UTF-8"
-#define HEADER_AUTHORIZATION "Authorization: Bearer "
-
 #define MIMETYPE_FOLDER "application/vnd.google-apps.folder"
 
 namespace drive
