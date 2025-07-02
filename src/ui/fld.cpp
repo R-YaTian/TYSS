@@ -241,7 +241,7 @@ void fldMenuRestore(void *a)
     ui::confirm(q, fldMenuRestore_t, NULL, a);
 }
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
 std::vector<drive::driveItem *> driveList;
 
 void fldMenuUpload_t(void *a)
@@ -473,10 +473,14 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
     if(fs::gDrive)
     {
-        fs::gDrive->getListWithParent(uploadParent, driveList);
+        fs::gDrive->getListWithParent(uploadParent, driveList,
+            [](const drive::driveItem& item) {
+                return !util::endsWith(item.name, std::string(".sv"));
+            }
+        );
 
         for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
@@ -496,7 +500,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
         fldMenu.addOptEvent(fldInd, KEY_A, fldMenuOverwrite, di);
         fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDelete, di);
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
         if (fs::gDrive)
             fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
 #endif
@@ -512,10 +516,14 @@ void ui::fldRefresh()
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
     if(fs::gDrive)
     {
-        fs::gDrive->getListWithParent(uploadParent, driveList);
+        fs::gDrive->getListWithParent(uploadParent, driveList,
+            [](const drive::driveItem& item) {
+                return !util::endsWith(item.name, std::string(".sv"));
+            }
+        );
 
         for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
@@ -535,7 +543,7 @@ void ui::fldRefresh()
         fldMenu.addOptEvent(fldInd, KEY_A, fldMenuOverwrite, di);
         fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDelete, di);
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
         if (fs::gDrive)
             fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
 #endif

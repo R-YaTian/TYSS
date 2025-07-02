@@ -38,28 +38,21 @@ namespace drive
         public:
             gd(const std::string& _clientID, const std::string& _secretID, const std::string& _authCode, const std::string& _rToken);
 
-            void exhangeAuthCode(const std::string& _authCode);
-            bool hasToken() { return token.empty() == false; }
-            void refreshToken();
-            bool tokenIsValid();
+            void exhangeAuthCode(const std::string& _authCode) override;
+            void refreshToken() override;
+            bool tokenIsValid() override;
 
-            void debugWriteList();
             void loadDriveList() override;
-            void getListWithParent(const std::string& _parent, std::vector<driveItem *>& _out);
-
             bool createDir(const std::string& _dirName, const std::string& _parent) override;
             void uploadFile(const std::string& _filename, const std::string& _parent, FILE *_upload) override;
             void updateFile(const std::string& _fileID, FILE *_upload) override;
             void downloadFile(const std::string& _fileID, FILE *_download) override;
             void deleteFile(const std::string& _fileID) override;
 
-            std::string getClientID() const { return clientID; }
-            std::string getClientSecret() const { return secretID; }
+            bool hasToken() { return token.empty() == false; }
             std::string getRefreshToken() const { return rToken; }
 
-            Result setupProxy(void);
-
         private:
-            std::string clientID, secretID, token, rToken, proxyURL;
+            std::string clientID, secretID, token, rToken;
     };
 }

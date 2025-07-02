@@ -57,7 +57,7 @@ enum selop
 
 extern const std::string TITLE_TEXT;
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
 #define FLD_GUIDE_TEXT_GD "\ue000 选择 \ue002 删除 \ue003 恢复 \ue005 上传 \ue001 关闭"
 #endif
 #define FLD_GUIDE_TEXT "\ue000 选择 \ue002 删除 \ue003 恢复 \ue001 关闭"

@@ -22,7 +22,7 @@
 #include "cfg.h"
 #include "fs.h"
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
 #include "json.h"
 std::string cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken;
 #endif
@@ -59,7 +59,7 @@ void cfg::load()
         fclose(cfgIn);
     }
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
     fs::fsfile drvCfg(fs::getSDMCArch(), "/TYSS/drive.json", FS_OPEN_READ);
     if(drvCfg.isOpen())
     {
@@ -100,7 +100,7 @@ void cfg::saveCommon()
     }
 }
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
 void cfg::saveGD()
 {
     if(!driveRefreshToken.empty())

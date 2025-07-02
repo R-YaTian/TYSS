@@ -51,7 +51,7 @@ static void sysViewCallback(void *a)
                 data::titleData *t = &data::sysDataTitles[sysView->getSelected()];
                 data::curData = *t;
                 std::string uploadParent;
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
                 if(fs::gDrive)
                 {
                     fs::currentDirID = fs::sysSaveDirID;
@@ -207,7 +207,7 @@ void ui::sysDrawBot()
     if(fldOpen)
     {
         ui::fldDraw();
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
         ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_GD : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
 #else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);

@@ -81,10 +81,24 @@ void fs::exit()
     svcCloseHandle(fsPxiHandle);
 }
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
 drive::gd *fs::gDrive = NULL;
 std::string fs::tyssDirID, fs::usrSaveDirID, fs::extDataDirID, fs::sysSaveDirID, fs::bossExtDirID, fs::sharedExtID;
 std::string fs::currentDirID;
+
+void fs::debugWriteDriveList(drive::DriveBase* driveBase)
+{
+    fs::fsfile list(fs::getSDMCArch(), "/TYSS/drive_list.txt", FS_OPEN_CREATE | FS_OPEN_WRITE);
+    for(size_t i = 0; i < driveBase->getDriveListCount(); i++)
+    {
+        drive::driveItem di = *driveBase->getItemAt(i);
+        list.writef("%s\nID:\t%s\n", di.name.c_str(), di.id.c_str());
+        if (!di.parent.empty())
+            list.writef("Parent:\t%s\n", di.parent.c_str());
+        if (i != driveBase->getDriveListCount() - 1)
+            list.writef("\n");
+    }
+}
 
 void fs::driveInit(void *a)
 {

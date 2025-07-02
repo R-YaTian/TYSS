@@ -131,7 +131,7 @@ static void setMenuReloadTitles(void *a)
     ui::newThread(data::loadTitles, NULL, NULL);
 }
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
 static void setMenuReloadDriveList_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -220,7 +220,7 @@ void ui::setInit(void *a)
     setMenu.addOpt("重置黑名单", 320);
     setMenu.addOptEvent(6, KEY_A, setMenuClearBlackList, NULL);
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
     setMenu.addOpt("重载云端存储列表", 320);
     setMenu.addOptEvent(setMenu.getCount() - 1, KEY_A, setMenuReloadDriveList, NULL);
 #endif

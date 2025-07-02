@@ -56,35 +56,6 @@ drive::gd::gd(const std::string &_clientID, const std::string& _secretID, const 
         refreshToken();
 }
 
-Result drive::gd::setupProxy(void)
-{
-    Result res;
-    bool proxyEnable = false;
-
-    res = acInit();
-    if (R_FAILED(res)) return res;
-
-    res = ACU_GetProxyEnable(&proxyEnable);
-    if (R_FAILED(res))  return res;
-
-    if (proxyEnable)
-    {
-        u16 proxyPort;
-        res = ACU_GetProxyPort((u16*) &proxyPort);
-        if (R_FAILED(res)) return res;
-
-        char *proxyHost = new char[0x100];
-        res = ACU_GetProxyHost(proxyHost);
-        if (R_SUCCEEDED(res))
-            proxyURL = "http://" + std::string(proxyHost) + ":" + std::to_string(proxyPort);
-
-        delete proxyHost;
-    }
-
-    acExit();
-    return res;
-}
-
 void drive::gd::exhangeAuthCode(const std::string& _authCode)
 {
     // Header
@@ -308,28 +279,6 @@ void drive::gd::loadDriveList()
 
         delete jsonResp;
     } while (!nextPageToken.empty());
-}
-
-void drive::gd::getListWithParent(const std::string& _parent, std::vector<driveItem *>& _out)
-{
-    _out.clear();
-    if (_parent.empty()) return;
-    for(unsigned i = 0; i < driveList.size(); i++)
-    {
-        if(driveList[i].parent == _parent && !util::endsWith(driveList[i].name, std::string(".sv")))
-            _out.push_back(&driveList[i]);
-    }
-}
-
-void drive::gd::debugWriteList()
-{
-    fs::fsfile list(fs::getSDMCArch(), "/TYSS/drive_list.txt", FS_OPEN_CREATE | FS_OPEN_WRITE);
-    for(auto& di : driveList)
-    {
-        list.writef("%s\n\t%s\n", di.name.c_str(), di.id.c_str());
-        if(!di.parent.empty())
-            list.writef("\t%s\n", di.parent.c_str());
-    }
 }
 
 bool drive::gd::createDir(const std::string& _dirName, const std::string& _parent)

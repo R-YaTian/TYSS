@@ -33,7 +33,7 @@ namespace cfg
 
     extern std::unordered_map<std::string, CFGVarType> config;
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
     void saveGD();
     extern std::string driveClientID, driveClientSecret, driveAuthCode, driveRefreshToken;
 #endif

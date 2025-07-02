@@ -26,7 +26,7 @@
 #include "data.h"
 #include "ui.h"
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
 #include "drive/IDrive.h"
 #include "drive/gd.h"
 #endif
@@ -43,9 +43,10 @@ namespace fs
     void init();
     void exit();
 
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
     void driveInit(void *a);
     void driveExit();
+    void debugWriteDriveList(drive::DriveBase* driveBase);
     extern drive::gd *gDrive;
     extern std::string tyssDirID, usrSaveDirID, extDataDirID, sysSaveDirID, bossExtDirID, sharedExtID, currentDirID;
 #endif

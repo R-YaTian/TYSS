@@ -69,7 +69,7 @@ static void shrdViewCallback(void *)
         {
             data::titleData *t = &shared[shrdView->getSelected()];
             std::string uploadParent;
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
             if(fs::gDrive)
             {
                 fs::currentDirID = fs::sharedExtID;
@@ -147,7 +147,7 @@ void ui::shrdDrawBot()
     if(fldOpen)
     {
         ui::fldDraw();
-#ifdef ENABLE_GD
+#ifdef ENABLE_DRIVE
         ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_GD : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
 #else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
