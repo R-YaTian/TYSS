@@ -109,7 +109,7 @@ void fs::driveInit(void *a)
     {
         cfg::driveRefreshToken = gDrive->getRefreshToken();
         if(!cfg::driveAuthCode.empty())
-            cfg::saveGD();
+            cfg::saveDrive();
 
         gDrive->loadDriveList();
 

@@ -303,7 +303,7 @@ void ui::ttlDrawBot()
     {
         ui::fldDraw();
 #ifdef ENABLE_DRIVE
-        ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_GD : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+        ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_DRIVE : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
 #else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
 #endif

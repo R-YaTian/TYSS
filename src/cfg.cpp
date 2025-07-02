@@ -101,7 +101,7 @@ void cfg::saveCommon()
 }
 
 #ifdef ENABLE_DRIVE
-void cfg::saveGD()
+void cfg::saveDrive()
 {
     if(!driveRefreshToken.empty())
     {
