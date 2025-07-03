@@ -117,6 +117,7 @@ void fs::driveInit(void *a)
             cfg::saveDrive();
 
         netDrive->loadDriveList();
+        fs::debugWriteDriveList(netDrive.get());
 
         if(!netDrive->dirExists(DRIVE_TYSS_DIR))
             netDrive->createDir(DRIVE_TYSS_DIR, "");
@@ -148,7 +149,6 @@ void fs::driveInit(void *a)
 
         sharedExtID = netDrive->getFolderID(DRIVE_SHARED_DIR, tyssDirID);
 
-        fs::debugWriteDriveList(netDrive.get());
         ui::showMessage("云端存储: 服务初始化完成!");
     } else {
         netDrive.reset();

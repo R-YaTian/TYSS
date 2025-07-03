@@ -37,6 +37,12 @@ struct driveItem {
     unsigned int size = 0;
 };
 
+enum class DriveType {
+    Unknown,
+    GD,
+    ADrive
+};
+
 class IDrive {
 public:
     virtual ~IDrive() {}
@@ -49,6 +55,7 @@ public:
     virtual void updateFile(const std::string& fileID, FILE* upload) = 0;
     virtual void downloadFile(const std::string& fileID, FILE* download) = 0;
     virtual void deleteFile(const std::string& fileID) = 0;
+    virtual DriveType getDriveType() const { return DriveType::Unknown; }
 };
 
 class DriveBase : public IDrive {

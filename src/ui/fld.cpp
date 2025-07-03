@@ -266,6 +266,8 @@ void fldMenuUpload_t(void *a)
     {
         std::string fileID = fs::netDrive->getFileID(utf8Name, uploadParent);
         fs::netDrive->updateFile(fileID, upload);
+        if (fs::netDrive->getDriveType() == drive::DriveType::ADrive)
+             fs::netDrive->uploadFile(utf8Name, uploadParent, upload);
         ui::showMessage("云端存储: 云盘中已存在该存档,已覆盖");
     } else
         fs::netDrive->uploadFile(utf8Name, uploadParent, upload);
@@ -289,6 +291,8 @@ void fldMenuUpload_t(void *a)
         {
             std::string fileID = fs::netDrive->getFileID(utf8NameSV, uploadParent);
             fs::netDrive->updateFile(fileID, upload);
+            if (fs::netDrive->getDriveType() == drive::DriveType::ADrive)
+                fs::netDrive->uploadFile(utf8NameSV, uploadParent, upload);
         } else
             fs::netDrive->uploadFile(utf8NameSV, uploadParent, upload);
         

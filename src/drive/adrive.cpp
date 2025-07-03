@@ -232,14 +232,15 @@ void drive::adrive::loadDriveList()
     do {
         // Request url with specific fields needed.
         std::string url = adriveURL;
-        url.append("/list");
+        url.append("/search");
 
         // JSON To Post
         nlohmann::json post;
         post["drive_id"] = driveID;
-        post["parent_file_id"] = "root";
-        post["category"] = "zip,others";
-        post["fields"] = "next_marker,items(name,file_id,type,size,parent_file_id)";
+        //post["parent_file_id"] = "root";
+        post["query"] = "type = 'folder' or category = 'zip' or file_extension = 'bin' or file_extension = 'sav' or file_extension = 'sv'";
+        //post["category"] = "zip,others";
+        //post["fields"] = "next_marker,items(name,file_id,type,size,parent_file_id)";
         if (!nextPageToken.empty())
             post["marker"] = nextPageToken;
         auto json_str = post.dump();
@@ -385,8 +386,7 @@ void drive::adrive::uploadFile(const std::string& _filename, const std::string& 
     if(!tokenIsValid())
         refreshToken();
 
-    std::string url = adriveUploadURL;
-    url.append("?uploadType=resumable");
+    std::string uploadURL;
 
     // Headers
     curl_slist *postHeaders = NULL;
@@ -395,19 +395,145 @@ void drive::adrive::uploadFile(const std::string& _filename, const std::string& 
 
     // Post JSON
     nlohmann::json post;
+    post["drive_id"] = driveID;
     post["name"] = _filename;
-    if (!_parent.empty())
-    {
-        nlohmann::json parentsArray = nlohmann::json::array();
-        parentsArray.push_back(_parent);
-        post["parents"] = parentsArray;
-    }
+    post["type"] = "file";
+    post["check_name_mode"] = "refuse";
+    post["parent_file_id"] = _parent;
     auto json_str = post.dump();
 
     // Curl upload request
     CURL *curl = curl_easy_init();
     std::string *jsonResp = new std::string;
-    std::vector<std::string> *headers = new std::vector<std::string>;
+
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeaders);
+    curl_easy_setopt(curl, CURLOPT_URL, adriveUploadURL);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_str.c_str());
+
+    CURLcode error = curl_easy_perform(curl);
+    curl_slist_free_all(postHeaders);
+    curl_easy_cleanup(curl);
+
+    if (error == CURLE_OK)
+    {
+        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        if (respParse.contains("part_info_list") && respParse["part_info_list"].is_array())
+        {
+            // Get upload URL
+            const auto& infoArray = respParse["part_info_list"];
+            for (const auto& partinfo : infoArray) {
+                if (partinfo.contains("upload_url") && partinfo["upload_url"].is_string())
+                    uploadURL = partinfo["upload_url"].get<std::string>();
+            }
+
+            CURL *curlUp = curl_easy_init();
+            if (!proxyURL.empty())
+            {
+                curl_easy_setopt(curlUp, CURLOPT_PROXY, proxyURL.c_str());
+                curl_easy_setopt(curlUp, CURLOPT_HTTPPROXYTUNNEL, 1);
+            }
+            curl_easy_setopt(curlUp, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_easy_setopt(curlUp, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_easy_setopt(curlUp, CURLOPT_URL, uploadURL.c_str());
+            curl_easy_setopt(curlUp, CURLOPT_READFUNCTION, curlFuncs::readDataFile);
+            curl_easy_setopt(curlUp, CURLOPT_READDATA, _upload);
+            curl_easy_setopt(curlUp, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_RT_BUFFER_SIZE);
+            curl_easy_setopt(curlUp, CURLOPT_UPLOAD, 1);
+            CURLcode upError = curl_easy_perform(curlUp);
+            curl_easy_cleanup(curlUp);
+
+            if (upError == CURLE_OK)
+            {
+                if (respParse.contains("file_id") && respParse.contains("name") && respParse.contains("upload_id"))
+                {
+                    drive::driveItem uploadData;
+                    uploadData.id = respParse["file_id"].get<std::string>();
+                    uploadData.name = respParse["name"].get<std::string>();
+                    uploadData.isDir = false;
+                    uploadData.parent = _parent;
+
+                    // Complete URL
+                    std::string url = adriveURL;
+                    url.append("/complete");
+
+                    // Header
+                    curl_slist *header = NULL;
+                    header = curl_slist_append(header, std::string(HEADER_AUTHORIZATION + token).c_str());
+                    header = curl_slist_append(header, HEADER_CONTENT_TYPE_APP_JSON);
+
+                    // Post JSON
+                    nlohmann::json postComplete;
+                    postComplete["drive_id"] = driveID;
+                    postComplete["file_id"] = uploadData.id;
+                    postComplete["upload_id"] = respParse["upload_id"].get<std::string>();
+                    auto jsonComplete_str = postComplete.dump();
+
+                    CURL *curlComplete = curl_easy_init();
+                    if (!proxyURL.empty())
+                    {
+                        curl_easy_setopt(curlComplete, CURLOPT_PROXY, proxyURL.c_str());
+                        curl_easy_setopt(curlComplete, CURLOPT_HTTPPROXYTUNNEL, 1);
+                    }
+                    curl_easy_setopt(curlComplete, CURLOPT_POST, 1);
+                    curl_easy_setopt(curlComplete, CURLOPT_SSL_VERIFYPEER, 0);
+                    curl_easy_setopt(curlComplete, CURLOPT_USERAGENT, userAgent);
+                    curl_easy_setopt(curlComplete, CURLOPT_HTTPHEADER, header);
+                    curl_easy_setopt(curlComplete, CURLOPT_URL, url.c_str());
+                    curl_easy_setopt(curlComplete, CURLOPT_POSTFIELDS, jsonComplete_str.c_str());
+
+                    CURLcode errorComplete = curl_easy_perform(curlComplete);
+                    curl_slist_free_all(header);
+                    curl_easy_cleanup(curlComplete);
+
+                    if(errorComplete == CURLE_OK)
+                        driveList.push_back(uploadData);
+                }
+            }
+        }
+    }
+
+    delete jsonResp;
+}
+
+void drive::adrive::updateFile(const std::string& _fileID, FILE *_upload)
+{
+    // adrive do not support "UPDATE" operation, delete original file and upload new one later on
+    deleteFile(_fileID);
+}
+
+void drive::adrive::downloadFile(const std::string& _fileID, FILE *_download)
+{
+    if(!tokenIsValid())
+        refreshToken();
+
+    // URL
+    std::string url = adriveURL;
+    url.append("/getDownloadUrl");
+
+    // Headers to use
+    curl_slist *postHeaders = NULL;
+    postHeaders = curl_slist_append(postHeaders, std::string(HEADER_AUTHORIZATION + token).c_str());
+    postHeaders = curl_slist_append(postHeaders, HEADER_CONTENT_TYPE_APP_JSON);
+
+    // JSON To Post
+    nlohmann::json post;
+    post["drive_id"] = driveID;
+    post["file_id"] = _fileID;
+    auto json_str = post.dump();
+
+    // Curl
+    CURL *curl = curl_easy_init();
+    std::string *jsonResp = new std::string;
 
     if (!proxyURL.empty())
     {
@@ -419,153 +545,48 @@ void drive::adrive::uploadFile(const std::string& _filename, const std::string& 
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeaders);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, curlFuncs::writeHeaders);
-    curl_easy_setopt(curl, CURLOPT_HEADERDATA, headers);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_str.c_str());
 
     CURLcode error = curl_easy_perform(curl);
     curl_slist_free_all(postHeaders);
     curl_easy_cleanup(curl);
 
-    if (error == CURLE_OK)
-    {
-        std::string location = curlFuncs::getHeader("Location", headers);
-        if (location != HEADER_ERROR)
-        {
-            CURL *curlUp = curl_easy_init();
-            if (!proxyURL.empty())
-            {
-                curl_easy_setopt(curlUp, CURLOPT_PROXY, proxyURL.c_str());
-                curl_easy_setopt(curlUp, CURLOPT_HTTPPROXYTUNNEL, 1);
-            }
-            curl_easy_setopt(curlUp, CURLOPT_CUSTOMREQUEST, "PUT");
-            curl_easy_setopt(curlUp, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_easy_setopt(curlUp, CURLOPT_URL, location.c_str());
-            curl_easy_setopt(curlUp, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
-            curl_easy_setopt(curlUp, CURLOPT_WRITEDATA, jsonResp);
-            curl_easy_setopt(curlUp, CURLOPT_READFUNCTION, curlFuncs::readDataFile);
-            curl_easy_setopt(curlUp, CURLOPT_READDATA, _upload);
-            curl_easy_setopt(curlUp, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_RT_BUFFER_SIZE);
-            curl_easy_setopt(curlUp, CURLOPT_UPLOAD, 1);
-            CURLcode upError = curl_easy_perform(curlUp);
-            curl_easy_cleanup(curlUp);
-
-            if (upError == CURLE_OK)
-            {
-                nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
-                if (respParse.contains("id") && respParse.contains("name") && respParse.contains("mimeType"))
-                {
-                    drive::driveItem uploadData;
-                    uploadData.id = respParse["id"].get<std::string>();
-                    uploadData.name = respParse["name"].get<std::string>();
-                    uploadData.isDir = false;
-                    uploadData.parent = _parent;
-                    driveList.push_back(uploadData);
-                }
-            }
-        }
-    }
-
-    delete jsonResp;
-    delete headers;
-}
-
-void drive::adrive::updateFile(const std::string& _fileID, FILE *_upload)
-{
-    if(!tokenIsValid())
-        refreshToken();
-
-    // URL
-    std::string url = adriveUploadURL;
-    url.append("/" + _fileID);
-    url.append("?uploadType=resumable");
-
-    // Header
-    curl_slist *patchHeader = NULL;
-    patchHeader = curl_slist_append(patchHeader, std::string(HEADER_AUTHORIZATION + token).c_str());
-
-    // Curl
-    CURL *curl = curl_easy_init();
-    std::string *jsonResp = new std::string;
-    std::vector<std::string> *headers = new std::vector<std::string>;
-
-    if (!proxyURL.empty())
-    {
-        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
-        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
-    }
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PATCH");
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, patchHeader);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
-    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, curlFuncs::writeHeaders);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
-    curl_easy_setopt(curl, CURLOPT_HEADERDATA, headers);
-
-    CURLcode error = curl_easy_perform(curl);
-    curl_slist_free_all(patchHeader);
-    curl_easy_cleanup(curl);
-
     if(error == CURLE_OK)
     {
-        std::string location = curlFuncs::getHeader("Location", headers);
-        if (location != HEADER_ERROR) {
-            CURL *curlPatch = curl_easy_init();
+        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        if(respParse.contains("url"))
+        {
+            // Download URL
+            std::string getURL = respParse["url"].get<std::string>();
+
+            // Headers
+            curl_slist *getHeaders = NULL;
+            getHeaders = curl_slist_append(getHeaders, std::string(HEADER_AUTHORIZATION + token).c_str());
+
+            // Curl
+            CURL *curlGet = curl_easy_init();
             if (!proxyURL.empty())
             {
-                curl_easy_setopt(curlPatch, CURLOPT_PROXY, proxyURL.c_str());
-                curl_easy_setopt(curlPatch, CURLOPT_HTTPPROXYTUNNEL, 1);
+                curl_easy_setopt(curlGet, CURLOPT_PROXY, proxyURL.c_str());
+                curl_easy_setopt(curlGet, CURLOPT_HTTPPROXYTUNNEL, 1);
             }
-            curl_easy_setopt(curlPatch, CURLOPT_CUSTOMREQUEST, "PUT");
-            curl_easy_setopt(curlPatch, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_easy_setopt(curlPatch, CURLOPT_URL, location.c_str());
-            curl_easy_setopt(curlPatch, CURLOPT_READFUNCTION, curlFuncs::readDataFile);
-            curl_easy_setopt(curlPatch, CURLOPT_READDATA, _upload);
-            curl_easy_setopt(curlPatch, CURLOPT_UPLOAD_BUFFERSIZE, DRIVE_RT_BUFFER_SIZE);
-            curl_easy_setopt(curlPatch, CURLOPT_UPLOAD, 1);
-            curl_easy_perform(curlPatch);
-            curl_easy_cleanup(curlPatch);
+            curl_easy_setopt(curlGet, CURLOPT_HTTPGET, 1);
+            curl_easy_setopt(curlGet, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_easy_setopt(curlGet, CURLOPT_USERAGENT, userAgent);
+            curl_easy_setopt(curlGet, CURLOPT_HTTPHEADER, getHeaders);
+            curl_easy_setopt(curlGet, CURLOPT_URL, getURL.c_str());
+            curl_easy_setopt(curlGet, CURLOPT_BUFFERSIZE, DRIVE_RT_BUFFER_SIZE);
+            curl_easy_setopt(curlGet, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataFile);
+            curl_easy_setopt(curlGet, CURLOPT_WRITEDATA, _download);
+            curl_easy_perform(curlGet);
+            curl_slist_free_all(getHeaders);
+            curl_easy_cleanup(curlGet);
         }
     }
 
     delete jsonResp;
-    delete headers;
-}
-
-void drive::adrive::downloadFile(const std::string& _fileID, FILE *_download)
-{
-    if(!tokenIsValid())
-        refreshToken();
-
-    // URL
-    std::string url = adriveURL;
-    url.append("/" + _fileID);
-    url.append("?alt=media");
-
-    // Headers
-    curl_slist *getHeaders = NULL;
-    getHeaders = curl_slist_append(getHeaders, std::string(HEADER_AUTHORIZATION + token).c_str());
-
-    // Curl
-    CURL *curl = curl_easy_init();
-    if (!proxyURL.empty())
-    {
-        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
-        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
-    }
-    curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, getHeaders);
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, DRIVE_RT_BUFFER_SIZE);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataFile);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, _download);
-    curl_easy_perform(curl);
-    curl_slist_free_all(getHeaders);
-    curl_easy_cleanup(curl);
 }
 
 void drive::adrive::deleteFile(const std::string& _fileID)
@@ -575,38 +596,56 @@ void drive::adrive::deleteFile(const std::string& _fileID)
 
     // URL
     std::string url = adriveURL;
-    url.append("/" + _fileID);
+    url.append("/delete");
 
-    // Header
-    curl_slist *delHeaders = NULL;
-    delHeaders = curl_slist_append(delHeaders, std::string(HEADER_AUTHORIZATION + token).c_str());
+    // Headers to use
+    curl_slist *postHeaders = NULL;
+    postHeaders = curl_slist_append(postHeaders, std::string(HEADER_AUTHORIZATION + token).c_str());
+    postHeaders = curl_slist_append(postHeaders, HEADER_CONTENT_TYPE_APP_JSON);
+
+    // JSON To Post
+    nlohmann::json post;
+    post["drive_id"] = driveID;
+    post["file_id"] = _fileID;
+    auto json_str = post.dump();
 
     // Curl
     CURL *curl = curl_easy_init();
+    std::string *jsonResp = new std::string;
+
     if (!proxyURL.empty())
     {
         curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
     }
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, delHeaders);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeaders);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_str.c_str());
 
     CURLcode error = curl_easy_perform(curl);
-    curl_slist_free_all(delHeaders);
+    curl_slist_free_all(postHeaders);
     curl_easy_cleanup(curl);
 
     if(error == CURLE_OK)
     {
-        for(unsigned i = 0; i < driveList.size(); i++)
+        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        if(!respParse.contains("code"))
         {
-            if(driveList[i].id == _fileID)
+            for(size_t i = 0; i < driveList.size(); i++)
             {
-                driveList.erase(driveList.begin() + i);
-                break;
+                if(driveList[i].id == _fileID)
+                {
+                    driveList.erase(driveList.begin() + i);
+                    break;
+                }
             }
         }
     }
+
+    delete jsonResp;
 }

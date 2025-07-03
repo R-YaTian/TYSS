@@ -43,6 +43,8 @@ namespace drive
             void downloadFile(const std::string& _fileID, FILE *_download) override;
             void deleteFile(const std::string& _fileID) override;
 
+            DriveType getDriveType() const override { return DriveType::GD; }
+
         private:
             std::string clientID, secretID;
     };
