@@ -57,11 +57,11 @@ static void ttlViewCallback(void *a)
                 data::curData = *t;
                 std::string uploadParent;
 #ifdef ENABLE_DRIVE
-                if(fs::gDrive)
+                if(fs::netDrive)
                 {
                     fs::currentDirID = fs::usrSaveDirID;
-                    if(fs::gDrive->dirExists(t->getTitleUTF8(), fs::usrSaveDirID))
-                        uploadParent = fs::gDrive->getFolderID(t->getTitleUTF8(), fs::usrSaveDirID);
+                    if(fs::netDrive->dirExists(t->getTitleUTF8(), fs::usrSaveDirID))
+                        uploadParent = fs::netDrive->getFolderID(t->getTitleUTF8(), fs::usrSaveDirID);
                 }
 #endif
                 if(fs::openArchive(*t, ARCHIVE_USER_SAVEDATA, false)
@@ -303,7 +303,7 @@ void ui::ttlDrawBot()
     {
         ui::fldDraw();
 #ifdef ENABLE_DRIVE
-        ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_DRIVE : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+        ui::drawUIBar(fs::netDrive ? FLD_GUIDE_TEXT_DRIVE : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
 #else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
 #endif

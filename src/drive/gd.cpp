@@ -16,16 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include <stdio.h>
 #include <curl/curl.h>
-#include <string>
-#include <vector>
 
 #include "json.h"
 #include "drive/gd.h"
 #include "fs.h"
 #include "util.h"
-#include "sys.h"
 
 /*
 Google Drive code for TYSS.
@@ -34,13 +30,10 @@ Original author: J-D-K
 Continued by: R-YaTian
 */
 
-#define DRIVE_RT_BUFFER_SIZE 0x8000
-
-#define tokenURL "https://oauth2.googleapis.com/token"
-#define tokenCheckURL "https://oauth2.googleapis.com/tokeninfo"
-#define driveURL "https://www.googleapis.com/drive/v3/files"
-#define driveUploadURL "https://www.googleapis.com/upload/drive/v3/files"
-#define userAgent "TYSS"
+#define gdTokenURL "https://oauth2.googleapis.com/token"
+#define gdTokenCheckURL "https://oauth2.googleapis.com/tokeninfo"
+#define gdriveURL "https://www.googleapis.com/drive/v3/files"
+#define gdriveUploadURL "https://www.googleapis.com/upload/drive/v3/files"
 
 drive::gd::gd(const std::string &_clientID, const std::string& _secretID, const std::string& _authCode, const std::string& _rToken)
 {
@@ -85,7 +78,7 @@ void drive::gd::exhangeAuthCode(const std::string& _authCode)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeader);
-    curl_easy_setopt(curl, CURLOPT_URL, tokenURL);
+    curl_easy_setopt(curl, CURLOPT_URL, gdTokenURL);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_str.c_str());
@@ -135,7 +128,7 @@ void drive::gd::refreshToken()
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-    curl_easy_setopt(curl, CURLOPT_URL, tokenURL);
+    curl_easy_setopt(curl, CURLOPT_URL, gdTokenURL);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_str.c_str());
@@ -158,7 +151,7 @@ bool drive::gd::tokenIsValid()
 {
     bool ret = false;
 
-    std::string url = tokenCheckURL;
+    std::string url = gdTokenCheckURL;
     url.append("?access_token=" + token);
 
     CURL *curl = curl_easy_init();
@@ -200,7 +193,7 @@ void drive::gd::loadDriveList()
 
     do {
         // Request url with specific fields needed.
-        std::string url = driveURL;
+        std::string url = gdriveURL;
         url.append("?fields=nextPageToken,files(name,id,mimeType,size,parents)&q=trashed=false\%20and\%20\%27me\%27\%20in\%20owners");
 
         if (!nextPageToken.empty())
@@ -318,7 +311,7 @@ bool drive::gd::createDir(const std::string& _dirName, const std::string& _paren
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeaders);
-    curl_easy_setopt(curl, CURLOPT_URL, driveURL);
+    curl_easy_setopt(curl, CURLOPT_URL, gdriveURL);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_str.c_str());
@@ -352,7 +345,7 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
     if(!tokenIsValid())
         refreshToken();
 
-    std::string url = driveUploadURL;
+    std::string url = gdriveUploadURL;
     url.append("?uploadType=resumable");
 
     // Headers
@@ -443,7 +436,7 @@ void drive::gd::updateFile(const std::string& _fileID, FILE *_upload)
         refreshToken();
 
     // URL
-    std::string url = driveUploadURL;
+    std::string url = gdriveUploadURL;
     url.append("/" + _fileID);
     url.append("?uploadType=resumable");
 
@@ -507,7 +500,7 @@ void drive::gd::downloadFile(const std::string& _fileID, FILE *_download)
         refreshToken();
 
     // URL
-    std::string url = driveURL;
+    std::string url = gdriveURL;
     url.append("/" + _fileID);
     url.append("?alt=media");
 
@@ -541,7 +534,7 @@ void drive::gd::deleteFile(const std::string& _fileID)
         refreshToken();
 
     // URL
-    std::string url = driveURL;
+    std::string url = gdriveURL;
     url.append("/" + _fileID);
 
     // Header

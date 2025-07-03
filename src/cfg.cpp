@@ -106,8 +106,10 @@ void cfg::saveDrive()
     if(!driveRefreshToken.empty())
     {
         nlohmann::json drvCfg;
-        drvCfg["driveClientID"] = driveClientID;
-        drvCfg["driveClientSecret"] = driveClientSecret;
+        if (!driveClientID.empty())
+            drvCfg["driveClientID"] = driveClientID;
+        if (!driveClientSecret.empty())
+            drvCfg["driveClientSecret"] = driveClientSecret;
         drvCfg["driveRefreshToken"] = driveRefreshToken;
         auto json_str = drvCfg.dump();
 

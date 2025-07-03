@@ -27,8 +27,10 @@
 #include "ui.h"
 
 #ifdef ENABLE_DRIVE
+#include <memory>
 #include "drive/IDrive.h"
 #include "drive/gd.h"
+#include "drive/adrive.h"
 #endif
 
 #define DRIVE_TYSS_DIR "TYSS"
@@ -47,7 +49,7 @@ namespace fs
     void driveInit(void *a);
     void driveExit();
     void debugWriteDriveList(drive::DriveBase* driveBase);
-    extern drive::gd *gDrive;
+    extern std::unique_ptr<drive::DriveBase> netDrive;
     extern std::string tyssDirID, usrSaveDirID, extDataDirID, sysSaveDirID, bossExtDirID, sharedExtID, currentDirID;
 #endif
 

@@ -51,6 +51,7 @@ ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 CFLAGS	:=	-g -Wall -O2 -mword-relocations -flto=auto \
 			-fomit-frame-pointer -ffunction-sections \
 			-DCHEAT_SIZE_DECOMPRESSED=${CHEAT_SIZE_DECOMPRESSED} \
+			-DADRIVE_SECRET_ID=\"$(ADRIVE_SECRET_ID)\" \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__ $(WITH)
@@ -94,7 +95,7 @@ GFXFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.t3s)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
 ifeq ($(WITH),)
-	CPPFILES := $(filter-out gd.cpp curlfuncs.cpp, $(CPPFILES))
+	CPPFILES := $(filter-out gd.cpp adrive.cpp curlfuncs.cpp, $(CPPFILES))
 endif
 
 #---------------------------------------------------------------------------------

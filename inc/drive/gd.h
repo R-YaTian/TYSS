@@ -20,9 +20,6 @@
 
 #include <curl/curl.h>
 
-#include <string>
-#include <vector>
-
 #include "drive/IDrive.h"
 #include "drive/curlfuncs.h"
 
@@ -46,10 +43,7 @@ namespace drive
             void downloadFile(const std::string& _fileID, FILE *_download) override;
             void deleteFile(const std::string& _fileID) override;
 
-            bool hasToken() { return token.empty() == false; }
-            std::string getRefreshToken() const { return rToken; }
-
         private:
-            std::string clientID, secretID, token, rToken;
+            std::string clientID, secretID;
     };
 }

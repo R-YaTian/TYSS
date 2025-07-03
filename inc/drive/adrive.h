@@ -20,9 +20,6 @@
 
 #include <curl/curl.h>
 
-#include <string>
-#include <vector>
-
 #include "drive/IDrive.h"
 #include "drive/curlfuncs.h"
 
@@ -31,7 +28,7 @@ namespace drive
     class adrive : public DriveBase
     {
         public:
-            adrive(const std::string& _clientID, const std::string& _secretID, const std::string& _authCode, const std::string& _rToken);
+            adrive(const std::string& _authCode, const std::string& _rToken);
 
             void exhangeAuthCode(const std::string& _authCode) override;
             void refreshToken() override;
@@ -44,10 +41,9 @@ namespace drive
             void downloadFile(const std::string& _fileID, FILE *_download) override;
             void deleteFile(const std::string& _fileID) override;
 
-            bool hasToken() { return token.empty() == false; }
-            std::string getRefreshToken() const { return rToken; }
-
         private:
-            std::string clientID, secretID, token, rToken;
+            const std::string clientID = "0f2cda4bb8de4f669ef4d3d763e88738";
+            const std::string secretID = ADRIVE_SECRET_ID;
+            std::string driveID;
     };
 }

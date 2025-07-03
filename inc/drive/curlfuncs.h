@@ -21,8 +21,6 @@
 #include <string>
 #include <vector>
 
-#include "ui.h"
-
 #define HEADER_ERROR "ERROR"
 
 namespace curlFuncs

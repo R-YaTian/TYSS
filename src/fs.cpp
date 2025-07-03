@@ -31,7 +31,7 @@
 #include "cfg.h"
 #include "crypto.h"
 
-#define buff_size 0x8000
+#define IO_BUFF_SIZE 0x8000
 
 static FS_Archive sdmcArch, saveArch;
 static FS_ArchiveID saveMode = (FS_ArchiveID)0;
@@ -82,7 +82,7 @@ void fs::exit()
 }
 
 #ifdef ENABLE_DRIVE
-drive::gd *fs::gDrive = NULL;
+std::unique_ptr<drive::DriveBase> fs::netDrive;
 std::string fs::tyssDirID, fs::usrSaveDirID, fs::extDataDirID, fs::sysSaveDirID, fs::bossExtDirID, fs::sharedExtID;
 std::string fs::currentDirID;
 
@@ -104,60 +104,59 @@ void fs::driveInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在启动云端存储服务...");
-    fs::gDrive = new drive::gd(cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken);
-    if(gDrive->hasToken())
+    if (!cfg::driveClientID.empty() && !cfg::driveClientSecret.empty())
+        fs::netDrive = std::make_unique<drive::gd>(cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken);
+    else
+        fs::netDrive = std::make_unique<drive::adrive>(cfg::driveAuthCode, cfg::driveRefreshToken);
+    if(netDrive->hasToken())
     {
-        cfg::driveRefreshToken = gDrive->getRefreshToken();
+        cfg::driveRefreshToken = netDrive->getRefreshToken();
         if(!cfg::driveAuthCode.empty())
             cfg::saveDrive();
 
-        gDrive->loadDriveList();
+        netDrive->loadDriveList();
 
-        if(!gDrive->dirExists(DRIVE_TYSS_DIR))
-            gDrive->createDir(DRIVE_TYSS_DIR, "");
+        if(!netDrive->dirExists(DRIVE_TYSS_DIR))
+            netDrive->createDir(DRIVE_TYSS_DIR, "");
 
-        tyssDirID = gDrive->getFolderID(DRIVE_TYSS_DIR);
+        tyssDirID = netDrive->getFolderID(DRIVE_TYSS_DIR);
 
-        if(!gDrive->dirExists(DRIVE_USER_SAVE_DIR, tyssDirID))
-            gDrive->createDir(DRIVE_USER_SAVE_DIR, tyssDirID);
+        if(!netDrive->dirExists(DRIVE_USER_SAVE_DIR, tyssDirID))
+            netDrive->createDir(DRIVE_USER_SAVE_DIR, tyssDirID);
 
-        usrSaveDirID = gDrive->getFolderID(DRIVE_USER_SAVE_DIR, tyssDirID);
+        usrSaveDirID = netDrive->getFolderID(DRIVE_USER_SAVE_DIR, tyssDirID);
 
-        if(!gDrive->dirExists(DRIVE_EXTDATA_DIR, tyssDirID))
-            gDrive->createDir(DRIVE_EXTDATA_DIR, tyssDirID);
+        if(!netDrive->dirExists(DRIVE_EXTDATA_DIR, tyssDirID))
+            netDrive->createDir(DRIVE_EXTDATA_DIR, tyssDirID);
 
-        extDataDirID = gDrive->getFolderID(DRIVE_EXTDATA_DIR, tyssDirID);
+        extDataDirID = netDrive->getFolderID(DRIVE_EXTDATA_DIR, tyssDirID);
 
-        if(!gDrive->dirExists(DRIVE_SYSTEM_DIR, tyssDirID))
-            gDrive->createDir(DRIVE_SYSTEM_DIR, tyssDirID);
+        if(!netDrive->dirExists(DRIVE_SYSTEM_DIR, tyssDirID))
+            netDrive->createDir(DRIVE_SYSTEM_DIR, tyssDirID);
 
-        sysSaveDirID = gDrive->getFolderID(DRIVE_SYSTEM_DIR, tyssDirID);
+        sysSaveDirID = netDrive->getFolderID(DRIVE_SYSTEM_DIR, tyssDirID);
 
-        if(!gDrive->dirExists(DRIVE_BOSS_DIR, tyssDirID))
-            gDrive->createDir(DRIVE_BOSS_DIR, tyssDirID);
+        if(!netDrive->dirExists(DRIVE_BOSS_DIR, tyssDirID))
+            netDrive->createDir(DRIVE_BOSS_DIR, tyssDirID);
 
-        bossExtDirID = gDrive->getFolderID(DRIVE_BOSS_DIR, tyssDirID);
+        bossExtDirID = netDrive->getFolderID(DRIVE_BOSS_DIR, tyssDirID);
 
-        if(!gDrive->dirExists(DRIVE_SHARED_DIR, tyssDirID))
-            gDrive->createDir(DRIVE_SHARED_DIR, tyssDirID);
+        if(!netDrive->dirExists(DRIVE_SHARED_DIR, tyssDirID))
+            netDrive->createDir(DRIVE_SHARED_DIR, tyssDirID);
 
-        sharedExtID = gDrive->getFolderID(DRIVE_SHARED_DIR, tyssDirID);
+        sharedExtID = netDrive->getFolderID(DRIVE_SHARED_DIR, tyssDirID);
 
         ui::showMessage("云端存储: 服务初始化完成!");
     } else {
-        delete gDrive;
-        gDrive = NULL;
+        netDrive.reset();
     }
     t->finished = true;
 }
 
 void fs::driveExit()
 {
-    if(gDrive)
-    {
-        delete gDrive;
-        gDrive = NULL;
-    }
+    if(netDrive)
+        netDrive.reset();
 }
 #endif
 
@@ -736,7 +735,7 @@ void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const 
 
     size_t readIn = 0;
     uint32_t size = 0;
-    size = src.getSize() > buff_size ? buff_size : src.getSize();
+    size = src.getSize() > IO_BUFF_SIZE ? IO_BUFF_SIZE : src.getSize();
     uint8_t *buffer = new uint8_t[size];
     while((readIn = src.read(buffer, size)))
         dst.write(buffer, readIn);
@@ -863,7 +862,7 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
                 fs::fsfile readFile(_arch, srcPath + archList->getItem(i), FS_OPEN_READ);
                 size_t readIn = 0;
                 uint32_t size = 0;
-                size = readFile.getSize() > buff_size ? buff_size : readFile.getSize();
+                size = readFile.getSize() > IO_BUFF_SIZE ? IO_BUFF_SIZE : readFile.getSize();
                 uint8_t *buff = new uint8_t[size];
                 while((readIn = readFile.read(buff, size)))
                     zipWriteInFileInZip(_zip, buff, readIn);
@@ -931,7 +930,7 @@ void fs::copyZipToArch(const FS_Archive& arch, unzFile _unz, threadInfo *t)
                 fs::fsfile writeFile(arch, dstPathUTF16, FS_OPEN_WRITE, info.uncompressed_size);
                 int readIn = 0;
                 uint32_t size = 0;
-                size = writeFile.getSize() > buff_size ? buff_size : writeFile.getSize();
+                size = writeFile.getSize() > IO_BUFF_SIZE ? IO_BUFF_SIZE : writeFile.getSize();
                 uint8_t *buff = new uint8_t[size];
                 while((readIn = unzReadCurrentFile(_unz, buff, size)) > 0)
                     writeFile.write(buff, readIn);

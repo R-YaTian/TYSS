@@ -22,8 +22,11 @@
 #include <vector>
 #include <functional>
 
+#define DRIVE_RT_BUFFER_SIZE 0x8000
+
 #define HEADER_CONTENT_TYPE_APP_JSON "Content-Type: application/json; charset=UTF-8"
 #define HEADER_AUTHORIZATION "Authorization: Bearer "
+#define userAgent "TYSS"
 
 namespace drive
 {
@@ -179,9 +182,13 @@ public:
 
     inline driveItem *getItemAt(unsigned int _ind) { return &driveList[_ind]; }
 
+    inline bool hasToken() { return token.empty() == false; }
+
+    inline std::string getRefreshToken() const { return rToken; }
+
 protected:
     std::vector<driveItem> driveList;
-    std::string proxyURL;
+    std::string proxyURL, token, rToken;
 };
 
 }

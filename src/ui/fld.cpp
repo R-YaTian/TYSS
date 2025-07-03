@@ -257,18 +257,18 @@ void fldMenuUpload_t(void *a)
     FSUSER_RenameFile(fs::getSDMCArch(), srcPath, fs::getSDMCArch(), tmpPath);
 
     std::string ttlUTF8 = data::curData.getTitleUTF8();
-    if(!fs::gDrive->dirExists(ttlUTF8, fs::currentDirID))
-        fs::gDrive->createDir(ttlUTF8, fs::currentDirID);
-    uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::currentDirID);
+    if(!fs::netDrive->dirExists(ttlUTF8, fs::currentDirID))
+        fs::netDrive->createDir(ttlUTF8, fs::currentDirID);
+    uploadParent = fs::netDrive->getFolderID(ttlUTF8, fs::currentDirID);
 
     FILE *upload = fopen("/TYSS/tmp.zip", "rb");
-    if(fs::gDrive->fileExists(utf8Name, uploadParent))
+    if(fs::netDrive->fileExists(utf8Name, uploadParent))
     {
-        std::string fileID = fs::gDrive->getFileID(utf8Name, uploadParent);
-        fs::gDrive->updateFile(fileID, upload);
+        std::string fileID = fs::netDrive->getFileID(utf8Name, uploadParent);
+        fs::netDrive->updateFile(fileID, upload);
         ui::showMessage("云端存储: 云盘中已存在该存档,已覆盖");
     } else
-        fs::gDrive->uploadFile(utf8Name, uploadParent, upload);
+        fs::netDrive->uploadFile(utf8Name, uploadParent, upload);
 
     fclose(upload);
     FSUSER_RenameFile(fs::getSDMCArch(), tmpPath, fs::getSDMCArch(), srcPath);
@@ -285,12 +285,12 @@ void fldMenuUpload_t(void *a)
         FSUSER_RenameFile(fs::getSDMCArch(), srcPathSV, fs::getSDMCArch(), tmpSV);
 
         upload = fopen("/TYSS/tmp.sv", "rb");
-        if(fs::gDrive->fileExists(utf8NameSV, uploadParent))
+        if(fs::netDrive->fileExists(utf8NameSV, uploadParent))
         {
-            std::string fileID = fs::gDrive->getFileID(utf8NameSV, uploadParent);
-            fs::gDrive->updateFile(fileID, upload);
+            std::string fileID = fs::netDrive->getFileID(utf8NameSV, uploadParent);
+            fs::netDrive->updateFile(fileID, upload);
         } else
-            fs::gDrive->uploadFile(utf8NameSV, uploadParent, upload);
+            fs::netDrive->uploadFile(utf8NameSV, uploadParent, upload);
         
         fclose(upload);
         FSUSER_RenameFile(fs::getSDMCArch(), tmpSV, fs::getSDMCArch(), srcPathSV);
@@ -304,7 +304,7 @@ void fldMenuUpload_t(void *a)
 void fldMenuUpload(void *a)
 {
     fs::dirItem *in = (fs::dirItem *)a;
-    if(fs::gDrive && !in->isDir)
+    if(fs::netDrive && !in->isDir)
         ui::newThread(fldMenuUpload_t, a, NULL);
     else if (in->isDir)
         ui::showMessage("云端存储: 仅支持上传压缩包或SAV及BIN存档文件");
@@ -327,13 +327,13 @@ void fldMenuDriveDownload_t(void *a)
         FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_UTF16, target.c_str()));
 
     FILE *tmp = fopen("/TYSS/tmp.zip", "wb");
-    fs::gDrive->downloadFile(in->id, tmp);
+    fs::netDrive->downloadFile(in->id, tmp);
     fclose(tmp);
     FSUSER_RenameFile(fs::getSDMCArch(), tmpPath, fs::getSDMCArch(), targetPath);
 
     // Download sv file (if found)
     std::string svName = util::removeSuffix(in->name, std::string(".sav")) + ".sv";
-    if (fs::gDrive->fileExists(svName, in->parent))
+    if (fs::netDrive->fileExists(svName, in->parent))
     {
         t->status->setStatus("正在下载 " + svName + "...");
 
@@ -345,8 +345,8 @@ void fldMenuDriveDownload_t(void *a)
             FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_UTF16, targetSV.c_str()));
 
         tmp = fopen("/TYSS/tmp.sv", "wb");
-        std::string fileID = fs::gDrive->getFileID(svName, in->parent);
-        fs::gDrive->downloadFile(fileID, tmp);
+        std::string fileID = fs::netDrive->getFileID(svName, in->parent);
+        fs::netDrive->downloadFile(fileID, tmp);
         fclose(tmp);
         FSUSER_RenameFile(fs::getSDMCArch(), tmpPathSV, fs::getSDMCArch(), targetPathSV);
     }
@@ -373,15 +373,15 @@ void fldMenuDriveDelete_t(void *a)
     std::string tmpParent = in->parent;
     std::string tmpName = in->name;
     t->status->setStatus("正在删除 " + tmpName + "...");
-    fs::gDrive->deleteFile(in->id);
+    fs::netDrive->deleteFile(in->id);
 
     // Delete sv file (if found)
     std::string svName = util::removeSuffix(tmpName, std::string(".sav")) + ".sv";
-    if (fs::gDrive->fileExists(svName, tmpParent))
+    if (fs::netDrive->fileExists(svName, tmpParent))
     {
         t->status->setStatus("正在删除 " + svName + "...");
-        std::string fileID = fs::gDrive->getFileID(svName, tmpParent);
-        fs::gDrive->deleteFile(fileID);
+        std::string fileID = fs::netDrive->getFileID(svName, tmpParent);
+        fs::netDrive->deleteFile(fileID);
     }
 
     ui::fldRefresh();
@@ -401,18 +401,18 @@ void fldMenuDriveRestore_t(void *a)
     t->status->setStatus("正在下载 " + in->name + "...");
 
     FILE *tmp = fopen("/TYSS/tmp.zip", "wb");
-    fs::gDrive->downloadFile(in->id, tmp);
+    fs::netDrive->downloadFile(in->id, tmp);
     fclose(tmp);
 
     // Download sv file to tmp (if found)
     bool svFound = false;
     std::string svName = util::removeSuffix(in->name, std::string(".sav")) + ".sv";
-    if (fs::gDrive->fileExists(svName, in->parent))
+    if (fs::netDrive->fileExists(svName, in->parent))
     {
         t->status->setStatus("正在下载 " + svName + "...");
         tmp = fopen("/TYSS/tmp.zip.sv", "wb");
-        std::string fileID = fs::gDrive->getFileID(svName, in->parent);
-        fs::gDrive->downloadFile(fileID, tmp);
+        std::string fileID = fs::netDrive->getFileID(svName, in->parent);
+        fs::netDrive->downloadFile(fileID, tmp);
         fclose(tmp);
         svFound = true;
     }
@@ -474,9 +474,9 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
 
     int fldInd = 1;
 #ifdef ENABLE_DRIVE
-    if(fs::gDrive)
+    if(fs::netDrive)
     {
-        fs::gDrive->getListWithParent(uploadParent, driveList,
+        fs::netDrive->getListWithParent(uploadParent, driveList,
             [](const drive::driveItem& item) {
                 return !util::endsWith(item.name, std::string(".sv"));
             }
@@ -501,7 +501,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
         fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDelete, di);
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
 #ifdef ENABLE_DRIVE
-        if (fs::gDrive)
+        if (fs::netDrive)
             fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
 #endif
     }
@@ -517,9 +517,9 @@ void ui::fldRefresh()
 
     int fldInd = 1;
 #ifdef ENABLE_DRIVE
-    if(fs::gDrive)
+    if(fs::netDrive)
     {
-        fs::gDrive->getListWithParent(uploadParent, driveList,
+        fs::netDrive->getListWithParent(uploadParent, driveList,
             [](const drive::driveItem& item) {
                 return !util::endsWith(item.name, std::string(".sv"));
             }
@@ -544,7 +544,7 @@ void ui::fldRefresh()
         fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDelete, di);
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
 #ifdef ENABLE_DRIVE
-        if (fs::gDrive)
+        if (fs::netDrive)
             fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
 #endif
     }

@@ -70,12 +70,12 @@ static void shrdViewCallback(void *)
             data::titleData *t = &shared[shrdView->getSelected()];
             std::string uploadParent;
 #ifdef ENABLE_DRIVE
-            if(fs::gDrive)
+            if(fs::netDrive)
             {
                 fs::currentDirID = fs::sharedExtID;
                 std::string ttl = util::toUtf8(shared[shrdView->getSelected()].getTitle());
-                if(fs::gDrive->dirExists(ttl, fs::sharedExtID))
-                    uploadParent = fs::gDrive->getFolderID(ttl, fs::sharedExtID);
+                if(fs::netDrive->dirExists(ttl, fs::sharedExtID))
+                    uploadParent = fs::netDrive->getFolderID(ttl, fs::sharedExtID);
             }
 #endif
             if(fs::openArchive(*t, ARCHIVE_SHARED_EXTDATA, false))
@@ -148,7 +148,7 @@ void ui::shrdDrawBot()
     {
         ui::fldDraw();
 #ifdef ENABLE_DRIVE
-        ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_DRIVE : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+        ui::drawUIBar(fs::netDrive ? FLD_GUIDE_TEXT_DRIVE : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
 #else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
 #endif

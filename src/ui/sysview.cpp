@@ -52,12 +52,12 @@ static void sysViewCallback(void *a)
                 data::curData = *t;
                 std::string uploadParent;
 #ifdef ENABLE_DRIVE
-                if(fs::gDrive)
+                if(fs::netDrive)
                 {
                     fs::currentDirID = fs::sysSaveDirID;
                     std::string ttlUTF8 = t->getTitleUTF8();
-                    if(fs::gDrive->dirExists(ttlUTF8, fs::sysSaveDirID))
-                        uploadParent = fs::gDrive->getFolderID(ttlUTF8, fs::sysSaveDirID);
+                    if(fs::netDrive->dirExists(ttlUTF8, fs::sysSaveDirID))
+                        uploadParent = fs::netDrive->getFolderID(ttlUTF8, fs::sysSaveDirID);
                 }
 #endif
                 if(fs::openArchive(*t, ARCHIVE_SYSTEM_SAVEDATA, false)
@@ -208,7 +208,7 @@ void ui::sysDrawBot()
     {
         ui::fldDraw();
 #ifdef ENABLE_DRIVE
-        ui::drawUIBar(fs::gDrive ? FLD_GUIDE_TEXT_DRIVE : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
+        ui::drawUIBar(fs::netDrive ? FLD_GUIDE_TEXT_DRIVE : FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
 #else
         ui::drawUIBar(FLD_GUIDE_TEXT, ui::SCREEN_BOT, true);
 #endif
