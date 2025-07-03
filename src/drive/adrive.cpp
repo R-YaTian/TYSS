@@ -20,18 +20,19 @@
 
 #include "json.h"
 #include "drive/adrive.h"
-#include "fs.h"
 #include "util.h"
 #include "cfg.h"
 
 #define adriveTokenURL "https://openapi.alipan.com/oauth/access_token"
 #define adriveGetUserInfoURL "https://openapi.alipan.com/oauth/users/info"
+#define adriveGetDriveInfoURL "https://openapi.alipan.com/adrive/v1.0/user/getDriveInfo"
 #define adriveURL "https://openapi.alipan.com/adrive/v1.0/openFile"
 #define adriveUploadURL "https://openapi.alipan.com/adrive/v1.0/openFile/create"
 
-drive::adrive::adrive(const std::string& _authCode, const std::string& _rToken)
+drive::adrive::adrive(const std::string& _authCode, const std::string& _rToken, const std::string& _driveID)
 {
     rToken = _rToken;
+    driveID = _driveID;
 
     setupProxy();
 
@@ -39,6 +40,47 @@ drive::adrive::adrive(const std::string& _authCode, const std::string& _rToken)
         exhangeAuthCode(_authCode);
     else if(!rToken.empty())
         refreshToken();
+
+    if (hasToken() && driveID.empty())
+        getUserDriveID();
+}
+
+void drive::adrive::getUserDriveID()
+{
+    // Header
+    curl_slist *header = NULL;
+    header = curl_slist_append(header, std::string(HEADER_AUTHORIZATION + token).c_str());
+    header = curl_slist_append(header, HEADER_CONTENT_TYPE_APP_JSON);
+
+    // Curl Request
+    CURL *curl = curl_easy_init();
+    std::string *jsonResp = new std::string;
+
+    if (!proxyURL.empty())
+    {
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+    }
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_URL, adriveGetDriveInfoURL);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
+
+    CURLcode error = curl_easy_perform(curl);
+    curl_slist_free_all(header);
+    curl_easy_cleanup(curl);
+
+    if (error == CURLE_OK)
+    {
+        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        if(respParse.contains("default_drive_id"))
+            driveID = respParse["default_drive_id"].get<std::string>();
+    }
+
+    delete jsonResp;
 }
 
 void drive::adrive::exhangeAuthCode(const std::string& _authCode)
@@ -84,7 +126,6 @@ void drive::adrive::exhangeAuthCode(const std::string& _authCode)
         {
             token = respParse["access_token"].get<std::string>();
             rToken = respParse["refresh_token"].get<std::string>();
-            ui::showMessage("云端存储: Token 请求并解析成功!");
         }
     }
 
@@ -191,14 +232,22 @@ void drive::adrive::loadDriveList()
     do {
         // Request url with specific fields needed.
         std::string url = adriveURL;
-        url.append("?fields=nextPageToken,files(name,id,mimeType,size,parents)&q=trashed=false\%20and\%20\%27me\%27\%20in\%20owners");
+        url.append("/list");
 
+        // JSON To Post
+        nlohmann::json post;
+        post["drive_id"] = driveID;
+        post["parent_file_id"] = "root";
+        post["category"] = "zip,others";
+        post["fields"] = "next_marker,items(name,file_id,type,size,parent_file_id)";
         if (!nextPageToken.empty())
-            url.append("&pageToken=" + nextPageToken);
+            post["marker"] = nextPageToken;
+        auto json_str = post.dump();
 
         // Headers needed
         curl_slist *postHeaders = NULL;
         postHeaders = curl_slist_append(postHeaders, std::string(HEADER_AUTHORIZATION + token).c_str());
+        postHeaders = curl_slist_append(postHeaders, HEADER_CONTENT_TYPE_APP_JSON);
 
         // Curl request
         CURL *curl = curl_easy_init();
@@ -209,14 +258,14 @@ void drive::adrive::loadDriveList()
             curl_easy_setopt(curl, CURLOPT_PROXY, proxyURL.c_str());
             curl_easy_setopt(curl, CURLOPT_HTTPPROXYTUNNEL, 1);
         }
-        curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
+        curl_easy_setopt(curl, CURLOPT_POST, 1);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
         curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeaders);
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_str.c_str());
 
         CURLcode error = curl_easy_perform(curl);
         curl_slist_free_all(postHeaders);
@@ -226,14 +275,15 @@ void drive::adrive::loadDriveList()
         {
             nlohmann::json parse = nlohmann::json::parse(*jsonResp);
 
-            if (parse.contains("files") && parse["files"].is_array())
+            if (parse.contains("items") && parse["items"].is_array())
             {
-                const auto& fileArray = parse["files"];
+                const auto& fileArray = parse["items"];
                 for (const auto& curFile : fileArray)
                 {
                     std::string name = curFile.value("name", "");
-                    std::string id = curFile.value("id", "");
-                    std::string mimeType = curFile.value("mimeType", "");
+                    std::string id = curFile.value("file_id", "");
+                    std::string type = curFile.value("type", "");
+                    std::string parent = curFile.value("parent_file_id", "");
                     unsigned int size = 0;
                     if (curFile.contains("size") && curFile["size"].is_number())
                         size = curFile["size"].get<unsigned int>();
@@ -242,16 +292,9 @@ void drive::adrive::loadDriveList()
                     newItem.name = name;
                     newItem.id = id;
                     newItem.size = size;
-                    if (mimeType == MIMETYPE_FOLDER)
+                    newItem.parent = parent;
+                    if (type == "folder")
                         newItem.isDir = true;
-
-                    if (curFile.contains("parents") && curFile["parents"].is_array()) {
-                        const auto& parentArray = curFile["parents"];
-                        for (const auto& parent : parentArray) {
-                            if (parent.is_string())
-                                newItem.parent = parent.get<std::string>();
-                        }
-                    }
 
                     if (newItem.isDir
                         || util::endsWith(newItem.name, std::string(".zip"))
@@ -263,8 +306,8 @@ void drive::adrive::loadDriveList()
             }
 
             nextPageToken.clear();
-            if (parse.contains("nextPageToken") && parse["nextPageToken"].is_string())
-                nextPageToken = parse["nextPageToken"];
+            if (parse.contains("next_marker") && parse["next_marker"].is_string())
+                nextPageToken = parse["next_marker"];
         }
 
         delete jsonResp;
@@ -285,14 +328,14 @@ bool drive::adrive::createDir(const std::string& _dirName, const std::string& _p
 
     // JSON To Post
     nlohmann::json post;
+    post["drive_id"] = driveID;
     post["name"] = _dirName;
-    post["mimeType"] = MIMETYPE_FOLDER;
+    post["type"] = "folder";
+    post["check_name_mode"] = "refuse";
     if (!_parent.empty())
-    {
-        nlohmann::json parentsArray = nlohmann::json::array();
-        parentsArray.push_back(_parent);
-        post["parents"] = parentsArray;
-    }
+        post["parent_file_id"] = _parent;
+    else
+        post["parent_file_id"] = "root";
     auto json_str = post.dump();
 
     // Curl Request
@@ -308,7 +351,7 @@ bool drive::adrive::createDir(const std::string& _dirName, const std::string& _p
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, postHeaders);
-    curl_easy_setopt(curl, CURLOPT_URL, adriveURL);
+    curl_easy_setopt(curl, CURLOPT_URL, adriveUploadURL);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlFuncs::writeDataString);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, jsonResp);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_str.c_str());
@@ -320,11 +363,11 @@ bool drive::adrive::createDir(const std::string& _dirName, const std::string& _p
     if (error == CURLE_OK)
     {
         nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
-        if(!respParse.contains("error"))
+        if(!respParse.contains("code"))
         {
             drive::driveItem newDir;
             newDir.name = _dirName;
-            newDir.id = respParse["id"];
+            newDir.id = respParse["file_id"];
             newDir.isDir = true;
             newDir.size = 0;
             newDir.parent = _parent;

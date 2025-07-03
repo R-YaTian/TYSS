@@ -78,18 +78,18 @@ namespace ui
     } confArgs;
     
     extern uint32_t down, held;
-    extern touchPosition p;
+    extern touchPosition pos;
     inline void updateInput()
     {
         hidScanInput();
         down = hidKeysDown();
         held = hidKeysHeld();
-        touchRead(&p);
+        touchRead(&pos);
     }
 
     inline uint32_t padKeysDown(){ return down; }
     inline uint32_t padKeysHeld(){ return held; }
-    inline touchPosition touchPosition() { return p; }
+    inline touchPosition getTouchPosition() { return pos; }
 
     void init();
     void exit();

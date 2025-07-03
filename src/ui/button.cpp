@@ -18,6 +18,7 @@
 
 #include <3ds.h>
 
+#include "ui.h"
 #include "button.h"
 #include "gfx.h"
 #include "util.h"
@@ -40,7 +41,7 @@ ui::button::button(const std::string &_txt, unsigned _x, unsigned _y, unsigned _
 void ui::button::update()
 {
     prev = cur;
-    cur = ui::touchPosition();
+    cur = ui::getTouchPosition();
 
     // If button was first thing pressed
     if (isOver() && prev.px == 0 && prev.py == 0)
@@ -49,13 +50,13 @@ void ui::button::update()
         pressed = true;
         retEvent = BUTTON_PRESSED;
     }
-    else if (retEvent == BUTTON_PRESSED && !util::touchPressed(p) && wasOver())
+    else if (retEvent == BUTTON_PRESSED && !util::touchPressed(pos) && wasOver())
     {
         first = false;
         pressed = false;
         retEvent = BUTTON_RELEASED;
     }
-    else if (retEvent != BUTTON_NOTHING && !util::touchPressed(p))
+    else if (retEvent != BUTTON_NOTHING && !util::touchPressed(pos))
     {
         first = false;
         pressed = false;

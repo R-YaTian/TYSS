@@ -24,7 +24,7 @@
 
 #ifdef ENABLE_DRIVE
 #include "json.h"
-std::string cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken;
+std::string cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken, cfg::driveDiskID;
 #endif
 
 std::unordered_map<std::string, CFGVarType> cfg::config;
@@ -82,6 +82,9 @@ void cfg::load()
         if(parse.contains("driveRefreshToken"))
             driveRefreshToken = parse["driveRefreshToken"];
 
+        if(parse.contains("driveDiskID"))
+            driveDiskID = parse["driveDiskID"];
+
         delete[] jsonBuff;
     }
 #endif
@@ -110,6 +113,8 @@ void cfg::saveDrive()
             drvCfg["driveClientID"] = driveClientID;
         if (!driveClientSecret.empty())
             drvCfg["driveClientSecret"] = driveClientSecret;
+        if (!driveDiskID.empty())
+            drvCfg["driveDiskID"] = driveDiskID;
         drvCfg["driveRefreshToken"] = driveRefreshToken;
         auto json_str = drvCfg.dump();
 

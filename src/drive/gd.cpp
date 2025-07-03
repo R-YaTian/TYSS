@@ -20,7 +20,6 @@
 
 #include "json.h"
 #include "drive/gd.h"
-#include "fs.h"
 #include "util.h"
 
 /*
@@ -94,7 +93,6 @@ void drive::gd::exhangeAuthCode(const std::string& _authCode)
         {
             token = respParse["access_token"].get<std::string>();
             rToken = respParse["refresh_token"].get<std::string>();
-            ui::showMessage("云端存储: Token 请求并解析成功!");
         }
     }
 

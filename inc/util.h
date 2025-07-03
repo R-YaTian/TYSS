@@ -21,10 +21,8 @@
 #define UTIL_H
 
 #include <string>
-#include <3ds.h>
+
 #include "data.h"
-#include "fs.h"
-#include "ui.h"
 
 namespace util
 {

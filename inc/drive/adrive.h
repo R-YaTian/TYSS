@@ -28,8 +28,9 @@ namespace drive
     class adrive : public DriveBase
     {
         public:
-            adrive(const std::string& _authCode, const std::string& _rToken);
+            adrive(const std::string& _authCode, const std::string& _rToken, const std::string& _driveID);
 
+            void getUserDriveID();
             void exhangeAuthCode(const std::string& _authCode) override;
             void refreshToken() override;
             bool tokenIsValid() override;
@@ -40,6 +41,8 @@ namespace drive
             void updateFile(const std::string& _fileID, FILE *_upload) override;
             void downloadFile(const std::string& _fileID, FILE *_download) override;
             void deleteFile(const std::string& _fileID) override;
+
+            inline std::string getDriveID() const { return driveID; }
 
         private:
             const std::string clientID = "0f2cda4bb8de4f669ef4d3d763e88738";

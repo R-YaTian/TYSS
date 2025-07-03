@@ -54,7 +54,7 @@ static ui::button *ok, *yes, *no;
 const std::string TITLE_TEXT = "TY Save Studio - 06.21.2025 ";
 
 uint32_t ui::down = 0, ui::held = 0;
-touchPosition ui::p;
+touchPosition ui::pos;
 
 void ui::init()
 {

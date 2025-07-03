@@ -21,6 +21,7 @@
 
 #include "ui.h"
 #include "data.h"
+#include "fs.h"
 #include "util.h"
 #include "gfx.h"
 

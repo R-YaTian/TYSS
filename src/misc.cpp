@@ -18,6 +18,7 @@
 
 #include <3ds.h>
 
+#include "fs.h"
 #include "util.h"
 #include "misc.h"
 

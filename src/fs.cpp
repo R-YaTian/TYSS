@@ -105,9 +105,11 @@ void fs::driveInit(void *a)
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在启动云端存储服务...");
     if (!cfg::driveClientID.empty() && !cfg::driveClientSecret.empty())
-        fs::netDrive = std::make_unique<drive::gd>(cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken);
-    else
-        fs::netDrive = std::make_unique<drive::adrive>(cfg::driveAuthCode, cfg::driveRefreshToken);
+        netDrive = std::make_unique<drive::gd>(cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken);
+    else {
+        netDrive = std::make_unique<drive::adrive>(cfg::driveAuthCode, cfg::driveRefreshToken, cfg::driveDiskID);
+        cfg::driveDiskID = static_cast<drive::adrive*>(netDrive.get())->getDriveID();
+    }
     if(netDrive->hasToken())
     {
         cfg::driveRefreshToken = netDrive->getRefreshToken();
@@ -146,6 +148,7 @@ void fs::driveInit(void *a)
 
         sharedExtID = netDrive->getFolderID(DRIVE_SHARED_DIR, tyssDirID);
 
+        fs::debugWriteDriveList(netDrive.get());
         ui::showMessage("云端存储: 服务初始化完成!");
     } else {
         netDrive.reset();
