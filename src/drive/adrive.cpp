@@ -237,10 +237,7 @@ void drive::adrive::loadDriveList()
         // JSON To Post
         nlohmann::json post;
         post["drive_id"] = driveID;
-        //post["parent_file_id"] = "root";
         post["query"] = "type = 'folder' or category = 'zip' or file_extension = 'bin' or file_extension = 'sav' or file_extension = 'sv'";
-        //post["category"] = "zip,others";
-        //post["fields"] = "next_marker,items(name,file_id,type,size,parent_file_id)";
         if (!nextPageToken.empty())
             post["marker"] = nextPageToken;
         auto json_str = post.dump();
@@ -454,11 +451,11 @@ void drive::adrive::uploadFile(const std::string& _filename, const std::string& 
 
             if (upError == CURLE_OK)
             {
-                if (respParse.contains("file_id") && respParse.contains("name") && respParse.contains("upload_id"))
+                if (respParse.contains("file_id") && respParse.contains("file_name") && respParse.contains("upload_id"))
                 {
                     drive::driveItem uploadData;
                     uploadData.id = respParse["file_id"].get<std::string>();
-                    uploadData.name = respParse["name"].get<std::string>();
+                    uploadData.name = respParse["file_name"].get<std::string>();
                     uploadData.isDir = false;
                     uploadData.parent = _parent;
 
