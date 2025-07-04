@@ -23,4 +23,4 @@ Follow the guide [here](./GD_INSTRUCTIONS.MD).
 ## Building:
 * Setup [devkitPro](https://www.3dbrew.org/wiki/Setting_up_Development_Environment)
 * Run this command. You may need to remove `dkp`:
-	* `dkp-pacman -S 3ds-curl 3ds-bzip2 3ds-mbedtls 3ds-zlib`
+	* `dkp-pacman -S 3ds-curl 3ds-mbedtls 3ds-zlib`

@@ -50,7 +50,6 @@ ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
 CFLAGS	:=	-g -Wall -O2 -mword-relocations -flto=auto \
 			-fomit-frame-pointer -ffunction-sections \
-			-DCHEAT_SIZE_DECOMPRESSED=${CHEAT_SIZE_DECOMPRESSED} \
 			-DADRIVE_SECRET_ID=\"$(ADRIVE_SECRET_ID)\" \
 			$(ARCH)
 
@@ -61,7 +60,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -Wno-psabi -std=gnu++23
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lbz2 -lcitro2d -lcitro3d -lcurl -lmbedtls -lmbedcrypto -lmbedx509 -lminizip -lctru -lz -lm
+LIBS	:= -lcitro2d -lcitro3d -lcurl -lmbedtls -lmbedcrypto -lmbedx509 -lminizip -lctru -lz -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -162,7 +161,7 @@ endif
 
 #---------------------------------------------------------------------------------
 all: cheats $(ROMFS_T3XFILES) $(T3XHFILES)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile CHEAT_SIZE_DECOMPRESSED=$(shell stat -t "sharkive/build/3ds_chs.json" | awk '{print $$2}')
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
 clean:
@@ -176,7 +175,7 @@ ifeq ($(OS),Windows_NT)
 else
 	@cd Sharkive && python3 joiner.py
 endif
-	@cd Sharkive/$(BUILD) && mv 3ds_chs.json.bz2 ../../$(ROMFS)/cheats/cheats.json.bz2
+	@cd Sharkive/$(BUILD) && mv 3ds_chs.json.zip ../../$(ROMFS)/cheats/cheats.json.zip
 
 $(TARGET)-strip.elf: $(BUILD)
 	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf

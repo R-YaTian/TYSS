@@ -56,26 +56,25 @@ CheatManager::CheatManager(void)
             fclose(in);
         }
     } else {
-        const std::string path = "romfs:/cheats/cheats.json.bz2";
+        const std::string path = "romfs:/cheats/cheats.json.zip";
         // load compressed archive in memory
-        FILE* f = fopen(path.c_str(), "rb");
-        if (f != NULL) {
-            fseek(f, 0, SEEK_END);
-            u32 size             = ftell(f);
-            unsigned int destLen = CHEAT_SIZE_DECOMPRESSED;
-            char* s              = new char[size];
-            char* d              = new char[destLen + 1]();
-            rewind(f);
-            fread(s, 1, size, f);
-
-            int r = BZ2_bzBuffToBuffDecompress(d, &destLen, s, size, 0, 0);
-            if (r == BZ_OK) {
-                mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(d));
+        unzFile zipFile = unzOpen64(path.c_str());
+        if (zipFile != nullptr)
+        {
+            if (unzGoToFirstFile(zipFile) == UNZ_OK)
+            {
+                char filename[0x301];
+                unz_file_info64 info;
+                memset(filename, 0, 0x301);
+                unzGetCurrentFileInfo64(zipFile, &info, filename, 0x300, NULL, 0, NULL, 0);
+                if (unzOpenCurrentFile(zipFile) == UNZ_OK) {
+                    std::vector<char> buffer(info.uncompressed_size + 1, 0);
+                    int bytesRead = unzReadCurrentFile(zipFile, buffer.data(), info.uncompressed_size);
+                    if (bytesRead == static_cast<int>(info.uncompressed_size))
+                        mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(buffer.data()));
+                }
             }
-
-            delete[] s;
-            delete[] d;
-            fclose(f);
+            unzClose(zipFile);
         }
     }
 }

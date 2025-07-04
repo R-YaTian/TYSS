@@ -49,7 +49,6 @@
 #include "json.h"
 
 #include <3ds.h>
-#include <bzlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
 

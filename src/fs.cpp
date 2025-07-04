@@ -117,7 +117,6 @@ void fs::driveInit(void *a)
             cfg::saveDrive();
 
         netDrive->loadDriveList();
-        fs::debugWriteDriveList(netDrive.get());
 
         if(!netDrive->dirExists(DRIVE_TYSS_DIR))
             netDrive->createDir(DRIVE_TYSS_DIR, "");
