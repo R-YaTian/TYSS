@@ -2,6 +2,7 @@
 build/
 romfs/gfx
 romfs/cheats
+adrivehelper/target
 *.cbp
 *.layout
 *.elf
@@ -9,3 +10,4 @@ romfs/cheats
 *.cia
 *.smdh
 3dslink.exe
+Cargo.lock
