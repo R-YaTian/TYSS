@@ -19,15 +19,10 @@ jobs:
             target: x86_64-unknown-linux-gnu
             artifact_name: adrivehelper-linux-x64
 
-          - name: Windows MSVC x86
+          - name: Windows x86
             os: windows-latest
             target: i686-pc-windows-msvc
-            artifact_name: adrivehelper-windows-msvc-x86.exe
-
-          - name: Windows MinGW x86
-            os: windows-latest
-            target: i686-pc-windows-gnu
-            artifact_name: adrivehelper-windows-mingw-x86.exe
+            artifact_name: adrivehelper-windows-x86.exe
 
           - name: macOS universal2
             os: macos-latest
@@ -80,7 +75,7 @@ jobs:
         with:
           name: ${{ matrix.artifact_name }}
           path: |
-            ./adrivehelper/target/${{ matrix.target }}/release/adrivehelper${{ contains(matrix.target, 'windows') && '.exe' || '' }}
+            ./adrivehelper/target/${{ matrix.target }}/release/adrivehelper${{ matrix.target == 'i686-pc-windows-msvc' && '.exe' || '' }}
 
       - name: Upload artifact (macOS universal2)
         if: matrix.target == 'universal2-apple-darwin'
