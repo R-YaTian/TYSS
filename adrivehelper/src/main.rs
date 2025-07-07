@@ -46,6 +46,8 @@ fn main() {
                 let response = Response::from_string("授权成功!\n授权码已保存到 drive.json 文件\n请将其放到SD卡根目录的TYSS文件夹中,并在10分钟之内启动TYSS完成客户端授权!\n此网页可安全关闭。");
                 let _ = request.respond(response);
 
+                println!("操作已完成, 请按下回车退出程序...");
+                let _ = std::io::stdin().read_line(&mut String::new());
                 break; // Stop server after getting code
             } else {
                 let response = Response::from_string("Missing code in callback URL.");
@@ -56,8 +58,6 @@ fn main() {
             let _ = request.respond(response);
         }
     }
-
-    println!("Done.");
 }
 
 fn save_auth_code(code: &str) -> std::io::Result<()> {

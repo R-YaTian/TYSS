@@ -214,13 +214,17 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt, bool isA
     if(mt != MEDIATYPE_GAME_CARD && isFavorite(id))
         fav = true;
 
-    if (!isAGB)
-        testMounts();
-    else if(fs::openArchive(*this, ARCHIVE_SAVEDATA_AND_CONTENT, false))
+    if (isAGB || IsGbaVirtualConsole(low, high, m))
     {
-        types.hasUser = true;
-        fs::closePxiSaveArch();
-    }
+        if (fs::openArchive(*this, ARCHIVE_SAVEDATA_AND_CONTENT, false))
+        {
+            types.hasUser = true;
+            fs::closePxiSaveArch();
+            if (!isAGB)
+                prodCode.replace(0, 3, "AGB");
+        }
+    } else
+        testMounts();
 
     smdh_s *smdh = loadSMDH(low, high, m);
     if(smdh != NULL && hasSaveData())
@@ -562,6 +566,30 @@ smdh_s *data::loadSMDH(const uint32_t& low, const uint32_t& high, const uint8_t&
         return ret;
     }
     return NULL;
+}
+
+bool data::IsGbaVirtualConsole(const uint32_t& low, const uint32_t& high, const uint8_t& media)
+{
+    Handle handle;
+
+    uint32_t archPath[] = {low, high, media, 0};
+    static const uint32_t filePath[] = {0x0, 0x0, 0x2, 0x646F632E, 0x00000065}; //.code
+
+    FS_Path binArchPath = {PATH_BINARY, 0x10, archPath};
+    FS_Path binFilePath = {PATH_BINARY, 0x14, filePath};
+
+    if(R_SUCCEEDED(FSUSER_OpenFileDirectly(&handle, ARCHIVE_SAVEDATA_AND_CONTENT, binArchPath, binFilePath, FS_OPEN_READ, 0)))
+    {
+        u32 gbaVcHeader[2], read;
+        u64 size = 0;
+        FSFILE_GetSize(handle, &size);
+        FSFILE_Read(handle, &read, size - 0x10, gbaVcHeader, sizeof(gbaVcHeader));
+        FSFILE_Close(handle);
+
+        return gbaVcHeader[0] == 0x4141432E && gbaVcHeader[1] == 1;
+    }
+
+    return false;
 }
 
 static inline bool checkHigh(const uint64_t& id)
