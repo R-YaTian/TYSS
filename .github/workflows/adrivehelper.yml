@@ -1,0 +1,69 @@
+name: Build adrivehelper
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build for ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - name: Linux x64
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: adrivehelper-linux-x64
+
+          - name: Windows x86
+            os: windows-latest
+            target: i686-pc-windows-msvc
+            artifact_name: adrivehelper-windows-x86.exe
+
+          - name: macOS universal2
+            os: macos-latest
+            target: universal2-apple-darwin
+            artifact_name: adrivehelper-macos-universal2
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Rust targets
+        if: matrix.target != 'universal2-apple-darwin'
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Build (Linux/Windows)
+        if: matrix.target != 'universal2-apple-darwin'
+        working-directory: ./adrivehelper
+        run: cargo build --release --target ${{ matrix.target }}
+
+      # macOS universal2 build
+      - name: Install cargo-lipo
+        if: matrix.target == 'universal2-apple-darwin'
+        run: cargo install cargo-lipo
+
+      - name: Build macOS universal2 (fat binary)
+        if: matrix.target == 'universal2-apple-darwin'
+        working-directory: ./adrivehelper
+        run: cargo lipo --release
+
+      - name: Upload artifact (Linux/Windows)
+        if: matrix.target != 'universal2-apple-darwin'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: |
+            ./adrivehelper/target/${{ matrix.target }}/release/adrivehelper${{ matrix.target == 'i686-pc-windows-msvc' && '.exe' || '' }}
+
+      - name: Upload artifact (macOS universal2)
+        if: matrix.target == 'universal2-apple-darwin'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: |
+            ./adrivehelper/target/universal/release/adrivehelper
