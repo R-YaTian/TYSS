@@ -33,7 +33,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Rust targets
+      - name: Install Rust target (Linux/Windows)
         if: matrix.target != 'universal2-apple-darwin'
         run: rustup target add ${{ matrix.target }}
 
@@ -42,15 +42,32 @@ jobs:
         working-directory: ./adrivehelper
         run: cargo build --release --target ${{ matrix.target }}
 
-      # macOS universal2 build
-      - name: Install cargo-lipo
+      # macOS: build x86_64 and aarch64 separately, then lipo merge
+      - name: Install Rust targets (macOS)
         if: matrix.target == 'universal2-apple-darwin'
-        run: cargo install cargo-lipo
+        run: |
+          rustup target add aarch64-apple-darwin
+          rustup target add x86_64-apple-darwin
 
-      - name: Build macOS universal2 (fat binary)
+      - name: Build macOS x86_64
         if: matrix.target == 'universal2-apple-darwin'
         working-directory: ./adrivehelper
-        run: cargo lipo --release
+        run: cargo build --release --target x86_64-apple-darwin
+
+      - name: Build macOS aarch64
+        if: matrix.target == 'universal2-apple-darwin'
+        working-directory: ./adrivehelper
+        run: cargo build --release --target aarch64-apple-darwin
+
+      - name: Combine macOS fat binary
+        if: matrix.target == 'universal2-apple-darwin'
+        working-directory: ./adrivehelper
+        run: |
+          lipo -create \
+            target/x86_64-apple-darwin/release/adrivehelper \
+            target/aarch64-apple-darwin/release/adrivehelper \
+            -output target/universal2-apple-darwin/adrivehelper
+          mkdir -p target/universal2-apple-darwin
 
       - name: Upload artifact (Linux/Windows)
         if: matrix.target != 'universal2-apple-darwin'
@@ -65,5 +82,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: |
-            ./adrivehelper/target/universal/release/adrivehelper
+          path: ./adrivehelper/target/universal2-apple-darwin/adrivehelper
