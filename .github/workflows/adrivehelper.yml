@@ -63,11 +63,11 @@ jobs:
         if: matrix.target == 'universal2-apple-darwin'
         working-directory: ./adrivehelper
         run: |
+          mkdir -p target/universal2-apple-darwin
           lipo -create \
             target/x86_64-apple-darwin/release/adrivehelper \
             target/aarch64-apple-darwin/release/adrivehelper \
             -output target/universal2-apple-darwin/adrivehelper
-          mkdir -p target/universal2-apple-darwin
 
       - name: Upload artifact (Linux/Windows)
         if: matrix.target != 'universal2-apple-darwin'
