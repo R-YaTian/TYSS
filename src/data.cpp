@@ -407,6 +407,33 @@ bool data::titleData::hasSaveData()
     return types.hasUser || types.hasExt || types.hasSys || types.hasBoss;
 }
 
+bool data::titleData::IsGbaVirtualConsole(const uint32_t& low, const uint32_t& high, const uint8_t& media)
+{
+    FSPXI_File handle;
+
+    if (fs::openArchive(*this, ARCHIVE_SAVEDATA_AND_CONTENT, false))
+    {
+        static const uint32_t filePath[] = {0x0, 0x0, 0x2, 0x646F632E, 0x00000065}; //.code
+        FS_Path binFilePath = {PATH_BINARY, 0x14, filePath};
+
+        if(R_SUCCEEDED(FSPXI_OpenFile(fs::getPxiHandle(), &handle, fs::getSaveArch(), binFilePath, FS_OPEN_READ, 0)))
+        {
+            u32 gbaVcHeader[2], read;
+            u64 size = 0;
+            FSPXI_GetFileSize(fs::getPxiHandle(), handle, &size);
+            FSPXI_ReadFile(fs::getPxiHandle(), handle, &read, size - 0x10, gbaVcHeader, sizeof(gbaVcHeader));
+            FSPXI_CloseFile(fs::getPxiHandle(), handle);
+            fs::closePxiSaveArch();
+
+            return gbaVcHeader[0] == 0x4141432E && gbaVcHeader[1] == 1;
+        }
+
+        return false;
+    }
+
+    return false;
+}
+
 void data::titleData::setTitle(const std::u16string& _t)
 {
     title = _t;
@@ -568,30 +595,6 @@ smdh_s *data::loadSMDH(const uint32_t& low, const uint32_t& high, const uint8_t&
     return NULL;
 }
 
-bool data::IsGbaVirtualConsole(const uint32_t& low, const uint32_t& high, const uint8_t& media)
-{
-    Handle handle;
-
-    uint32_t archPath[] = {low, high, media, 0};
-    static const uint32_t filePath[] = {0x0, 0x0, 0x2, 0x646F632E, 0x00000065}; //.code
-
-    FS_Path binArchPath = {PATH_BINARY, 0x10, archPath};
-    FS_Path binFilePath = {PATH_BINARY, 0x14, filePath};
-
-    if(R_SUCCEEDED(FSUSER_OpenFileDirectly(&handle, ARCHIVE_SAVEDATA_AND_CONTENT, binArchPath, binFilePath, FS_OPEN_READ, 0)))
-    {
-        u32 gbaVcHeader[2], read;
-        u64 size = 0;
-        FSFILE_GetSize(handle, &size);
-        FSFILE_Read(handle, &read, size - 0x10, gbaVcHeader, sizeof(gbaVcHeader));
-        FSFILE_Close(handle);
-
-        return gbaVcHeader[0] == 0x4141432E && gbaVcHeader[1] == 1;
-    }
-
-    return false;
-}
-
 static inline bool checkHigh(const uint64_t& id)
 {
     uint32_t high = (uint32_t)(id >> 32);
@@ -602,8 +605,6 @@ void data::loadCheatsDB(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在加载金手指数据库...");
-
-    fs::createDir("/cheats");
 
     auto future = std::async(std::launch::async, []() {
         CheatManager::getInstance(); // Initialize the cheats db

@@ -179,16 +179,21 @@ static void ttlOptDeleteCheats_t(void *a)
     t->finished = true;
 }
 
-static void ttlOptManageCheats(void *a)
+static void ttlOptManageCheats_t(void *a)
 {
+    threadInfo *t = (threadInfo *)a;
+
     data::titleData *title = &data::usrSaveTitles[ttlView->getSelected()];
     std::string key = title->getIDStr();
 
     if(title->getExtInfos().isDSCard || (title->getHigh() & 0x8000) == 0x8000 || title->isAGB())
     {
         ui::showMessage("GBAVC,DSiWare及DS卡带不支持此操作!");
+        t->finished = true;
         return;
     }
+
+    data::loadCheatsDB(a);
 
     if (util::fexists("/cheats/" + key + ".txt")) {
         std::string q = "该应用的金手指文件已安装, 是否删除?";
@@ -199,6 +204,13 @@ static void ttlOptManageCheats(void *a)
     } else {
         ui::showMessage("数据库中未找到该应用可用的金手指.");
     }
+
+    t->finished = true;
+}
+
+static void ttlOptManageCheats(void *a)
+{
+    ui::newThread(ttlOptManageCheats_t, NULL, NULL);
 }
 
 static void ttlOptAddtoBlackList(void *a)

@@ -58,7 +58,8 @@ int main(int argc, const char *argv[])
     ui::newThread(ui::bossViewInit, NULL, NULL);
     ui::newThread(ui::shrdInit, NULL, NULL);
     ui::newThread(ui::setInit, NULL, NULL);
-    ui::newThread(data::loadCheatsDB, NULL, NULL);
+    if (std::get<bool>(cfg::config["bootwithcheatdb"]))
+        ui::newThread(data::loadCheatsDB, NULL, NULL);
 
 #ifdef ENABLE_DRIVE
     if(util::fexists("/TYSS/drive.json"))

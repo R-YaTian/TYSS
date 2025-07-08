@@ -48,7 +48,12 @@ static void toggleDeflateLevel(void *b)
 
 static std::string getLightDarkText(const bool& g)
 {
-    return g ? "浅色" : "暗黑";
+    return g ? "浅色系" : "深色系";
+}
+
+static std::string getCheatDBText(const bool& g)
+{
+    return g ? "启动时" : "按需";
 }
 
 static std::string getBoolText(const bool& g)
@@ -232,15 +237,21 @@ void ui::setInit(void *a)
     setMenu.addOpt("GBAVC存档备份成功时保留原始数据", 320);
     setMenu.addOptEvent(4, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["rawvcsave"]));
 
+    setMenu.addOpt("金手指数据库载入时机", 320);
+    setMenu.addOptEvent(5, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["bootwithcheatdb"]));
+
     setMenu.addOpt("重置收藏列表", 320);
-    setMenu.addOptEvent(5, KEY_A, setMenuClearFavList, NULL);
+    setMenu.addOptEvent(6, KEY_A, setMenuClearFavList, NULL);
 
     setMenu.addOpt("重置黑名单", 320);
-    setMenu.addOptEvent(6, KEY_A, setMenuClearBlackList, NULL);
+    setMenu.addOptEvent(7, KEY_A, setMenuClearBlackList, NULL);
 
 #ifdef ENABLE_DRIVE
-    setMenu.addOpt("重载云端存储列表", 320);
-    setMenu.addOptEvent(setMenu.getCount() - 1, KEY_A, setMenuReloadDriveList, NULL);
+    if(util::fexists("/TYSS/drive.json"))
+    {
+        setMenu.addOpt("重载云端存储列表", 320);
+        setMenu.addOptEvent(setMenu.getCount() - 1, KEY_A, setMenuReloadDriveList, NULL);
+    }
 #endif
 
     setSubMenu.addOpt("修改 PlayCoin", 320);
@@ -305,6 +316,7 @@ void ui::setUpdate()
         setMenu.editOpt(2, getDeflateLevelText(std::get<int>(cfg::config["deflateLevel"])));
         setMenu.editOpt(3, "界面主题色: " + getLightDarkText(std::get<bool>(cfg::config["lightback"])));
         setMenu.editOpt(4, "GBAVC存档备份成功时保留原始数据: " + getBoolText(std::get<bool>(cfg::config["rawvcsave"])));
+        setMenu.editOpt(5, "金手指数据库载入时机: " + getCheatDBText(std::get<bool>(cfg::config["bootwithcheatdb"])));
 
         setMenu.update();
     } else {
@@ -347,12 +359,15 @@ void ui::setDrawBottom()
                 setOptsDesc = "当GBAVC存档备份成功时保留一份原始(.bin)数据。\n一般情况下不需要开启此项,因为原始数据不可用于\nGBAVC虚拟主机之外的任何地方(GBA模拟器等等)\n注:覆盖备份文件或还原数据时,将根据后缀自动判断";
                 break;
             case 5:
-                setOptsDesc = "这将会清空收藏列表, 请谨慎操作。";
+                setOptsDesc = "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将延长。";
                 break;
             case 6:
-                setOptsDesc = "清空黑名单列表, 将会自动执行一次重载 Titles.";
+                setOptsDesc = "这将会清空收藏列表, 请谨慎操作。";
                 break;
             case 7:
+                setOptsDesc = "清空黑名单列表, 将会自动执行一次重载 Titles.";
+                break;
+            case 8:
                 setOptsDesc = "从云端同步存档文件列表。\n这或许需要耗费一定时间, 视网络环境而定。";
                 break;
         }

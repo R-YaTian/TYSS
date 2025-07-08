@@ -56,6 +56,7 @@ namespace data
             bool initFromCache(const uint64_t& _id, const std::u16string& _title, const std::u16string& _pub, const std::string& code, const data::titleSaveTypes& _st, const uint8_t& mt);
             void testMounts();
             bool hasSaveData();
+            bool IsGbaVirtualConsole(const uint32_t& low, const uint32_t& high, const uint8_t& media);
 
             uint64_t getID() const { return id; }
             uint32_t getLow() const { return low; }
@@ -114,7 +115,6 @@ namespace data
     extern titleData curData;
 
     smdh_s *loadSMDH(const uint32_t& low, const uint32_t& high, const uint8_t& media);
-    bool IsGbaVirtualConsole(const uint32_t& low, const uint32_t& high, const uint8_t& media);
     void loadCheatsDB(void *a);
     void loadTitles(void *a);
     void deleteExtData(void *a);

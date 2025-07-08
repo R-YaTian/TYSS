@@ -72,12 +72,12 @@ void fs::init()
     createDir("/TYSS/ExtData");
     createDir("/TYSS/Boss");
     createDir("/TYSS/Shared");
+    createDir("/cheats");
 }
 
 void fs::exit()
 {
     FSUSER_CloseArchive(sdmcArch);
-    // FSUSER_CloseArchive(saveArch);
     svcCloseHandle(fsPxiHandle);
 }
 
@@ -172,6 +172,11 @@ FS_Archive fs::getSaveArch()
     return saveArch;
 }
 
+Handle fs::getPxiHandle()
+{
+    return fsPxiHandle;
+}
+
 void fs::closeSaveArch()
 {
     FSUSER_CloseArchive(saveArch);
@@ -259,7 +264,7 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_
 
         case ARCHIVE_SAVEDATA_AND_CONTENT:
             {
-                uint32_t path[4] = {dat.getLow(), dat.getHigh(), dat.getMedia(), 1};
+                uint32_t path[4] = {dat.getLow(), dat.getHigh(), dat.getMedia(), 0};
                 FS_Path binPath  = {PATH_BINARY, 16, path};
                 res = FSPXI_OpenArchive(fsPxiHandle, &arch, ARCHIVE_SAVEDATA_AND_CONTENT, binPath);
                 if (R_SUCCEEDED(res))

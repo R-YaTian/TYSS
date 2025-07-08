@@ -63,6 +63,7 @@ namespace fs
     FS_Archive getSDMCArch();
     FS_Archive getSaveArch();
     FS_ArchiveID getSaveMode();
+    Handle getPxiHandle();
 
     bool openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_Archive& arch);
     bool openArchive(data::titleData& dat, const uint32_t& mode, bool error);
