@@ -167,8 +167,27 @@ static void setMenuReloadDriveList(void *a)
 {
     if (fs::netDrive)
         ui::newThread(setMenuReloadDriveList_t, NULL, NULL);
-    else
-        ui::showMessage("云端存储: 服务尚未初始化");
+    else {
+        std::string q = "云端存储: 服务尚未初始化\n是否立即启动服务并加载云端存储列表?";
+        ui::confirm(q, fs::driveInit, NULL, NULL);
+    }
+}
+
+static void setMenuToggleDriveBOOL_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在保存设置...");
+    toggleBool(t->argPtr);
+    cfg::saveDrive();
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+static void setMenuToggleDriveBOOL(void *a)
+{
+    ui::newThread(setMenuToggleDriveBOOL_t, a, NULL);
 }
 #endif
 
@@ -249,6 +268,9 @@ void ui::setInit(void *a)
 #ifdef ENABLE_DRIVE
     if(util::fexists("/TYSS/drive.json"))
     {
+        setMenu.addOpt("云端存储服务随软件启动", 320);
+        setMenu.addOptEvent(setMenu.getCount() - 1, KEY_A, setMenuToggleDriveBOOL, &cfg::driveInitOnBoot);
+
         setMenu.addOpt("重载云端存储列表", 320);
         setMenu.addOptEvent(setMenu.getCount() - 1, KEY_A, setMenuReloadDriveList, NULL);
     }
@@ -317,6 +339,10 @@ void ui::setUpdate()
         setMenu.editOpt(3, "界面主题色: " + getLightDarkText(std::get<bool>(cfg::config["lightback"])));
         setMenu.editOpt(4, "GBAVC存档备份成功时保留原始数据: " + getBoolText(std::get<bool>(cfg::config["rawvcsave"])));
         setMenu.editOpt(5, "金手指数据库载入时机: " + getCheatDBText(std::get<bool>(cfg::config["bootwithcheatdb"])));
+#ifdef ENABLE_DRIVE
+        if(util::fexists("/TYSS/drive.json"))
+            setMenu.editOpt(setMenu.getCount() - 2, "云端存储服务随软件启动: " + getBoolText(cfg::driveInitOnBoot));
+#endif
 
         setMenu.update();
     } else {
@@ -359,7 +385,7 @@ void ui::setDrawBottom()
                 setOptsDesc = "当GBAVC存档备份成功时保留一份原始(.bin)数据。\n一般情况下不需要开启此项,因为原始数据不可用于\nGBAVC虚拟主机之外的任何地方(GBA模拟器等等)\n注:覆盖备份文件或还原数据时,将根据后缀自动判断";
                 break;
             case 5:
-                setOptsDesc = "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将延长。";
+                setOptsDesc = "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将增加。";
                 break;
             case 6:
                 setOptsDesc = "这将会清空收藏列表, 请谨慎操作。";
@@ -367,10 +393,16 @@ void ui::setDrawBottom()
             case 7:
                 setOptsDesc = "清空黑名单列表, 将会自动执行一次重载 Titles.";
                 break;
-            case 8:
-                setOptsDesc = "从云端同步存档文件列表。\n这或许需要耗费一定时间, 视网络环境而定。";
-                break;
         }
+#ifdef ENABLE_DRIVE
+        if(util::fexists("/TYSS/drive.json"))
+        {
+            if ((unsigned) setMenu.getSelected() == setMenu.getCount() - 2)
+                setOptsDesc = "云端存储服务是否随软件启动并加载云端存储列表。\n这可能导致应用程序启动耗时增加。";
+            else if ((unsigned) setMenu.getSelected() == setMenu.getCount() - 1)
+                setOptsDesc = "从云端同步存档文件列表。\n这或许需要耗费一定时间, 视网络环境而定。";
+        }
+#endif
         ui::drawUIBar("\ue000 选择/切换 \ue003 启动工具箱 \ue01A\ue077\ue019 视图类型", ui::SCREEN_BOT, false);
     } else {
         switch(setSubMenu.getSelected())

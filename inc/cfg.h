@@ -36,5 +36,6 @@ namespace cfg
 #ifdef ENABLE_DRIVE
     void saveDrive();
     extern std::string driveClientID, driveClientSecret, driveAuthCode, driveRefreshToken, driveDiskID;
+    extern bool driveInitOnBoot;
 #endif
 }

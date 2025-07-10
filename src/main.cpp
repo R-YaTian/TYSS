@@ -62,7 +62,7 @@ int main(int argc, const char *argv[])
         ui::newThread(data::loadCheatsDB, NULL, NULL);
 
 #ifdef ENABLE_DRIVE
-    if(util::fexists("/TYSS/drive.json"))
+    if(cfg::driveInitOnBoot && util::fexists("/TYSS/drive.json"))
         ui::newThread(fs::driveInit, NULL, NULL);
 #endif
 

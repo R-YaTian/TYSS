@@ -150,6 +150,7 @@ void fs::driveInit(void *a)
 
         ui::showMessage("云端存储: 服务初始化完成!");
     } else {
+        ui::showMessage("云端存储: 服务初始化失败!\n请检查云端存储服务配置信息。");
         netDrive.reset();
     }
     t->finished = true;

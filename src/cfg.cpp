@@ -25,6 +25,7 @@
 #ifdef ENABLE_DRIVE
 #include "json.h"
 std::string cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken, cfg::driveDiskID;
+bool cfg::driveInitOnBoot = true;
 #endif
 
 std::unordered_map<std::string, CFGVarType> cfg::config;
@@ -89,6 +90,9 @@ void cfg::load()
         if(parse.contains("driveDiskID"))
             driveDiskID = parse["driveDiskID"];
 
+        if(parse.contains("driveInitOnBoot"))
+            driveInitOnBoot = parse["driveInitOnBoot"].get<bool>();
+
         delete[] jsonBuff;
     }
 #endif
@@ -121,6 +125,7 @@ void cfg::saveDrive()
         if (!driveDiskID.empty())
             drvCfg["driveDiskID"] = driveDiskID;
         drvCfg["driveRefreshToken"] = driveRefreshToken;
+        drvCfg["driveInitOnBoot"] = driveInitOnBoot;
         auto json_str = drvCfg.dump();
 
         FILE *drvOut = fopen("/TYSS/drive.json", "w");
