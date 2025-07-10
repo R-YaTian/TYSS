@@ -60,6 +60,12 @@ namespace fs
         seek_end
     };
 
+    enum class BunchType {
+        Bunch_CTR,
+        Bunch_TWL,
+        Bunch_AGB
+    };
+
     FS_Archive getSDMCArch();
     FS_Archive getSaveArch();
     FS_ArchiveID getSaveMode();
@@ -160,7 +166,9 @@ namespace fs
     void copyZipToArch(const FS_Archive& _arch, unzFile _unz, threadInfo *t);
     void copyZipToArchThreaded(const FS_Archive& _arch, const std::u16string& _src);
 
-    void backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode);
+    void backupAGBSaves_t(void *a);
+    void backupTitles_t(void *a);
+    void backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode, BunchType type);
     void backupSPI(const std::u16string& savPath, const CardType& cardType);
     void restoreSPI(const std::u16string& savPath, const CardType& cardType);
     bool pxiFileToSaveFile(const std::u16string& _dst);

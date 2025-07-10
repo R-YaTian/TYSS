@@ -228,7 +228,7 @@ static void ttlOptAddtoBlackList(void *a)
 static void ttlOptBackupAll_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    fs::backupTitles(data::usrSaveTitles, ARCHIVE_USER_SAVEDATA);
+    fs::backupTitles(data::usrSaveTitles, ARCHIVE_USER_SAVEDATA, fs::BunchType::Bunch_CTR);
     t->finished = true;
 }
 
@@ -241,7 +241,7 @@ static void ttlOptBackupAll(void *a)
 static void ttlOptBackupAllDSiWare_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    fs::backupTitles(data::usrSaveTitles, ARCHIVE_NAND_TWL_FS);
+    fs::backupTitles(data::usrSaveTitles, ARCHIVE_USER_SAVEDATA, fs::BunchType::Bunch_TWL);
     t->finished = true;
 }
 
@@ -249,6 +249,19 @@ static void ttlOptBackupAllDSiWare(void *a)
 {
     std::string q = "你确定要备份此页所有的DSiWare存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!";
     ui::confirm(q, ttlOptBackupAllDSiWare_t, NULL, NULL);
+}
+
+static void ttlOptBackupAllAGBSave_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    fs::backupTitles(data::usrSaveTitles, ARCHIVE_USER_SAVEDATA, fs::BunchType::Bunch_AGB);
+    t->finished = true;
+}
+
+static void ttlOptBackupAllAGBSave(void *a)
+{
+    std::string q = "你确定要备份此页所有的GBAVC存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!";
+    ui::confirm(q, ttlOptBackupAllAGBSave_t, NULL, NULL);
 }
 
 void ui::ttlInit(void *a)
@@ -269,6 +282,8 @@ void ui::ttlInit(void *a)
     ttlOpts->addOptEvent(3, KEY_A, ttlOptBackupAll, NULL);
     ttlOpts->addOpt("备份所有的 DSiWare 存档", 320);
     ttlOpts->addOptEvent(4, KEY_A, ttlOptBackupAllDSiWare, NULL);
+    ttlOpts->addOpt("备份所有的 GBAVC 存档", 320);
+    ttlOpts->addOptEvent(5, KEY_A, ttlOptBackupAllAGBSave, NULL);
 
     t->finished = true;
 }

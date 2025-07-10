@@ -43,6 +43,11 @@ APP_TITLE   :=	TYSS
 APP_AUTHOR  :=	R-YaTian
 APP_DESCRIPTION :=	3DS Save Studio
 
+VERSION_MAJOR	:=	1
+VERSION_MINOR	:=	0
+VERSION_MICRO	:=	0
+MAKEROM_VERARGS := -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO)
+
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
@@ -181,11 +186,11 @@ $(TARGET)-strip.elf: $(BUILD)
 	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf
 
 cia: $(TARGET)-strip.elf
-	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf res/$(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner res/$(TARGET).bnr -DAPP_SYSTEM_MODE="64MB"
+	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf res/$(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner res/$(TARGET).bnr -DAPP_SYSTEM_MODE="64MB" $(MAKEROM_VERARGS)
 	@echo Built TYSS.cia
 
 mode3: $(TARGET)-strip.elf
-	@makerom -f cia -o $(TARGET)_mode3.cia -elf $(TARGET)-strip.elf -rsf res/$(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner res/$(TARGET).bnr -DAPP_SYSTEM_MODE="80MB"
+	@makerom -f cia -o $(TARGET)_mode3.cia -elf $(TARGET)-strip.elf -rsf res/$(TARGET).rsf -exefslogo -target t -icon $(TARGET).smdh -banner res/$(TARGET).bnr -DAPP_SYSTEM_MODE="80MB" $(MAKEROM_VERARGS)
 	@echo Built TYSS_mode3.cia
 
 send:

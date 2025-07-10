@@ -126,7 +126,7 @@ static void sysOptAddtoBlackList(void *a)
 static void sysOptBackupAll_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    fs::backupTitles(data::sysDataTitles, ARCHIVE_SYSTEM_SAVEDATA);
+    fs::backupTitles(data::sysDataTitles, ARCHIVE_SYSTEM_SAVEDATA, fs::BunchType::Bunch_CTR);
     t->finished = true;
 }
 
@@ -139,7 +139,7 @@ static void sysOptBackupAll(void *a)
 static void sysOptBackupAllDSiWare_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    fs::backupTitles(data::sysDataTitles, ARCHIVE_NAND_TWL_FS);
+    fs::backupTitles(data::sysDataTitles, ARCHIVE_SYSTEM_SAVEDATA, fs::BunchType::Bunch_TWL);
     t->finished = true;
 }
 

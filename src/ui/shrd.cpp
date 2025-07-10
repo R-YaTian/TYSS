@@ -58,7 +58,7 @@ static void fldCallback(void *)
 static void shrdViewBackupAll(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    fs::backupTitles(shared, ARCHIVE_SHARED_EXTDATA);
+    fs::backupTitles(shared, ARCHIVE_SHARED_EXTDATA, fs::BunchType::Bunch_CTR);
     t->finished = true;
 }
 

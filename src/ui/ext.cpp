@@ -138,7 +138,7 @@ static void extOptAddtoBlackList(void *a)
 static void extOptBackupAll_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    fs::backupTitles(data::extDataTitles, ARCHIVE_EXTDATA);
+    fs::backupTitles(data::extDataTitles, ARCHIVE_EXTDATA, fs::BunchType::Bunch_CTR);
     t->finished = true;
 }
 

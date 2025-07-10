@@ -438,6 +438,7 @@ void data::titleData::setTitle(const std::u16string& _t)
 {
     title = _t;
     titleSafe = util::safeString(_t);
+    titleUTF8 = util::toUtf8(_t);
 }
 
 void data::titleData::drawInfo(unsigned x, unsigned y)

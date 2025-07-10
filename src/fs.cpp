@@ -54,6 +54,7 @@ typedef struct
 {
     std::vector<data::titleData>* vect = NULL;
     uint32_t mode = 0;
+    fs::BunchType type = fs::BunchType::Bunch_CTR;
 } bakArgs;
 
 void fs::createDir(const std::string& path)
@@ -284,7 +285,7 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_
     if(R_FAILED(res))
     {
         if(error)
-            ui::showMessage("无法打开该存档位. 该存档类型可能不存在适用此 title 的数据.\n错误: 0x%08X", (unsigned)res);
+            ui::showMessage("无法打开该存档位. 该存档类型可能不存在适用此 title 的数据.\n错误: 0x%08X\nTitle: %s", (unsigned)res, dat.getTitleUTF8().c_str());
         return false;
     }
 
@@ -986,24 +987,68 @@ void fs::copyZipToArchThreaded(const FS_Archive& _arch, const std::u16string& _s
     ui::newThread(copyZipToArch_t, send, NULL, ZIP_THRD_STACK_SIZE);
 }
 
-void backupTitles_t(void *a)
+void fs::backupAGBSaves_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     bakArgs *args = (bakArgs *)t->argPtr;
     std::vector<data::titleData>& vect = *args->vect;
     uint32_t mode = args->mode;
+    BunchType type = args->type;
+
+    if (type != BunchType::Bunch_AGB)
+        return;
+
+    for(unsigned i = 0; i < vect.size(); i++)
+    {
+        if (!vect[i].isAGB()) continue;
+        std::string copyStr = "正在处理 '" + vect[i].getTitleUTF8() + "'...";
+        ui::prog->setText(copyStr);
+        ui::prog->update(i);
+
+        if(fs::openArchive(vect[i], ARCHIVE_SAVEDATA_AND_CONTENT, true))
+        {
+            util::createTitleDir(vect[i], mode);
+            std::u16string outpath = util::createPath(vect[i], mode) + util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
+
+            bool res = fs::pxiFileToSaveFile(outpath);
+            if (!res)
+                ui::showMessage("%s:\n存档数据无效, 备份失败!", vect[i].getTitleUTF8().c_str());
+            else {
+                if (std::get<bool>(cfg::config["rawvcsave"])) {
+                    std::u16string savPath = outpath + util::toUtf16(".bin");
+                    fs::copyFile(fs::getSaveArch(), util::toUtf16("原始 GBAVC 存档数据"), fs::getSDMCArch(), savPath, false, true, NULL);
+                }
+            }
+
+            fs::closePxiSaveArch();
+        }
+    }
+
+    t->argPtr = NULL;
+    t->drawFunc = NULL;
+    t->finished = true;
+}
+
+void fs::backupTitles_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    bakArgs *args = (bakArgs *)t->argPtr;
+    std::vector<data::titleData>& vect = *args->vect;
+    uint32_t mode = args->mode;
+    BunchType type = args->type;
 
     for(unsigned i = 0; i < vect.size(); i++)
     {
         if (vect[i].getExtInfos().isDSCard) continue;
-        if (mode != ARCHIVE_NAND_TWL_FS && (vect[i].getHigh() & 0x8000) == 0x8000) continue;
-        if (mode == ARCHIVE_NAND_TWL_FS && (vect[i].getHigh() & 0x8000) != 0x8000) continue;
-        std::string copyStr = "正在处理 '" + util::toUtf8(vect[i].getTitle()) + "'...";
+        if (vect[i].isAGB()) continue;
+        if (type != BunchType::Bunch_TWL && (vect[i].getHigh() & 0x8000) == 0x8000) continue;
+        if (type == BunchType::Bunch_TWL && (vect[i].getHigh() & 0x8000) != 0x8000) continue;
+        std::string copyStr = "正在处理 '" + vect[i].getTitleUTF8() + "'...";
         ui::prog->setText(copyStr);
         ui::prog->update(i);
 
         FS_Archive _arch;
-        if(fs::openArchive(vect[i], mode, true, _arch))
+        if(fs::openArchive(vect[i], type == BunchType::Bunch_TWL ? ARCHIVE_NAND_TWL_FS : mode, true, _arch))
         {
             util::createTitleDir(vect[i], mode);
             std::u16string outpath = util::createPath(vect[i], mode) + util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
@@ -1012,7 +1057,8 @@ void backupTitles_t(void *a)
             {
                 std::u16string fullOut = outpath + util::toUtf16(".zip");
                 std::u16string svOut = fullOut + util::toUtf16(".sv");
-                fs::exportSv(mode, svOut, vect[i]); // export secure value if found
+                if (type != BunchType::Bunch_TWL)
+                    fs::exportSv(mode, svOut, vect[i]); // export secure value if found
 
                 zipFile zip = zipOpen64("/TYSS/tmp.zip", 0);
                 fs::copyArchToZip(_arch, util::toUtf16("/"), zip, NULL, NULL);
@@ -1025,7 +1071,8 @@ void backupTitles_t(void *a)
             else
             {
                 std::u16string svOut = outpath + util::toUtf16(".sv");
-                fs::exportSv(mode, svOut, vect[i]); // export secure value if found
+                if (type != BunchType::Bunch_TWL)
+                    fs::exportSv(mode, svOut, vect[i]); // export secure value if found
 
                 FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, outpath.c_str()), 0);
                 outpath += util::toUtf16("/");
@@ -1041,13 +1088,14 @@ void backupTitles_t(void *a)
     t->finished = true;
 }
 
-void fs::backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode)
+void fs::backupTitles(std::vector<data::titleData>& vect, const uint32_t &mode, BunchType type)
 {
     ui::prog->setMax(vect.size());
     bakArgs *send = new bakArgs;
     send->vect = &vect;
     send->mode = mode;
-    ui::newThread(backupTitles_t, send, ui::progressBarDrawFunc, ZIP_THRD_STACK_SIZE);
+    send->type = type;
+    ui::newThread(type == BunchType::Bunch_AGB ? backupAGBSaves_t : backupTitles_t, send, ui::progressBarDrawFunc, ZIP_THRD_STACK_SIZE);
 }
 
 void fs::backupSPI(const std::u16string& savPath, const CardType& cardType)

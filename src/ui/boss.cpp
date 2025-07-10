@@ -130,7 +130,7 @@ static void bossViewOptAddtoBlackList(void *a)
 static void bossViewOptBackupAll_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    fs::backupTitles(data::bossDataTitles, ARCHIVE_BOSS_EXTDATA);
+    fs::backupTitles(data::bossDataTitles, ARCHIVE_BOSS_EXTDATA, fs::BunchType::Bunch_CTR);
     t->finished = true;
 }
 
