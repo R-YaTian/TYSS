@@ -39,7 +39,7 @@ jobs:
 
       - name: Build TYSS
         run: |
-          make -j$(nproc)
+          make WITH=-DENABLE_DRIVE ADRIVE_SECRET_ID=${{ secrets.ADRIVE_SECRET_ID }} -j$(nproc)
 
       - uses: actions/upload-artifact@master
         with:
