@@ -409,6 +409,9 @@ bool data::titleData::hasSaveData()
 
 bool data::titleData::IsGbaVirtualConsole(const uint32_t& low, const uint32_t& high, const uint8_t& media)
 {
+    if (!(prodCode.compare(0, 5, "CTR-N") == 0) || (high & 0xFFFF) != 0)
+        return false;
+
     FSPXI_File handle;
 
     if (fs::openArchive(*this, ARCHIVE_SAVEDATA_AND_CONTENT, false))
