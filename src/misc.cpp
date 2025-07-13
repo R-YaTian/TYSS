@@ -117,21 +117,21 @@ void misc::clearSharedIconCache(void *a)
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在清除共享图标缓存数据...");
 
-    Result res;
+    Result res, ret;
     data::titleData tmp;
     tmp.setExtdata(0xF000000B);
 
     if (fs::openArchive(tmp, ARCHIVE_SHARED_EXTDATA, true))
     {
         res = FSUSER_DeleteFile(fs::getSaveArch(), (FS_Path) fsMakePath(PATH_ASCII, "/idb.dat"));
-        res = FSUSER_DeleteFile(fs::getSaveArch(), (FS_Path) fsMakePath(PATH_ASCII, "/idbt.dat"));
+        ret = FSUSER_DeleteFile(fs::getSaveArch(), (FS_Path) fsMakePath(PATH_ASCII, "/idbt.dat"));
 
         fs::closeSaveArch();
 
-        if (R_FAILED(res))
-            ui::showMessage("清除共享图标缓存数据失败!\n错误: 0x%08X", (unsigned) res);
-        else
+        if (R_SUCCEEDED(res) && R_SUCCEEDED(ret))
             ui::showMessage("清除共享图标缓存数据成功!");
+        else
+            ui::showMessage("清除共享图标缓存数据失败!\n代码(idb.dat): 0x%08X\n代码(idbt.dat): 0x%08X", (unsigned) res, (unsigned) ret);
     }
 
     t->finished = true;
@@ -142,7 +142,7 @@ void misc::clearHomeMenuIconCache(void *a)
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在清除主菜单图标缓存数据...");
 
-    Result res;
+    Result res, ret;
     u8 region = 0;
 
     res = CFGU_SecureInfoGetRegion(&region);
@@ -158,14 +158,14 @@ void misc::clearHomeMenuIconCache(void *a)
     if (fs::openArchive(tmp, ARCHIVE_EXTDATA, true))
     {
         res = FSUSER_DeleteFile(fs::getSaveArch(), (FS_Path) fsMakePath(PATH_ASCII, "/Cache.dat"));
-        res = FSUSER_DeleteFile(fs::getSaveArch(), (FS_Path) fsMakePath(PATH_ASCII, "/CacheD.dat"));
+        ret = FSUSER_DeleteFile(fs::getSaveArch(), (FS_Path) fsMakePath(PATH_ASCII, "/CacheD.dat"));
 
         fs::closeSaveArch();
 
-        if (R_FAILED(res))
-            ui::showMessage("清除主菜单图标缓存数据失败!\n错误: 0x%08X", (unsigned) res);
-        else
+        if (R_SUCCEEDED(res) && R_SUCCEEDED(ret))
             ui::showMessage("清除主菜单图标缓存数据成功!");
+        else
+            ui::showMessage("清除主菜单图标缓存数据失败!\n代码(Cache.dat): 0x%08X\n代码(CacheD.dat): 0x%08X", (unsigned) res, (unsigned) ret);
     }
 
     t->finished = true;

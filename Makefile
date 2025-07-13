@@ -45,7 +45,7 @@ APP_DESCRIPTION :=	3DS Save Studio
 
 VERSION_MAJOR	:=	1
 VERSION_MINOR	:=	0
-VERSION_MICRO	:=	1
+VERSION_MICRO	:=	2
 MAKEROM_VERARGS := -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO)
 
 #---------------------------------------------------------------------------------
