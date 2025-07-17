@@ -47,6 +47,7 @@ VERSION_MAJOR	:=	1
 VERSION_MINOR	:=	0
 VERSION_MICRO	:=	2
 MAKEROM_VERARGS := -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO)
+APP_VERSION		:= v$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_MICRO)
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -66,6 +67,8 @@ ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 LIBS	:= -lcitro2d -lcitro3d -lcurl -lmbedtls -lmbedcrypto -lmbedx509 -lminizip -lctru -lz -lm
+
+MO_FILES	:=  $(foreach lang,en_US,$(ROMFS)/locale/$(lang).mo)
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -162,7 +165,7 @@ ifneq ($(ROMFS),)
 	export _3DSXFLAGS += --romfs=$(CURDIR)/$(ROMFS)
 endif
 
-.PHONY: all clean cheats
+.PHONY: all clean cheats pot mo
 
 #---------------------------------------------------------------------------------
 all: cheats $(ROMFS_T3XFILES) $(T3XHFILES)
@@ -195,6 +198,32 @@ mode3: $(TARGET)-strip.elf
 
 send:
 	@3dslink $(TARGET).3dsx
+
+$(MO_FILES): $(ROMFS)/locale/%.mo: $(TOPDIR)/po/%.po
+	@echo "Building $@"
+	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
+	msgfmt -c --output-file=$@ $<
+
+po/%.po: $(TOPDIR)/$(notdir $(TARGET)).pot
+	@echo "Building $@"
+	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
+	@if [ -f $@ ]; \
+	then \
+		msgmerge --backup=off -qU $@ $< && touch $@; \
+	else \
+		msginit -i $< --no-translator -l $*.UTF-8 -o $@; \
+	fi
+
+pot: $(CFILES) $(CPPFILES)
+	@echo "Building $(TARGET).pot"
+	xgettext -o $(TARGET).pot $^ -kgetText -c \
+		--from-code="UTF-8" \
+		--copyright-holder="R-YaTian" \
+		--package-name="$(APP_TITLE)" \
+		--package-version="$(APP_VERSION)" \
+		--msgid-bugs-address="gmtianya@gmail.com"
+
+mo: $(MO_FILES)
 
 #---------------------------------------------------------------------------------
 $(GFXBUILD)/%.t3x	$(BUILD)/%.h	:	%.t3s
