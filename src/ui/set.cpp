@@ -259,11 +259,14 @@ void ui::setInit(void *a)
     setMenu.addOpt("金手指数据库载入时机", 320);
     setMenu.addOptEvent(5, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["bootwithcheatdb"]));
 
+    setMenu.addOpt("切换LR按键功能", 320);
+    setMenu.addOptEvent(6, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["swaplrfunc"]));
+
     setMenu.addOpt("重置收藏列表", 320);
-    setMenu.addOptEvent(6, KEY_A, setMenuClearFavList, NULL);
+    setMenu.addOptEvent(7, KEY_A, setMenuClearFavList, NULL);
 
     setMenu.addOpt("重置黑名单", 320);
-    setMenu.addOptEvent(7, KEY_A, setMenuClearBlackList, NULL);
+    setMenu.addOptEvent(8, KEY_A, setMenuClearBlackList, NULL);
 
 #ifdef ENABLE_DRIVE
     if(util::fexists("/TYSS/drive.json"))
@@ -317,28 +320,27 @@ void ui::setExit()
 
 void ui::setUpdate()
 {
+    uint32_t down = ui::padKeysDown();
     if (!setSubMenuOpen)
     {
-        switch(ui::padKeysDown())
+        switch(down)
         {
-            case KEY_CPAD_LEFT:
-                ui::state = SHR;
-                break;
-
-            case KEY_CPAD_RIGHT:
-                ui::state = USR;
-                break;
-
             case KEY_Y:
                 setSubMenuOpen = true;
                 break;
         }
+
+        if (down & KEY_PAGE_LEFT)
+            ui::state = SHR;
+        else if (down & KEY_PAGE_RIGHT)
+            ui::state = USR;
 
         setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(std::get<bool>(cfg::config["zip"])));
         setMenu.editOpt(2, getDeflateLevelText(std::get<int>(cfg::config["deflateLevel"])));
         setMenu.editOpt(3, "界面主题色: " + getLightDarkText(std::get<bool>(cfg::config["lightback"])));
         setMenu.editOpt(4, "GBAVC存档备份成功时保留原始数据: " + getBoolText(std::get<bool>(cfg::config["rawvcsave"])));
         setMenu.editOpt(5, "金手指数据库载入时机: " + getCheatDBText(std::get<bool>(cfg::config["bootwithcheatdb"])));
+        setMenu.editOpt(6, "切换LR按键功能: " + getBoolText(std::get<bool>(cfg::config["swaplrfunc"])));
 #ifdef ENABLE_DRIVE
         if(util::fexists("/TYSS/drive.json"))
             setMenu.editOpt(setMenu.getCount() - 2, "云端存储服务随软件启动: " + getBoolText(cfg::driveInitOnBoot));
@@ -388,9 +390,12 @@ void ui::setDrawBottom()
                 setOptsDesc = "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将增加。";
                 break;
             case 6:
-                setOptsDesc = "这将会清空收藏列表, 请谨慎操作。";
+                setOptsDesc = "将LR按键的功能与ZLZR按键的功能对调。\n在老三上启用则LR按键将可用于UI页面切换,\n原始LR按键功能将不可用(由于老三无ZLZR按键)";
                 break;
             case 7:
+                setOptsDesc = "这将会清空收藏列表, 请谨慎操作。";
+                break;
+            case 8:
                 setOptsDesc = "清空黑名单列表, 将会自动执行一次重载 Titles.";
                 break;
         }

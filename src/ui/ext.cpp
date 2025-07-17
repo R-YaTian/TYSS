@@ -93,15 +93,12 @@ static void extViewCallback(void *a)
                 ui::ttlRefresh();
             }
             break;
-
-        case KEY_CPAD_LEFT:
-            ui::state = USR;
-            break;
-
-        case KEY_CPAD_RIGHT:
-            ui::state = SYS;
-            break;
     }
+
+    if (down & KEY_PAGE_LEFT)
+        ui::state = USR;
+    else if (down & KEY_PAGE_RIGHT)
+        ui::state = SYS;
 }
 
 static void extOptCallback(void *a)

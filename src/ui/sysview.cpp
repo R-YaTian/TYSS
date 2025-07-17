@@ -94,15 +94,12 @@ static void sysViewCallback(void *a)
                 ui::ttlRefresh();
             }
             break;
-
-        case KEY_CPAD_LEFT:
-            ui::state = EXT;
-            break;
-
-        case KEY_CPAD_RIGHT:
-            ui::state = BOS;
-            break;
     }
+
+    if (down & KEY_PAGE_LEFT)
+        ui::state = EXT;
+    else if (down & KEY_PAGE_RIGHT)
+        ui::state = BOS;
 }
 
 static void sysOptCallback(void *a)

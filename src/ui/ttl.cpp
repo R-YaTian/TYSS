@@ -100,15 +100,12 @@ static void ttlViewCallback(void *a)
                 ui::bossViewRefresh();
             }
             break;
-
-        case KEY_CPAD_LEFT:
-            ui::state = SET;
-            break;
-
-        case KEY_CPAD_RIGHT:
-            ui::state = EXT;
-            break;
     }
+
+    if (down & KEY_PAGE_LEFT)
+        ui::state = SET;
+    else if (down & KEY_PAGE_RIGHT)
+        ui::state = EXT;
 }
 
 static void ttlOptCallback(void *a)

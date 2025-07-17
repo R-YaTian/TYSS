@@ -25,6 +25,8 @@
 #include "data.h"
 #include "thrdMgr.h"
 #include "type.h"
+#include "cfg.h"
+#include "3dsgettext.h"
 
 #include "ui/button.h"
 #include "ui/menu.h"
@@ -53,6 +55,13 @@ enum selop
     SEL_NO_OP = 0,
     SEL_BACK_TO_TOP = 1,
     SEL_AUTO = 2
+};
+
+// Key values extend.
+enum
+{
+    KEY_PAGE_LEFT  = KEY_CSTICK_LEFT  | KEY_CPAD_LEFT  | KEY_ZL,
+    KEY_PAGE_RIGHT = KEY_CSTICK_RIGHT | KEY_CPAD_RIGHT | KEY_ZR,
 };
 
 extern const std::string TITLE_TEXT;
@@ -85,6 +94,19 @@ namespace ui
         down = hidKeysDown();
         held = hidKeysHeld();
         touchRead(&pos);
+
+        if (std::get<bool>(cfg::config["swaplrfunc"]))
+        {
+            bool lPressed = down & KEY_L;
+            bool zlPressed = down & KEY_ZL;
+            bool rPressed = down & KEY_R;
+            bool zrPressed = down & KEY_ZR;
+            down &= ~(KEY_L | KEY_ZL | KEY_R | KEY_ZR);
+            if (lPressed) down |= KEY_ZL;
+            if (zlPressed) down |= KEY_L;
+            if (rPressed) down |= KEY_ZR;
+            if (zrPressed) down |= KEY_R;
+        }
     }
 
     inline uint32_t padKeysDown(){ return down; }

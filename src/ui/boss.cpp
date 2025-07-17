@@ -93,15 +93,12 @@ static void bossViewCallback(void *a)
                 ui::ttlRefresh();
             }
             break;
-
-        case KEY_CPAD_LEFT:
-            ui::state = SYS;
-            break;
-
-        case KEY_CPAD_RIGHT:
-            ui::state = SHR;
-            break;
     }
+
+    if (down & KEY_PAGE_LEFT)
+        ui::state = SYS;
+    else if (down & KEY_PAGE_RIGHT)
+        ui::state = SHR;
 }
 
 static void bossViewOptCallback(void *a)

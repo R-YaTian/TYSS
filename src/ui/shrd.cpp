@@ -64,7 +64,8 @@ static void shrdViewBackupAll(void *a)
 
 static void shrdViewCallback(void *)
 {
-    switch(ui::padKeysDown())
+    uint32_t down = ui::padKeysDown();
+    switch(down)
     {
         case KEY_A:
         {
@@ -94,15 +95,12 @@ static void shrdViewCallback(void *)
                 ui::confirm(q, shrdViewBackupAll, NULL, NULL);
             }
             break;
-
-        case KEY_CPAD_LEFT:
-            ui::state = BOS;
-            break;
-
-        case KEY_CPAD_RIGHT:
-            ui::state = SET;
-            break;
     }
+
+    if (down & KEY_PAGE_LEFT)
+        ui::state = BOS;
+    else if (down & KEY_PAGE_RIGHT)
+        ui::state = SET;
 }
 
 void ui::shrdInit(void *a)

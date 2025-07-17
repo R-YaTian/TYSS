@@ -37,6 +37,7 @@ void cfg::initToDefault()
     cfg::config["lightback"] = false;
     cfg::config["rawvcsave"] = false;
     cfg::config["bootwithcheatdb"] = false;
+    cfg::config["swaplrfunc"] = false;
 }
 
 void cfg::load()
@@ -60,6 +61,9 @@ void cfg::load()
 
         fread(&getBool, sizeof(bool), 1, cfgIn);
         cfg::config["bootwithcheatdb"] = getBool;
+
+        fread(&getBool, sizeof(bool), 1, cfgIn);
+        cfg::config["swaplrfunc"] = getBool;
 
         fclose(cfgIn);
     }
@@ -108,6 +112,7 @@ void cfg::saveCommon()
         fwrite(&std::get<bool>(cfg::config["lightback"]), sizeof(bool), 1, cfgOut);
         fwrite(&std::get<bool>(cfg::config["rawvcsave"]), sizeof(bool), 1, cfgOut);
         fwrite(&std::get<bool>(cfg::config["bootwithcheatdb"]), sizeof(bool), 1, cfgOut);
+        fwrite(&std::get<bool>(cfg::config["swaplrfunc"]), sizeof(bool), 1, cfgOut);
         fclose(cfgOut);
     }
 }
