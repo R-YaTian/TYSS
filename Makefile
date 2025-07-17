@@ -49,6 +49,10 @@ VERSION_MICRO	:=	2
 MAKEROM_VERARGS := -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO)
 APP_VERSION		:= v$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_MICRO)
 
+ifeq ($(NO_DRIVE),)
+	WITH_DRIVE := -DENABLE_DRIVE
+endif
+
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
@@ -59,7 +63,7 @@ CFLAGS	:=	-g -Wall -O2 -mword-relocations -flto=auto \
 			-DADRIVE_SECRET_ID=\"$(ADRIVE_SECRET_ID)\" \
 			$(ARCH)
 
-CFLAGS	+=	$(INCLUDE) -D__3DS__ $(WITH)
+CFLAGS	+=	$(INCLUDE) -D__3DS__ $(WITH_DRIVE)
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -Wno-psabi -std=gnu++23
 
@@ -101,7 +105,7 @@ SHLISTFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.shlist)))
 GFXFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.t3s)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
-ifeq ($(WITH),)
+ifneq ($(NO_DRIVE),)
 	CPPFILES := $(filter-out gd.cpp adrive.cpp curlfuncs.cpp, $(CPPFILES))
 endif
 

@@ -164,7 +164,7 @@ namespace
 
 void setLanguage(char const *const language_)
 {
-	if (language_ == "zh_Hans")
+	if (std::string(language_) == "zh_Hans")
 	{
 		if (!s_translations.empty())
 			s_translations.clear();
