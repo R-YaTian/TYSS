@@ -37,22 +37,20 @@ static void toggleBool(void *b)
         *in = true;
 }
 
-static void IncreaseDeflateLevel(void *b)
+static void toggleUInt(void *b, int step, int max, const std::vector<int>& blacklist = {})
 {
     int *in = (int *)b;
-    *in = (*in + 1) % 10; 
+    *in = (*in + step) % (max + 1); 
 
-    if (*in == 0)
-        *in = 1;
-}
+    for (int x : blacklist) {
+        if (*in == x) {
+            *in = (*in + step) % (max + 1);
+            break;
+        }
+    }
 
-static void DecreaseDeflateLevel(void *b)
-{
-    int *in = (int *)b;
-    *in = (*in - 1) % 10; 
-
-    if (*in == 0)
-        *in = 9;
+    if (*in < 0)
+        *in = max;
 }
 
 static std::string getLightDarkText(const bool& g)
@@ -68,6 +66,76 @@ static std::string getCheatDBText(const bool& g)
 static std::string getBoolText(const bool& g)
 {
     return g ? "开" : "关";
+}
+
+static std::string getUILangText(const int& g)
+{
+    std::string s = "界面语言: ";
+
+    if (g == 0)
+        s += "简体中文";
+    else if (g == 1)
+        s += "English";
+
+    return s;
+}
+
+static std::string getTitleLangText(const int& g)
+{
+    std::string s = "应用标题语言: ";
+
+    switch (g) {
+    case CFG_LANGUAGE_JP:
+        s += "日本語";
+        break;
+    case CFG_LANGUAGE_EN:
+        s += "English";
+        break;
+    case CFG_LANGUAGE_FR:
+        s += "Français";
+        break;
+    case CFG_LANGUAGE_DE:
+        s += "Deutsch";
+        break;
+    case CFG_LANGUAGE_IT:
+        s += "Italiano";
+        break;
+    case CFG_LANGUAGE_ES:
+        s += "Español";
+        break;
+    case CFG_LANGUAGE_ZH:
+        s += "简体中文";
+        break;
+    case CFG_LANGUAGE_KO:
+        s += "한국어";
+        break;
+    case CFG_LANGUAGE_NL:
+        s += "Nederlands";
+        break;
+    case CFG_LANGUAGE_PT:
+        s += "Português";
+        break;
+    case CFG_LANGUAGE_RU:
+        s += "Русский";
+        break;
+    case CFG_LANGUAGE_TW:
+        s += "繁體中文";
+        break;
+    }
+
+    return s;
+}
+
+static std::string getCheatLangText(const int& g)
+{
+    std::string s = "金手指数据库语言: ";
+
+    if (g == 0)
+        s += "简体中文";
+    else if (g == 1)
+        s += "English";
+
+    return s;
 }
 
 static std::string getDeflateLevelText(const int& g)
@@ -222,7 +290,7 @@ static void setMenuIncreaseDeflateLevel_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在保存设置...");
-    IncreaseDeflateLevel(t->argPtr);
+    toggleUInt(t->argPtr, 1, 9, {0});
     cfg::saveCommon();
     t->lock();
     t->argPtr = NULL;
@@ -239,7 +307,7 @@ static void setMenuDecreaseDeflateLevel_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在保存设置...");
-    DecreaseDeflateLevel(t->argPtr);
+    toggleUInt(t->argPtr, -1, 9, {0});
     cfg::saveCommon();
     t->lock();
     t->argPtr = NULL;
@@ -250,6 +318,91 @@ static void setMenuDecreaseDeflateLevel_t(void *a)
 static void setMenuDecreaseDeflateLevel(void *a)
 {
     ui::newThread(setMenuDecreaseDeflateLevel_t, a, NULL);
+}
+
+static void setMenuIncreaseTitleLang_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在保存设置...");
+    toggleUInt(t->argPtr, 1, 11, {CFG_LANGUAGE_KO});
+    cfg::saveCommon();
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+static void setMenuIncreaseTitleLang(void *a)
+{
+    ui::newThread(setMenuIncreaseTitleLang_t, a, NULL);
+}
+
+static void setMenuDecreaseTitleLang_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在保存设置...");
+    toggleUInt(t->argPtr, -1, 11, {CFG_LANGUAGE_KO});
+    cfg::saveCommon();
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+static void setMenuDecreaseTitleLang(void *a)
+{
+    ui::newThread(setMenuDecreaseTitleLang_t, a, NULL);
+}
+
+static void setMenuToggleCheatLang_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在保存设置...");
+    toggleUInt(t->argPtr, 1, 1);
+    cfg::saveCommon();
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+static void setMenuToggleCheatLang(void *a)
+{
+    ui::newThread(setMenuToggleCheatLang_t, a, NULL);
+}
+
+static void setMenuIncreaseUILang_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在保存设置...");
+    toggleUInt(t->argPtr, 1, 1);
+    cfg::saveCommon();
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+static void setMenuIncreaseUILang(void *a)
+{
+    ui::newThread(setMenuIncreaseUILang_t, a, NULL);
+}
+
+static void setMenuDecreaseUILang_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在保存设置...");
+    toggleUInt(t->argPtr, -1, 1);
+    cfg::saveCommon();
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+static void setMenuDecreaseUILang(void *a)
+{
+    ui::newThread(setMenuDecreaseUILang_t, a, NULL);
 }
 
 static void setSubMenuCallback(void *a)
@@ -280,14 +433,25 @@ void ui::setInit(void *a)
     setMenu.addOpt("界面主题色", 320);
     setMenu.addOptEvent(3, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["lightback"]));
 
-    setMenu.addOpt("GBAVC存档备份成功时保留原始数据", 320);
-    setMenu.addOptEvent(4, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["rawvcsave"]));
+    setMenu.addOpt("界面语言", 320);
+    setMenu.addOptEvent(4, KEY_B, setMenuDecreaseUILang, &std::get<int>(cfg::config["uilang"]));
+    setMenu.addOptEvent(4, KEY_A, setMenuIncreaseUILang, &std::get<int>(cfg::config["uilang"]));
+
+    setMenu.addOpt("应用标题语言", 320);
+    setMenu.addOptEvent(5, KEY_B, setMenuDecreaseTitleLang, &std::get<int>(cfg::config["titlelang"]));
+    setMenu.addOptEvent(5, KEY_A, setMenuIncreaseTitleLang, &std::get<int>(cfg::config["titlelang"]));
+
+    setMenu.addOpt("金手指数据库语言", 320);
+    setMenu.addOptEvent(6, KEY_A, setMenuToggleCheatLang, &std::get<int>(cfg::config["cheatdblang"]));
 
     setMenu.addOpt("金手指数据库载入时机", 320);
-    setMenu.addOptEvent(5, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["bootwithcheatdb"]));
+    setMenu.addOptEvent(7, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["bootwithcheatdb"]));
+
+    setMenu.addOpt("GBAVC存档备份成功时保留原始数据", 320);
+    setMenu.addOptEvent(8, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["rawvcsave"]));
 
     setMenu.addOpt("切换LR按键功能", 320);
-    setMenu.addOptEvent(6, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["swaplrfunc"]));
+    setMenu.addOptEvent(9, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["swaplrfunc"]));
 
 #ifdef ENABLE_DRIVE
     if(util::fexists("/TYSS/drive.json"))
@@ -365,9 +529,12 @@ void ui::setUpdate()
         setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(std::get<bool>(cfg::config["zip"])));
         setMenu.editOpt(2, getDeflateLevelText(std::get<int>(cfg::config["deflateLevel"])));
         setMenu.editOpt(3, "界面主题色: " + getLightDarkText(std::get<bool>(cfg::config["lightback"])));
-        setMenu.editOpt(4, "GBAVC存档备份成功时保留原始数据: " + getBoolText(std::get<bool>(cfg::config["rawvcsave"])));
-        setMenu.editOpt(5, "金手指数据库载入时机: " + getCheatDBText(std::get<bool>(cfg::config["bootwithcheatdb"])));
-        setMenu.editOpt(6, "切换LR按键功能: " + getBoolText(std::get<bool>(cfg::config["swaplrfunc"])));
+        setMenu.editOpt(4, getUILangText(std::get<int>(cfg::config["uilang"])));
+        setMenu.editOpt(5, getTitleLangText(std::get<int>(cfg::config["titlelang"])));
+        setMenu.editOpt(6, getCheatLangText(std::get<int>(cfg::config["cheatdblang"])));
+        setMenu.editOpt(7, "金手指数据库载入时机: " + getCheatDBText(std::get<bool>(cfg::config["bootwithcheatdb"])));
+        setMenu.editOpt(8, "GBAVC存档备份成功时保留原始数据: " + getBoolText(std::get<bool>(cfg::config["rawvcsave"])));
+        setMenu.editOpt(9, "切换LR按键功能: " + getBoolText(std::get<bool>(cfg::config["swaplrfunc"])));
 #ifdef ENABLE_DRIVE
         if(util::fexists("/TYSS/drive.json"))
             setMenu.editOpt(setMenu.getCount() - 2, "云端存储服务随软件启动: " + getBoolText(cfg::driveInitOnBoot));
@@ -411,13 +578,22 @@ void ui::setDrawBottom()
                 setOptsDesc = "选择 UI 界面主题色。\n(浅色/暗黑)";
                 break;
             case 4:
-                setOptsDesc = "当GBAVC存档备份成功时保留一份原始(.bin)数据。\n一般情况下不需要开启此项,因为原始数据不可用于\nGBAVC虚拟主机之外的任何地方(GBA模拟器等等)\n注:覆盖备份文件或还原数据时,将根据后缀自动判断";
+                setOptsDesc = "选择 UI 界面显示语言。";
                 break;
             case 5:
-                setOptsDesc = "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将增加。";
+                setOptsDesc = "以何种语言显示应用程序标题。\n这将影响存放应用程序数据备份的文件夹名称,\n一经设置不建议再修改,并且需要重载Titles才生效!";
                 break;
             case 6:
-                setOptsDesc = "将LR按键的功能与ZLZR按键的功能对调。\n在老三上启用则LR按键将可用于UI页面切换,\n原始LR按键功能将不可用(由于老三无ZLZR按键)";
+                setOptsDesc = "选择金手指数据库语言(目前仅支持简体中文与英语)";
+                break;
+            case 7:
+                setOptsDesc = "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将增加。";
+                break;
+            case 8:
+                setOptsDesc = "当GBAVC存档备份成功时保留一份原始(.bin)数据。\n一般情况下不需要开启此项,因为原始数据不可用于\nGBAVC虚拟主机之外的任何地方(GBA模拟器等等)\n注:覆盖备份文件或还原数据时,将根据后缀自动判断";
+                break;
+            case 9:
+                setOptsDesc = "将LR按键的功能与ZLZR按键的功能对调。\n在老三上启用则LR按键将用于UI页面切换,而LR快速\n浏览应用列表功能将被禁用(由于老三无ZLZR按键)";
                 break;
         }
 #ifdef ENABLE_DRIVE

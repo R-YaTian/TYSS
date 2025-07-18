@@ -32,12 +32,18 @@ std::unordered_map<std::string, CFGVarType> cfg::config;
 
 void cfg::initToDefault()
 {
+    u8 syslang = CFG_LANGUAGE_EN;
+    CFGU_GetSystemLanguage(&syslang);
+
     cfg::config["zip"] = false;
     cfg::config["deflateLevel"] = 1;
     cfg::config["lightback"] = false;
     cfg::config["rawvcsave"] = false;
     cfg::config["bootwithcheatdb"] = false;
     cfg::config["swaplrfunc"] = false;
+    cfg::config["titlelang"] = syslang;
+    cfg::config["uilang"] = (syslang == CFG_LANGUAGE_ZH ? 0 : 1);
+    cfg::config["cheatdblang"] = (syslang == CFG_LANGUAGE_ZH ? 0 : 1);
 }
 
 void cfg::load()
@@ -64,6 +70,15 @@ void cfg::load()
 
         fread(&getBool, sizeof(bool), 1, cfgIn);
         cfg::config["swaplrfunc"] = getBool;
+
+        fread(&getInt, sizeof(int), 1, cfgIn);
+        cfg::config["titlelang"] = getInt;
+
+        fread(&getInt, sizeof(int), 1, cfgIn);
+        cfg::config["uilang"] = getInt;
+
+        fread(&getInt, sizeof(int), 1, cfgIn);
+        cfg::config["cheatdblang"] = getInt;
 
         fclose(cfgIn);
     }
@@ -113,6 +128,9 @@ void cfg::saveCommon()
         fwrite(&std::get<bool>(cfg::config["rawvcsave"]), sizeof(bool), 1, cfgOut);
         fwrite(&std::get<bool>(cfg::config["bootwithcheatdb"]), sizeof(bool), 1, cfgOut);
         fwrite(&std::get<bool>(cfg::config["swaplrfunc"]), sizeof(bool), 1, cfgOut);
+        fwrite(&std::get<int>(cfg::config["titlelang"]), sizeof(int), 1, cfgOut);
+        fwrite(&std::get<int>(cfg::config["uilang"]), sizeof(int), 1, cfgOut);
+        fwrite(&std::get<int>(cfg::config["cheatdblang"]), sizeof(int), 1, cfgOut);
         fclose(cfgOut);
     }
 }

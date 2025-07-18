@@ -40,7 +40,6 @@
 const char *blPath    = "/TYSS/blacklist.txt";
 const char *favPath   = "/TYSS/favorites.txt";
 const char *titlePath = "/TYSS/cache.bin";
-static uint8_t lang = CFG_LANGUAGE_EN;
 static bool cartValid = false;
 static bool titleLoaded = false;
 
@@ -184,7 +183,6 @@ static C3D_Tex *loadIcon(smdh_s *smdh)
 
 void data::init()
 {
-    CFGU_GetSystemLanguage(&lang);
 }
 
 void data::exit()
@@ -229,7 +227,7 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt, bool isA
     smdh_s *smdh = loadSMDH(low, high, m);
     if(smdh != NULL && hasSaveData())
     {
-        title.assign((char16_t *)(smdh->applicationTitles[lang].shortDescription));
+        title.assign((char16_t *)(smdh->applicationTitles[std::get<int>(cfg::config["titlelang"])].shortDescription));
         if(title.empty())
             title.assign((char16_t *)(smdh->applicationTitles[1].shortDescription));
 
@@ -237,7 +235,7 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt, bool isA
 
         titleSafe.assign(util::safeString(title));
 
-        publisher.assign((char16_t *)(smdh->applicationTitles[lang].publisher));
+        publisher.assign((char16_t *)(smdh->applicationTitles[std::get<int>(cfg::config["titlelang"])].publisher));
         if(publisher.empty())
             publisher.assign((char16_t *)(smdh->applicationTitles[1].publisher));
 
