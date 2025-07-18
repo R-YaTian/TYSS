@@ -908,6 +908,7 @@ void data::clearFav(void *a)
     t->status->setStatus("正在重置收藏列表...");
 
     favorites.clear();
+    remove("/TYSS/favorites.txt");
 
     // resort with new fav
     std::sort(data::usrSaveTitles.begin(), data::usrSaveTitles.end(), sortTitles);

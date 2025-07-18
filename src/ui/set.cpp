@@ -27,6 +27,7 @@
 
 static ui::menu setMenu, setSubMenu;
 static bool setSubMenuOpen = false;
+static bool anySettingChanged = false;
 
 static void toggleBool(void *b)
 {
@@ -35,6 +36,8 @@ static void toggleBool(void *b)
         *in = false;
     else
         *in = true;
+
+    if (!anySettingChanged) anySettingChanged = true;
 }
 
 static void toggleUInt(void *b, int step, int max, const std::vector<int>& blacklist = {})
@@ -51,6 +54,8 @@ static void toggleUInt(void *b, int step, int max, const std::vector<int>& black
 
     if (*in < 0)
         *in = max;
+
+    if (!anySettingChanged) anySettingChanged = true;
 }
 
 static std::string getLightDarkText(const bool& g)
@@ -215,8 +220,8 @@ static void setMenuHackPlayCoin(void *a)
 
 static void setMenuClearFavList(void *a)
 {
-    remove("/TYSS/favorites.txt");
-    ui::newThread(data::clearFav, NULL, NULL);
+    std::string q = "你确定要重置收藏列表吗?";
+    ui::confirm(q, data::clearFav, NULL, NULL);
 }
 
 static void setMenuClearBlackList(void *a)
@@ -256,6 +261,8 @@ static void setMenuToggleDriveBOOL_t(void *a)
     t->status->setStatus("正在保存设置...");
     toggleBool(t->argPtr);
     cfg::saveDrive();
+    anySettingChanged = false;
+    svcSleepThread(1e+9 / 4);
     t->lock();
     t->argPtr = NULL;
     t->unlock();
@@ -268,141 +275,60 @@ static void setMenuToggleDriveBOOL(void *a)
 }
 #endif
 
-static void setMenuToggleBOOL_t(void *a)
+static void setMenuSaveCommon(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在保存设置...");
-    toggleBool(t->argPtr);
     cfg::saveCommon();
-    gfx::setColor(std::get<bool>(cfg::config["lightback"]));
-    t->lock();
-    t->argPtr = NULL;
-    t->unlock();
+    anySettingChanged = false;
+    svcSleepThread(1e+9 / 4);
     t->finished = true;
 }
 
 static void setMenuToggleBOOL(void *a)
 {
-    ui::newThread(setMenuToggleBOOL_t, a, NULL);
+    toggleBool(a);
 }
 
-static void setMenuIncreaseDeflateLevel_t(void *a)
+static void setMenuToggleColor(void *a)
 {
-    threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在保存设置...");
-    toggleUInt(t->argPtr, 1, 9, {0});
-    cfg::saveCommon();
-    t->lock();
-    t->argPtr = NULL;
-    t->unlock();
-    t->finished = true;
+    toggleBool(a);
+    gfx::setColor(std::get<bool>(cfg::config["lightback"]));
 }
 
 static void setMenuIncreaseDeflateLevel(void *a)
 {
-    ui::newThread(setMenuIncreaseDeflateLevel_t, a, NULL);
-}
-
-static void setMenuDecreaseDeflateLevel_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在保存设置...");
-    toggleUInt(t->argPtr, -1, 9, {0});
-    cfg::saveCommon();
-    t->lock();
-    t->argPtr = NULL;
-    t->unlock();
-    t->finished = true;
+    toggleUInt(a, 1, 9, {0});
 }
 
 static void setMenuDecreaseDeflateLevel(void *a)
 {
-    ui::newThread(setMenuDecreaseDeflateLevel_t, a, NULL);
-}
-
-static void setMenuIncreaseTitleLang_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在保存设置...");
-    toggleUInt(t->argPtr, 1, 11, {CFG_LANGUAGE_KO});
-    cfg::saveCommon();
-    t->lock();
-    t->argPtr = NULL;
-    t->unlock();
-    t->finished = true;
+    toggleUInt(a, -1, 9, {0});
 }
 
 static void setMenuIncreaseTitleLang(void *a)
 {
-    ui::newThread(setMenuIncreaseTitleLang_t, a, NULL);
-}
-
-static void setMenuDecreaseTitleLang_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在保存设置...");
-    toggleUInt(t->argPtr, -1, 11, {CFG_LANGUAGE_KO});
-    cfg::saveCommon();
-    t->lock();
-    t->argPtr = NULL;
-    t->unlock();
-    t->finished = true;
+    toggleUInt(a, 1, 11, {CFG_LANGUAGE_KO}); // Our font table does not support Korean yet.
 }
 
 static void setMenuDecreaseTitleLang(void *a)
 {
-    ui::newThread(setMenuDecreaseTitleLang_t, a, NULL);
-}
-
-static void setMenuToggleCheatLang_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在保存设置...");
-    toggleUInt(t->argPtr, 1, 1);
-    cfg::saveCommon();
-    t->lock();
-    t->argPtr = NULL;
-    t->unlock();
-    t->finished = true;
-}
-
-static void setMenuToggleCheatLang(void *a)
-{
-    ui::newThread(setMenuToggleCheatLang_t, a, NULL);
-}
-
-static void setMenuIncreaseUILang_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在保存设置...");
-    toggleUInt(t->argPtr, 1, 1);
-    cfg::saveCommon();
-    t->lock();
-    t->argPtr = NULL;
-    t->unlock();
-    t->finished = true;
+    toggleUInt(a, -1, 11, {CFG_LANGUAGE_KO}); // Our font table does not support Korean yet.
 }
 
 static void setMenuIncreaseUILang(void *a)
 {
-    ui::newThread(setMenuIncreaseUILang_t, a, NULL);
-}
-
-static void setMenuDecreaseUILang_t(void *a)
-{
-    threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在保存设置...");
-    toggleUInt(t->argPtr, -1, 1);
-    cfg::saveCommon();
-    t->lock();
-    t->argPtr = NULL;
-    t->unlock();
-    t->finished = true;
+    toggleUInt(a, 1, 1);
 }
 
 static void setMenuDecreaseUILang(void *a)
 {
-    ui::newThread(setMenuDecreaseUILang_t, a, NULL);
+    toggleUInt(a, -1, 1);
+}
+
+static void setMenuToggleCheatLang(void *a)
+{
+    toggleUInt(a, 1, 1);
 }
 
 static void setSubMenuCallback(void *a)
@@ -431,7 +357,7 @@ void ui::setInit(void *a)
     setMenu.addOptEvent(2, KEY_A, setMenuIncreaseDeflateLevel, &std::get<int>(cfg::config["deflateLevel"]));
 
     setMenu.addOpt("界面主题色", 320);
-    setMenu.addOptEvent(3, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["lightback"]));
+    setMenu.addOptEvent(3, KEY_A, setMenuToggleColor, &std::get<bool>(cfg::config["lightback"]));
 
     setMenu.addOpt("界面语言", 320);
     setMenu.addOptEvent(4, KEY_B, setMenuDecreaseUILang, &std::get<int>(cfg::config["uilang"]));
@@ -507,6 +433,7 @@ void ui::setInit(void *a)
 
 void ui::setExit()
 {
+    cfg::saveCommon();
 }
 
 void ui::setUpdate()
@@ -522,9 +449,15 @@ void ui::setUpdate()
         }
 
         if (down & KEY_PAGE_LEFT)
+        {
+            if (anySettingChanged) ui::newThread(setMenuSaveCommon, NULL, NULL);
             ui::state = SHR;
+        }
         else if (down & KEY_PAGE_RIGHT)
+        {
+            if (anySettingChanged) ui::newThread(setMenuSaveCommon, NULL, NULL);
             ui::state = USR;
+        }
 
         setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(std::get<bool>(cfg::config["zip"])));
         setMenu.editOpt(2, getDeflateLevelText(std::get<int>(cfg::config["deflateLevel"])));
