@@ -506,7 +506,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
 #ifdef ENABLE_DRIVE
         if (fs::netDrive)
-            fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
+            fldMenu.addOptEvent(fldInd, std::get<bool>(cfg::config["swaplrfunc"]) ? KEY_ZR : KEY_R, fldMenuUpload, di);
 #endif
     }
 }
@@ -549,7 +549,7 @@ void ui::fldRefresh()
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
 #ifdef ENABLE_DRIVE
         if (fs::netDrive)
-            fldMenu.addOptEvent(fldInd, KEY_R, fldMenuUpload, di);
+            fldMenu.addOptEvent(fldInd, std::get<bool>(cfg::config["swaplrfunc"]) ? KEY_ZR : KEY_R, fldMenuUpload, di);
 #endif
     }
 }

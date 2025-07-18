@@ -37,13 +37,22 @@ static void toggleBool(void *b)
         *in = true;
 }
 
-static void toggleDeflateLevel(void *b)
+static void IncreaseDeflateLevel(void *b)
 {
     int *in = (int *)b;
     *in = (*in + 1) % 10; 
 
     if (*in == 0)
         *in = 1;
+}
+
+static void DecreaseDeflateLevel(void *b)
+{
+    int *in = (int *)b;
+    *in = (*in - 1) % 10; 
+
+    if (*in == 0)
+        *in = 9;
 }
 
 static std::string getLightDarkText(const bool& g)
@@ -209,11 +218,11 @@ static void setMenuToggleBOOL(void *a)
     ui::newThread(setMenuToggleBOOL_t, a, NULL);
 }
 
-static void setMenuToggleDeflateLevel_t(void *a)
+static void setMenuIncreaseDeflateLevel_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在保存设置...");
-    toggleDeflateLevel(t->argPtr);
+    IncreaseDeflateLevel(t->argPtr);
     cfg::saveCommon();
     t->lock();
     t->argPtr = NULL;
@@ -221,9 +230,26 @@ static void setMenuToggleDeflateLevel_t(void *a)
     t->finished = true;
 }
 
-static void setMenuToggleDeflateLevel(void *a)
+static void setMenuIncreaseDeflateLevel(void *a)
 {
-    ui::newThread(setMenuToggleDeflateLevel_t, a, NULL);
+    ui::newThread(setMenuIncreaseDeflateLevel_t, a, NULL);
+}
+
+static void setMenuDecreaseDeflateLevel_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    t->status->setStatus("正在保存设置...");
+    DecreaseDeflateLevel(t->argPtr);
+    cfg::saveCommon();
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
+static void setMenuDecreaseDeflateLevel(void *a)
+{
+    ui::newThread(setMenuDecreaseDeflateLevel_t, a, NULL);
 }
 
 static void setSubMenuCallback(void *a)
@@ -248,7 +274,8 @@ void ui::setInit(void *a)
     setMenu.addOptEvent(1, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["zip"]));
 
     setMenu.addOpt("ZIP 压缩等级", 320);
-    setMenu.addOptEvent(2, KEY_A, setMenuToggleDeflateLevel, &std::get<int>(cfg::config["deflateLevel"]));
+    setMenu.addOptEvent(2, KEY_B, setMenuDecreaseDeflateLevel, &std::get<int>(cfg::config["deflateLevel"]));
+    setMenu.addOptEvent(2, KEY_A, setMenuIncreaseDeflateLevel, &std::get<int>(cfg::config["deflateLevel"]));
 
     setMenu.addOpt("界面主题色", 320);
     setMenu.addOptEvent(3, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["lightback"]));
@@ -261,12 +288,6 @@ void ui::setInit(void *a)
 
     setMenu.addOpt("切换LR按键功能", 320);
     setMenu.addOptEvent(6, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["swaplrfunc"]));
-
-    setMenu.addOpt("重置收藏列表", 320);
-    setMenu.addOptEvent(7, KEY_A, setMenuClearFavList, NULL);
-
-    setMenu.addOpt("重置黑名单", 320);
-    setMenu.addOptEvent(8, KEY_A, setMenuClearBlackList, NULL);
 
 #ifdef ENABLE_DRIVE
     if(util::fexists("/TYSS/drive.json"))
@@ -308,6 +329,12 @@ void ui::setInit(void *a)
 
     setSubMenu.addOpt("修改今日步数", 320);
     setSubMenu.addOptEvent(9, KEY_A, setMenuHackStepCount, NULL);
+
+    setSubMenu.addOpt("重置 TYSS 收藏列表", 320);
+    setSubMenu.addOptEvent(10, KEY_A, setMenuClearFavList, NULL);
+
+    setSubMenu.addOpt("重置 TYSS 黑名单", 320);
+    setSubMenu.addOptEvent(11, KEY_A, setMenuClearBlackList, NULL);
 
     setSubMenu.setCallback(setSubMenuCallback, NULL);
 
@@ -392,12 +419,6 @@ void ui::setDrawBottom()
             case 6:
                 setOptsDesc = "将LR按键的功能与ZLZR按键的功能对调。\n在老三上启用则LR按键将可用于UI页面切换,\n原始LR按键功能将不可用(由于老三无ZLZR按键)";
                 break;
-            case 7:
-                setOptsDesc = "这将会清空收藏列表, 请谨慎操作。";
-                break;
-            case 8:
-                setOptsDesc = "清空黑名单列表, 将会自动执行一次重载 Titles.";
-                break;
         }
 #ifdef ENABLE_DRIVE
         if(util::fexists("/TYSS/drive.json"))
@@ -441,6 +462,12 @@ void ui::setDrawBottom()
                 break;
             case 9:
                 setOptsDesc = "修改主菜单上显示的今日步数数据。\n由于部分限制因素, 该项功能仅影响当前小时步数。\n此前产生的步数不会被修改!";
+                break;
+            case 10:
+                setOptsDesc = "这将会清空本程序收藏列表, 请谨慎操作。";
+                break;
+            case 11:
+                setOptsDesc = "清空本程序黑名单列表, 随后将自动执行重载 Titles";
                 break;
         }
         ui::drawUIBar("\ue000 选择 \ue001 退出工具箱", ui::SCREEN_BOT, false);
