@@ -58,7 +58,7 @@ int main(int argc, const char *argv[])
     ui::newThread(ui::bossViewInit, NULL, NULL);
     ui::newThread(ui::shrdInit, NULL, NULL);
     ui::newThread(ui::setInit, NULL, NULL);
-    if (std::get<bool>(cfg::config["bootwithcheatdb"]))
+    if (cfg::config["bootwithcheatdb"])
         ui::newThread(data::loadCheatsDB, NULL, NULL);
 
 #ifdef ENABLE_DRIVE

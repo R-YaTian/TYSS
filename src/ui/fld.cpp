@@ -50,7 +50,7 @@ static void fldMenuNew_t(void *a)
         newFolder = util::safeString(util::toUtf16(util::getString("输入新备份名称", true)));
 
     if(!newFolder.empty()
-        && std::get<bool>(cfg::config["zip"])
+        && cfg::config["zip"]
         && !data::curData.getExtInfos().isDSCard
         && !data::curData.isAGB())
     {
@@ -69,7 +69,7 @@ static void fldMenuNew_t(void *a)
                 ui::showMessage("GBAVC 存档数据无效, 备份失败!");
             else {
                 ui::showMessage("GBAVC 存档数据备份成功!");
-                if (std::get<bool>(cfg::config["rawvcsave"])) {
+                if (cfg::config["rawvcsave"]) {
                     std::u16string savPath = fullOut + util::toUtf16(".bin");
                     fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16("原始 GBAVC 存档数据"), fs::getSDMCArch(), savPath, false, true);
                 }
@@ -506,7 +506,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
 #ifdef ENABLE_DRIVE
         if (fs::netDrive)
-            fldMenu.addOptEvent(fldInd, std::get<bool>(cfg::config["swaplrfunc"]) ? KEY_ZR : KEY_R, fldMenuUpload, di);
+            fldMenu.addOptEvent(fldInd, cfg::config["swaplrfunc"] ? KEY_ZR : KEY_R, fldMenuUpload, di);
 #endif
     }
 }
@@ -549,7 +549,7 @@ void ui::fldRefresh()
         fldMenu.addOptEvent(fldInd, KEY_Y, fldMenuRestore, di);
 #ifdef ENABLE_DRIVE
         if (fs::netDrive)
-            fldMenu.addOptEvent(fldInd, std::get<bool>(cfg::config["swaplrfunc"]) ? KEY_ZR : KEY_R, fldMenuUpload, di);
+            fldMenu.addOptEvent(fldInd, cfg::config["swaplrfunc"] ? KEY_ZR : KEY_R, fldMenuUpload, di);
 #endif
     }
 }

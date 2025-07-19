@@ -228,7 +228,7 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt, bool isA
     smdh_s *smdh = loadSMDH(low, high, m);
     if(smdh != NULL && hasSaveData())
     {
-        title.assign((char16_t *)(smdh->applicationTitles[std::get<int>(cfg::config["titlelang"])].shortDescription));
+        title.assign((char16_t *)(smdh->applicationTitles[cfg::config["titlelang"]].shortDescription));
         if(title.empty())
             title.assign((char16_t *)(smdh->applicationTitles[1].shortDescription));
 
@@ -236,7 +236,7 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt, bool isA
 
         titleSafe.assign(util::safeString(title));
 
-        publisher.assign((char16_t *)(smdh->applicationTitles[std::get<int>(cfg::config["titlelang"])].publisher));
+        publisher.assign((char16_t *)(smdh->applicationTitles[cfg::config["titlelang"]].publisher));
         if(publisher.empty())
             publisher.assign((char16_t *)(smdh->applicationTitles[1].publisher));
 

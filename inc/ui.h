@@ -95,7 +95,7 @@ namespace ui
         held = hidKeysHeld();
         touchRead(&pos);
 
-        if (std::get<bool>(cfg::config["swaplrfunc"]))
+        if (cfg::config["swaplrfunc"])
         {
             bool lPressed = down & KEY_L;
             bool zlPressed = down & KEY_ZL;

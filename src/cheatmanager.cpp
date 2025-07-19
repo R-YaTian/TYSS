@@ -108,7 +108,7 @@ void CheatManager::reset()
 void CheatManager::loadBuiltIn()
 {
     char path[64];
-    std::snprintf(path, sizeof(path), "romfs:/cheats/cheats%02d.json.zip", std::get<int>(cfg::config["cheatdblang"]));
+    std::snprintf(path, sizeof(path), "romfs:/cheats/cheats%02d.json.zip", cfg::config["cheatdblang"]);
     // load compressed archive in memory
     unzFile zipFile = unzOpen64(path);
     if (zipFile != nullptr)

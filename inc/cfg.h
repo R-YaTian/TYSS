@@ -19,10 +19,9 @@
 #pragma once
 
 #include <string>
-#include <variant>
 #include <unordered_map>
 
-using CFGVarType = std::variant<bool, int>;
+#include <3ds/types.h>
 
 namespace cfg
 {
@@ -31,7 +30,7 @@ namespace cfg
     void load();
     void saveCommon();
 
-    extern std::unordered_map<std::string, CFGVarType> config;
+    extern std::unordered_map<std::string, u8> config;
 
 #ifdef ENABLE_DRIVE
     void saveDrive();

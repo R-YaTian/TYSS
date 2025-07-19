@@ -851,7 +851,7 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
             std::u16string newDir = archList->getItem(i) + util::toUtf16("/");
             if (_dir) newDir = *_dir + newDir; // Join existing path
             std::string dirname = util::toUtf8(newDir); // We should add the folder to zip first
-            zipOpenNewFileInZip64(_zip, dirname.c_str(), NULL, NULL, 0, NULL, 0, NULL, Z_DEFLATED, std::get<int>(cfg::config["deflateLevel"]), 0);
+            zipOpenNewFileInZip64(_zip, dirname.c_str(), NULL, NULL, 0, NULL, 0, NULL, Z_DEFLATED, cfg::config["deflateLevel"], 0);
             fs::copyArchToZip(_arch, newSrc, _zip, &newDir, t, true);
         }
         else
@@ -865,7 +865,7 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
             std::string filename = util::toUtf8(archList->getItem(i));
             if (_dir) filename = util::toUtf8(*_dir) + filename; // Join dirname if exists
             if(t) t->status->setStatus("正在压缩 " + filename + "...");
-            int openZip = zipOpenNewFileInZip64(_zip, filename.c_str(), &inf, NULL, 0, NULL, 0, NULL, Z_DEFLATED, std::get<int>(cfg::config["deflateLevel"]), 0);
+            int openZip = zipOpenNewFileInZip64(_zip, filename.c_str(), &inf, NULL, 0, NULL, 0, NULL, Z_DEFLATED, cfg::config["deflateLevel"], 0);
             if(openZip == 0)
             {
                 fs::fsfile readFile(_arch, srcPath + archList->getItem(i), FS_OPEN_READ);
@@ -1014,7 +1014,7 @@ void fs::backupAGBSaves_t(void *a)
             if (!res)
                 ui::showMessage("%s:\n存档数据无效, 备份失败!", vect[i].getTitleUTF8().c_str());
             else {
-                if (std::get<bool>(cfg::config["rawvcsave"])) {
+                if (cfg::config["rawvcsave"]) {
                     std::u16string savPath = outpath + util::toUtf16(".bin");
                     fs::copyFile(fs::getSaveArch(), util::toUtf16("原始 GBAVC 存档数据"), fs::getSDMCArch(), savPath, false, true, NULL);
                 }
@@ -1053,7 +1053,7 @@ void fs::backupTitles_t(void *a)
             util::createTitleDir(vect[i], mode);
             std::u16string outpath = util::createPath(vect[i], mode) + util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
 
-            if(std::get<bool>(cfg::config["zip"]))
+            if(cfg::config["zip"])
             {
                 std::u16string fullOut = outpath + util::toUtf16(".zip");
                 std::u16string svOut = fullOut + util::toUtf16(".sv");

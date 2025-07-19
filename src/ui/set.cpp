@@ -28,9 +28,19 @@
 
 static ui::menu setMenu, setSubMenu;
 static bool setSubMenuOpen = false;
-static bool anySettingChanged = false;
-static bool cheatdbLangChanged = false;
-static int cheatdbLangVal;
+
+static std::unordered_map<std::string, u8> sconfig;
+static bool anySettingChanged(const std::unordered_map<std::string, u8>& newSettings) {
+    bool changed = false;
+    for (const auto& [key, newValue] : newSettings) {
+        auto it = sconfig.find(key);
+        if (it == sconfig.end() || it->second != newValue) {
+            changed = true;
+            break;
+        }
+    }
+    return changed;
+}
 
 static void toggleBool(void *b)
 {
@@ -39,8 +49,6 @@ static void toggleBool(void *b)
         *in = false;
     else
         *in = true;
-
-    if (!anySettingChanged) anySettingChanged = true;
 }
 
 static void toggleUInt(void *b, int step, int max, const std::vector<int>& blacklist = {})
@@ -57,8 +65,6 @@ static void toggleUInt(void *b, int step, int max, const std::vector<int>& black
 
     if (*in < 0)
         *in = max;
-
-    if (!anySettingChanged) anySettingChanged = true;
 }
 
 static std::string getLightDarkText(const bool& g)
@@ -264,7 +270,6 @@ static void setMenuToggleDriveBOOL_t(void *a)
     t->status->setStatus("正在保存设置...");
     toggleBool(t->argPtr);
     cfg::saveDrive();
-    anySettingChanged = false;
     svcSleepThread(1e+9 / 4);
     t->lock();
     t->argPtr = NULL;
@@ -283,14 +288,10 @@ static void setMenuSaveCommon(void *a)
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在保存设置...");
     cfg::saveCommon();
-    if (cheatdbLangChanged && cheatdbLangVal != std::get<int>(cfg::config["cheatdblang"]))
-    {
-        cheatdbLangVal = std::get<int>(cfg::config["cheatdblang"]);
-        if (!util::fexists("/TYSS/cheats.json") && CheatManager::getInstance().cheats())
-            CheatManager::getInstance().reset();
-    }
-    cheatdbLangChanged = false;
-    anySettingChanged = false;
+    if (sconfig["cheatdblang"] != cfg::config["cheatdblang"] &&
+        !util::fexists("/TYSS/cheats.json") && CheatManager::getInstance().cheats())
+        CheatManager::getInstance().reset();
+    sconfig = cfg::config;
     svcSleepThread(1e+9 / 4);
     t->finished = true;
 }
@@ -303,7 +304,7 @@ static void setMenuToggleBOOL(void *a)
 static void setMenuToggleColor(void *a)
 {
     toggleBool(a);
-    gfx::setColor(std::get<bool>(cfg::config["lightback"]));
+    gfx::setColor(cfg::config["lightback"]);
 }
 
 static void setMenuIncreaseDeflateLevel(void *a)
@@ -339,7 +340,6 @@ static void setMenuDecreaseUILang(void *a)
 static void setMenuToggleCheatLang(void *a)
 {
     toggleUInt(a, 1, 1);
-    cheatdbLangChanged = true;
 }
 
 static void setSubMenuCallback(void *a)
@@ -356,40 +356,40 @@ static void setSubMenuCallback(void *a)
 void ui::setInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
+    sconfig = cfg::config;
 
     setMenu.addOpt("重载 Titles", 320);
     setMenu.addOptEvent(0, KEY_A, setMenuReloadTitles, NULL);
 
     setMenu.addOpt("导出到 ZIP", 320);
-    setMenu.addOptEvent(1, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["zip"]));
+    setMenu.addOptEvent(1, KEY_A, setMenuToggleBOOL, &cfg::config["zip"]);
 
     setMenu.addOpt("ZIP 压缩等级", 320);
-    setMenu.addOptEvent(2, KEY_B, setMenuDecreaseDeflateLevel, &std::get<int>(cfg::config["deflateLevel"]));
-    setMenu.addOptEvent(2, KEY_A, setMenuIncreaseDeflateLevel, &std::get<int>(cfg::config["deflateLevel"]));
+    setMenu.addOptEvent(2, KEY_B, setMenuDecreaseDeflateLevel, &cfg::config["deflateLevel"]);
+    setMenu.addOptEvent(2, KEY_A, setMenuIncreaseDeflateLevel, &cfg::config["deflateLevel"]);
 
     setMenu.addOpt("界面主题色", 320);
-    setMenu.addOptEvent(3, KEY_A, setMenuToggleColor, &std::get<bool>(cfg::config["lightback"]));
+    setMenu.addOptEvent(3, KEY_A, setMenuToggleColor, &cfg::config["lightback"]);
 
     setMenu.addOpt("界面语言", 320);
-    setMenu.addOptEvent(4, KEY_B, setMenuDecreaseUILang, &std::get<int>(cfg::config["uilang"]));
-    setMenu.addOptEvent(4, KEY_A, setMenuIncreaseUILang, &std::get<int>(cfg::config["uilang"]));
+    setMenu.addOptEvent(4, KEY_B, setMenuDecreaseUILang, &cfg::config["uilang"]);
+    setMenu.addOptEvent(4, KEY_A, setMenuIncreaseUILang, &cfg::config["uilang"]);
 
     setMenu.addOpt("应用标题语言", 320);
-    setMenu.addOptEvent(5, KEY_B, setMenuDecreaseTitleLang, &std::get<int>(cfg::config["titlelang"]));
-    setMenu.addOptEvent(5, KEY_A, setMenuIncreaseTitleLang, &std::get<int>(cfg::config["titlelang"]));
+    setMenu.addOptEvent(5, KEY_B, setMenuDecreaseTitleLang, &cfg::config["titlelang"]);
+    setMenu.addOptEvent(5, KEY_A, setMenuIncreaseTitleLang, &cfg::config["titlelang"]);
 
     setMenu.addOpt("内置金手指数据库语言", 320);
-    setMenu.addOptEvent(6, KEY_A, setMenuToggleCheatLang, &std::get<int>(cfg::config["cheatdblang"]));
-    cheatdbLangVal = std::get<int>(cfg::config["cheatdblang"]);
+    setMenu.addOptEvent(6, KEY_A, setMenuToggleCheatLang, &cfg::config["cheatdblang"]);
 
     setMenu.addOpt("金手指数据库载入时机", 320);
-    setMenu.addOptEvent(7, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["bootwithcheatdb"]));
+    setMenu.addOptEvent(7, KEY_A, setMenuToggleBOOL, &cfg::config["bootwithcheatdb"]);
 
     setMenu.addOpt("GBAVC存档备份成功时保留原始数据", 320);
-    setMenu.addOptEvent(8, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["rawvcsave"]));
+    setMenu.addOptEvent(8, KEY_A, setMenuToggleBOOL, &cfg::config["rawvcsave"]);
 
     setMenu.addOpt("切换LR按键功能", 320);
-    setMenu.addOptEvent(9, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["swaplrfunc"]));
+    setMenu.addOptEvent(9, KEY_A, setMenuToggleBOOL, &cfg::config["swaplrfunc"]);
 
 #ifdef ENABLE_DRIVE
     if(util::fexists("/TYSS/drive.json"))
@@ -462,24 +462,24 @@ void ui::setUpdate()
 
         if (down & KEY_PAGE_LEFT)
         {
-            if (anySettingChanged) ui::newThread(setMenuSaveCommon, NULL, NULL);
+            if (anySettingChanged(cfg::config)) ui::newThread(setMenuSaveCommon, NULL, NULL);
             ui::state = SHR;
         }
         else if (down & KEY_PAGE_RIGHT)
         {
-            if (anySettingChanged) ui::newThread(setMenuSaveCommon, NULL, NULL);
+            if (anySettingChanged(cfg::config)) ui::newThread(setMenuSaveCommon, NULL, NULL);
             ui::state = USR;
         }
 
-        setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(std::get<bool>(cfg::config["zip"])));
-        setMenu.editOpt(2, getDeflateLevelText(std::get<int>(cfg::config["deflateLevel"])));
-        setMenu.editOpt(3, "界面主题色: " + getLightDarkText(std::get<bool>(cfg::config["lightback"])));
-        setMenu.editOpt(4, getUILangText(std::get<int>(cfg::config["uilang"])));
-        setMenu.editOpt(5, getTitleLangText(std::get<int>(cfg::config["titlelang"])));
-        setMenu.editOpt(6, getCheatLangText(std::get<int>(cfg::config["cheatdblang"])));
-        setMenu.editOpt(7, "金手指数据库载入时机: " + getCheatDBText(std::get<bool>(cfg::config["bootwithcheatdb"])));
-        setMenu.editOpt(8, "GBAVC存档备份成功时保留原始数据: " + getBoolText(std::get<bool>(cfg::config["rawvcsave"])));
-        setMenu.editOpt(9, "切换LR按键功能: " + getBoolText(std::get<bool>(cfg::config["swaplrfunc"])));
+        setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(cfg::config["zip"]));
+        setMenu.editOpt(2, getDeflateLevelText(cfg::config["deflateLevel"]));
+        setMenu.editOpt(3, "界面主题色: " + getLightDarkText(cfg::config["lightback"]));
+        setMenu.editOpt(4, getUILangText(cfg::config["uilang"]));
+        setMenu.editOpt(5, getTitleLangText(cfg::config["titlelang"]));
+        setMenu.editOpt(6, getCheatLangText(cfg::config["cheatdblang"]));
+        setMenu.editOpt(7, "金手指数据库载入时机: " + getCheatDBText(cfg::config["bootwithcheatdb"]));
+        setMenu.editOpt(8, "GBAVC存档备份成功时保留原始数据: " + getBoolText(cfg::config["rawvcsave"]));
+        setMenu.editOpt(9, "切换LR按键功能: " + getBoolText(cfg::config["swaplrfunc"]));
 #ifdef ENABLE_DRIVE
         if(util::fexists("/TYSS/drive.json"))
             setMenu.editOpt(setMenu.getCount() - 2, "云端存储服务随软件启动: " + getBoolText(cfg::driveInitOnBoot));
@@ -529,7 +529,7 @@ void ui::setDrawBottom()
                 setOptsDesc = "以何种语言显示应用程序标题。\n这将影响存放应用程序数据备份的文件夹名称,\n一经设置不建议再修改,并且需要重载Titles才生效!";
                 break;
             case 6:
-                setOptsDesc = "选择内置金手指数据库语言(目前仅支持简中与英语)\n软件优先加载TYSS文件夹中外置金手指数据库文件\ncheats.json,该选项仅决定内置金手指数据库语言,\n当外置数据库存在时无效!";
+                setOptsDesc = "选择内置金手指数据库语言(目前仅支持简中与英语)\n软件优先加载TYSS文件夹中外置金手指数据库文件\ncheats.json,该选项仅决定内置金手指数据库语言,\n当外置数据库存在时无效!\n该项设置更改时,已载入的金手指数据库会被卸载,\n并且将在需要使用时重载!";
                 break;
             case 7:
                 setOptsDesc = "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将增加。";

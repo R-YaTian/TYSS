@@ -51,7 +51,7 @@ ui::progressBar *ui::prog;
 static ui::threadProcMngr *thrdMgr;
 static ui::button *ok, *yes, *no;
 
-const std::string TITLE_TEXT = "TY Save Studio - v1.0.7 ";
+const std::string TITLE_TEXT = "TY Save Studio - v1.0.8 ";
 
 uint32_t ui::down = 0, ui::held = 0;
 touchPosition ui::pos;
@@ -64,7 +64,7 @@ void ui::init()
     no  = new ui::button("否 \ue001", 168, 184, 120, 32);
     prog = new ui::progressBar(100);
 
-    gfx::setColor(std::get<bool>(cfg::config["lightback"]));
+    gfx::setColor(cfg::config["lightback"]);
 }
 
 void ui::exit()

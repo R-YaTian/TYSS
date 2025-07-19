@@ -28,19 +28,21 @@ std::string cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg:
 bool cfg::driveInitOnBoot = true;
 #endif
 
-std::unordered_map<std::string, CFGVarType> cfg::config;
+#define TYSS_CFG_VER 2
+
+std::unordered_map<std::string, u8> cfg::config;
 
 void cfg::initToDefault()
 {
     u8 syslang = CFG_LANGUAGE_EN;
     CFGU_GetSystemLanguage(&syslang);
 
-    cfg::config["zip"] = false;
+    cfg::config["zip"] = (u8) false;
     cfg::config["deflateLevel"] = 1;
-    cfg::config["lightback"] = false;
-    cfg::config["rawvcsave"] = false;
-    cfg::config["bootwithcheatdb"] = false;
-    cfg::config["swaplrfunc"] = false;
+    cfg::config["lightback"] = (u8) false;
+    cfg::config["rawvcsave"] = (u8) false;
+    cfg::config["bootwithcheatdb"] = (u8) false;
+    cfg::config["swaplrfunc"] = (u8) false;
     cfg::config["titlelang"] = syslang;
     cfg::config["uilang"] = (syslang == CFG_LANGUAGE_ZH ? 0 : 1);
     cfg::config["cheatdblang"] = (syslang == CFG_LANGUAGE_ZH ? 0 : 1);
@@ -51,34 +53,37 @@ void cfg::load()
     FILE *cfgIn = fopen("/TYSS/cfg.bin", "rb");
     if(cfgIn)
     {
-        bool getBool = false;
-        fread(&getBool, sizeof(bool), 1, cfgIn);
-        cfg::config["zip"] = getBool;
+        u8 getVal = 0;
+        fread(&getVal, sizeof(u8), 1, cfgIn);
+        if (TYSS_CFG_VER == getVal)
+        {
+            fread(&getVal, sizeof(u8), 1, cfgIn);
+            cfg::config["zip"] = getVal;
 
-        int getInt = 0;
-        fread(&getInt, sizeof(int), 1, cfgIn);
-        cfg::config["deflateLevel"] = getInt;
+            fread(&getVal, sizeof(u8), 1, cfgIn);
+            cfg::config["deflateLevel"] = getVal;
 
-        fread(&getBool, sizeof(bool), 1, cfgIn);
-        cfg::config["lightback"] = getBool;
+            fread(&getVal, sizeof(u8), 1, cfgIn);
+            cfg::config["lightback"] = getVal;
 
-        fread(&getBool, sizeof(bool), 1, cfgIn);
-        cfg::config["rawvcsave"] = getBool;
+            fread(&getVal, sizeof(u8), 1, cfgIn);
+            cfg::config["rawvcsave"] = getVal;
 
-        fread(&getBool, sizeof(bool), 1, cfgIn);
-        cfg::config["bootwithcheatdb"] = getBool;
+            fread(&getVal, sizeof(u8), 1, cfgIn);
+            cfg::config["bootwithcheatdb"] = getVal;
 
-        fread(&getBool, sizeof(bool), 1, cfgIn);
-        cfg::config["swaplrfunc"] = getBool;
+            fread(&getVal, sizeof(u8), 1, cfgIn);
+            cfg::config["swaplrfunc"] = getVal;
 
-        fread(&getInt, sizeof(int), 1, cfgIn);
-        cfg::config["titlelang"] = getInt;
+            fread(&getVal, sizeof(u8), 1, cfgIn);
+            cfg::config["titlelang"] = getVal;
 
-        fread(&getInt, sizeof(int), 1, cfgIn);
-        cfg::config["uilang"] = getInt;
+            fread(&getVal, sizeof(u8), 1, cfgIn);
+            cfg::config["uilang"] = getVal;
 
-        fread(&getInt, sizeof(int), 1, cfgIn);
-        cfg::config["cheatdblang"] = getInt;
+            fread(&getVal, sizeof(u8), 1, cfgIn);
+            cfg::config["cheatdblang"] = getVal;
+        }
 
         fclose(cfgIn);
     }
@@ -122,15 +127,17 @@ void cfg::saveCommon()
     FILE *cfgOut = fopen("/TYSS/cfg.bin", "wb");
     if(cfgOut)
     {
-        fwrite(&std::get<bool>(cfg::config["zip"]), sizeof(bool), 1, cfgOut);
-        fwrite(&std::get<int>(cfg::config["deflateLevel"]), sizeof(int), 1, cfgOut);
-        fwrite(&std::get<bool>(cfg::config["lightback"]), sizeof(bool), 1, cfgOut);
-        fwrite(&std::get<bool>(cfg::config["rawvcsave"]), sizeof(bool), 1, cfgOut);
-        fwrite(&std::get<bool>(cfg::config["bootwithcheatdb"]), sizeof(bool), 1, cfgOut);
-        fwrite(&std::get<bool>(cfg::config["swaplrfunc"]), sizeof(bool), 1, cfgOut);
-        fwrite(&std::get<int>(cfg::config["titlelang"]), sizeof(int), 1, cfgOut);
-        fwrite(&std::get<int>(cfg::config["uilang"]), sizeof(int), 1, cfgOut);
-        fwrite(&std::get<int>(cfg::config["cheatdblang"]), sizeof(int), 1, cfgOut);
+        u8 cfgver = TYSS_CFG_VER;
+        fwrite(&cfgver, sizeof(u8), 1, cfgOut);
+        fwrite(&cfg::config["zip"], sizeof(u8), 1, cfgOut);
+        fwrite(&cfg::config["deflateLevel"], sizeof(u8), 1, cfgOut);
+        fwrite(&cfg::config["lightback"], sizeof(u8), 1, cfgOut);
+        fwrite(&cfg::config["rawvcsave"], sizeof(u8), 1, cfgOut);
+        fwrite(&cfg::config["bootwithcheatdb"], sizeof(u8), 1, cfgOut);
+        fwrite(&cfg::config["swaplrfunc"], sizeof(u8), 1, cfgOut);
+        fwrite(&cfg::config["titlelang"], sizeof(u8), 1, cfgOut);
+        fwrite(&cfg::config["uilang"], sizeof(u8), 1, cfgOut);
+        fwrite(&cfg::config["cheatdblang"], sizeof(u8), 1, cfgOut);
         fclose(cfgOut);
     }
 }
