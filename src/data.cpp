@@ -183,6 +183,7 @@ static C3D_Tex *loadIcon(smdh_s *smdh)
 
 void data::init()
 {
+    CheatManager::getInstance();
 }
 
 void data::exit()
@@ -609,7 +610,7 @@ void data::loadCheatsDB(void *a)
     t->status->setStatus("正在加载金手指数据库...");
 
     auto future = std::async(std::launch::async, []() {
-        CheatManager::getInstance(); // Initialize the cheats db
+        CheatManager::getInstance().init(); // Initialize the cheats db
     });
     future.get();
 

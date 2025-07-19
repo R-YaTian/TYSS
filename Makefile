@@ -45,7 +45,7 @@ APP_DESCRIPTION :=	3DS Save Studio
 
 VERSION_MAJOR	:=	1
 VERSION_MINOR	:=	0
-VERSION_MICRO	:=	6
+VERSION_MICRO	:=	7
 MAKEROM_VERARGS := -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO)
 APP_VERSION		:= v$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_MICRO)
 
@@ -187,7 +187,7 @@ ifeq ($(OS),Windows_NT)
 else
 	@cd Sharkive && python3 joiner.py
 endif
-	@cd Sharkive/$(BUILD) && mv 3ds_chs.json.zip ../../$(ROMFS)/cheats/cheats.json.zip
+	@cd Sharkive/$(BUILD) && mv 3ds_chs.json.zip ../../$(ROMFS)/cheats/cheats00.json.zip && mv 3ds_eng.json.zip ../../$(ROMFS)/cheats/cheats01.json.zip
 
 $(TARGET)-strip.elf: $(BUILD)
 	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf

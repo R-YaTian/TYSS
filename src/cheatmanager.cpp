@@ -48,39 +48,12 @@
 CheatManager::CheatManager(void)
 {
     mCheats = nullptr;
-    if (util::fexists("/TYSS/cheats.json")) {
-        const std::string path = "/TYSS/cheats.json";
-        FILE* in               = fopen(path.c_str(), "rt");
-        if (in != NULL) {
-            mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(in, nullptr, false));
-            fclose(in);
-        }
-    } else {
-        const std::string path = "romfs:/cheats/cheats.json.zip";
-        // load compressed archive in memory
-        unzFile zipFile = unzOpen64(path.c_str());
-        if (zipFile != nullptr)
-        {
-            if (unzGoToFirstFile(zipFile) == UNZ_OK)
-            {
-                char filename[0x301];
-                unz_file_info64 info;
-                memset(filename, 0, 0x301);
-                unzGetCurrentFileInfo64(zipFile, &info, filename, 0x300, NULL, 0, NULL, 0);
-                if (unzOpenCurrentFile(zipFile) == UNZ_OK) {
-                    std::vector<char> buffer(info.uncompressed_size + 1, 0);
-                    int bytesRead = unzReadCurrentFile(zipFile, buffer.data(), info.uncompressed_size);
-                    if (bytesRead == static_cast<int>(info.uncompressed_size))
-                        mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(buffer.data()));
-                }
-            }
-            unzClose(zipFile);
-        }
-    }
 }
 
 bool CheatManager::areCheatsAvailable(const std::string& key)
 {
+    if (!mCheats || mCheats->empty())
+        return false;
     return mCheats->find(key) != mCheats->end();
 }
 
@@ -111,4 +84,48 @@ bool CheatManager::install(const std::string& key)
     }
 
     return false;
+}
+
+void CheatManager::init()
+{
+    if (util::fexists("/TYSS/cheats.json")) {
+        const std::string path = "/TYSS/cheats.json";
+        FILE* in               = fopen(path.c_str(), "rt");
+        if (in != NULL) {
+            mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(in, nullptr, false));
+            fclose(in);
+        }
+    } else {
+        loadBuiltIn();
+    } 
+}
+
+void CheatManager::reset()
+{
+    mCheats.reset();
+}
+
+void CheatManager::loadBuiltIn()
+{
+    char path[64];
+    std::snprintf(path, sizeof(path), "romfs:/cheats/cheats%02d.json.zip", std::get<int>(cfg::config["cheatdblang"]));
+    // load compressed archive in memory
+    unzFile zipFile = unzOpen64(path);
+    if (zipFile != nullptr)
+    {
+        if (unzGoToFirstFile(zipFile) == UNZ_OK)
+        {
+            char filename[0x301];
+            unz_file_info64 info;
+            memset(filename, 0, 0x301);
+            unzGetCurrentFileInfo64(zipFile, &info, filename, 0x300, NULL, 0, NULL, 0);
+            if (unzOpenCurrentFile(zipFile) == UNZ_OK) {
+                std::vector<char> buffer(info.uncompressed_size + 1, 0);
+                int bytesRead = unzReadCurrentFile(zipFile, buffer.data(), info.uncompressed_size);
+                if (bytesRead == static_cast<int>(info.uncompressed_size))
+                    mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(buffer.data()));
+            }
+        }
+        unzClose(zipFile);
+    } 
 }

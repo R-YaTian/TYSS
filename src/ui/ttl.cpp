@@ -190,12 +190,13 @@ static void ttlOptManageCheats_t(void *a)
         return;
     }
 
-    data::loadCheatsDB(a);
+    if (!CheatManager::getInstance().cheats())
+        data::loadCheatsDB(a);
 
     if (util::fexists("/cheats/" + key + ".txt")) {
         std::string q = "该应用的金手指文件已安装, 是否删除?";
         ui::confirm(q, ttlOptDeleteCheats_t, NULL, NULL);
-    } else if (CheatManager::getInstance().cheats() != nullptr && CheatManager::getInstance().areCheatsAvailable(key)) {
+    } else if (CheatManager::getInstance().areCheatsAvailable(key)) {
         std::string q = "你确定要为 " + util::toUtf8(title->getTitle()) + " 安装金手指文件?";
         ui::confirm(q, ttlOptInstallCheats_t, NULL, NULL);
     } else {

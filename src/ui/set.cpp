@@ -24,10 +24,13 @@
 #include "fs.h"
 #include "util.h"
 #include "misc.h"
+#include "cheatmanager.h"
 
 static ui::menu setMenu, setSubMenu;
 static bool setSubMenuOpen = false;
 static bool anySettingChanged = false;
+static bool cheatdbLangChanged = false;
+static int cheatdbLangVal;
 
 static void toggleBool(void *b)
 {
@@ -133,7 +136,7 @@ static std::string getTitleLangText(const int& g)
 
 static std::string getCheatLangText(const int& g)
 {
-    std::string s = "金手指数据库语言: ";
+    std::string s = "内置金手指数据库语言: ";
 
     if (g == 0)
         s += "简体中文";
@@ -280,6 +283,13 @@ static void setMenuSaveCommon(void *a)
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus("正在保存设置...");
     cfg::saveCommon();
+    if (cheatdbLangChanged && cheatdbLangVal != std::get<int>(cfg::config["cheatdblang"]))
+    {
+        cheatdbLangVal = std::get<int>(cfg::config["cheatdblang"]);
+        if (!util::fexists("/TYSS/cheats.json") && CheatManager::getInstance().cheats())
+            CheatManager::getInstance().reset();
+    }
+    cheatdbLangChanged = false;
     anySettingChanged = false;
     svcSleepThread(1e+9 / 4);
     t->finished = true;
@@ -329,6 +339,7 @@ static void setMenuDecreaseUILang(void *a)
 static void setMenuToggleCheatLang(void *a)
 {
     toggleUInt(a, 1, 1);
+    cheatdbLangChanged = true;
 }
 
 static void setSubMenuCallback(void *a)
@@ -367,8 +378,9 @@ void ui::setInit(void *a)
     setMenu.addOptEvent(5, KEY_B, setMenuDecreaseTitleLang, &std::get<int>(cfg::config["titlelang"]));
     setMenu.addOptEvent(5, KEY_A, setMenuIncreaseTitleLang, &std::get<int>(cfg::config["titlelang"]));
 
-    setMenu.addOpt("金手指数据库语言", 320);
+    setMenu.addOpt("内置金手指数据库语言", 320);
     setMenu.addOptEvent(6, KEY_A, setMenuToggleCheatLang, &std::get<int>(cfg::config["cheatdblang"]));
+    cheatdbLangVal = std::get<int>(cfg::config["cheatdblang"]);
 
     setMenu.addOpt("金手指数据库载入时机", 320);
     setMenu.addOptEvent(7, KEY_A, setMenuToggleBOOL, &std::get<bool>(cfg::config["bootwithcheatdb"]));
@@ -517,7 +529,7 @@ void ui::setDrawBottom()
                 setOptsDesc = "以何种语言显示应用程序标题。\n这将影响存放应用程序数据备份的文件夹名称,\n一经设置不建议再修改,并且需要重载Titles才生效!";
                 break;
             case 6:
-                setOptsDesc = "选择金手指数据库语言(目前仅支持简体中文与英语)";
+                setOptsDesc = "选择内置金手指数据库语言(目前仅支持简中与英语)\n软件优先加载TYSS文件夹中外置金手指数据库文件\ncheats.json,该选项仅决定内置金手指数据库语言,\n当外置数据库存在时无效!";
                 break;
             case 7:
                 setOptsDesc = "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将增加。";

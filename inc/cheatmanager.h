@@ -60,6 +60,10 @@ public:
         return mCheatManager;
     }
 
+    void init();
+    void loadBuiltIn();
+    void reset();
+
     bool areCheatsAvailable(const std::string& key);
     bool install(const std::string& key);
 
