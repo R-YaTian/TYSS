@@ -638,51 +638,10 @@ void data::loadTitles(void *a)
 
     if(!readCache(titles, titlePath))
     {
-        uint32_t count = 0;
-        AM_GetTitleCount(MEDIATYPE_SD, &count);
-
-        uint64_t *ids = new uint64_t[count];
-        AM_GetTitleList(NULL, MEDIATYPE_SD, count, ids);
-
-        for(unsigned i = 0; i < count; i++)
-        {
-            if(checkHigh(ids[i]) && !isBlacklisted(ids[i]))
-            {
-                char tmp[16];
-                AM_GetTitleProductCode(MEDIATYPE_SD, ids[i], tmp);
-                titleData newTitle;
-                if (strncmp(tmp, "AGB-", 4) == 0 || strncmp(tmp, "GBA-", 4) == 0) {
-                    if(newTitle.init(ids[i], MEDIATYPE_SD, true) && newTitle.hasSaveData())
-                        titles.push_back(newTitle);
-                } else {
-                    if(newTitle.init(ids[i], MEDIATYPE_SD) && newTitle.hasSaveData())
-                        titles.push_back(newTitle);
-                }
-            }
-        }
-        delete[] ids;
-
-        //Load NAND too now
-        AM_GetTitleCount(MEDIATYPE_NAND, &count);
-
-        ids = new uint64_t[count];
-        AM_GetTitleList(NULL, MEDIATYPE_NAND, count, ids);
-        for(unsigned i = 0; i < count; i++)
-        {
-            if (!isBlacklisted(ids[i]))
-            {
-                titleData newNandTitle;
-                if (((ids[i] >> 44) & 0x08) == 0x08) {
-                    if (newNandTitle.initTWL(ids[i], MEDIATYPE_NAND)
-                        && newNandTitle.hasSaveData()
-                        && !newNandTitle.getTitle().empty())
-                        titles.push_back(newNandTitle);
-                } else if (newNandTitle.init(ids[i], MEDIATYPE_NAND) &&
-                           newNandTitle.hasSaveData() && !newNandTitle.getTitle().empty())
-                    titles.push_back(newNandTitle);
-            }
-        }
-        delete[] ids;
+        auto future = std::async(std::launch::async, [&]() {
+            scanTitles(titles);
+        });
+        future.get();
 
         t->status->setStatus("正在写入缓存...");
         createCache(titles, titlePath);
@@ -722,6 +681,55 @@ void data::loadTitles(void *a)
         if (cartValid) cartValid = false;
     }
     t->finished = true;
+}
+
+void data::scanTitles(std::vector<titleData>& titles)
+{
+    uint32_t count = 0;
+    AM_GetTitleCount(MEDIATYPE_SD, &count);
+
+    uint64_t *ids = new uint64_t[count];
+    AM_GetTitleList(NULL, MEDIATYPE_SD, count, ids);
+
+    for(unsigned i = 0; i < count; i++)
+    {
+        if(checkHigh(ids[i]) && !isBlacklisted(ids[i]))
+        {
+            char tmp[16];
+            AM_GetTitleProductCode(MEDIATYPE_SD, ids[i], tmp);
+            titleData newTitle;
+            if (strncmp(tmp, "AGB-", 4) == 0 || strncmp(tmp, "GBA-", 4) == 0) {
+                if(newTitle.init(ids[i], MEDIATYPE_SD, true) && newTitle.hasSaveData())
+                    titles.push_back(newTitle);
+            } else {
+                if(newTitle.init(ids[i], MEDIATYPE_SD) && newTitle.hasSaveData())
+                    titles.push_back(newTitle);
+            }
+        }
+    }
+    delete[] ids;
+
+    //Load NAND too now
+    AM_GetTitleCount(MEDIATYPE_NAND, &count);
+
+    ids = new uint64_t[count];
+    AM_GetTitleList(NULL, MEDIATYPE_NAND, count, ids);
+    for(unsigned i = 0; i < count; i++)
+    {
+        if (!isBlacklisted(ids[i]))
+        {
+            titleData newNandTitle;
+            if (((ids[i] >> 44) & 0x08) == 0x08) {
+                if (newNandTitle.initTWL(ids[i], MEDIATYPE_NAND)
+                    && newNandTitle.hasSaveData()
+                    && !newNandTitle.getTitle().empty())
+                    titles.push_back(newNandTitle);
+            } else if (newNandTitle.init(ids[i], MEDIATYPE_NAND) &&
+                        newNandTitle.hasSaveData() && !newNandTitle.getTitle().empty())
+                titles.push_back(newNandTitle);
+        }
+    }
+    delete[] ids;
 }
 
 void data::deleteExtData(void *a)

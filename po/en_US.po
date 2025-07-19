@@ -1,0 +1,70 @@
+# English translations for TYSS package.
+# Copyright (C) 2025 R-YaTian
+# This file is distributed under the same license as the TYSS package.
+# Automatically generated, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: TYSS v1.0.9\n"
+"Report-Msgid-Bugs-To: gmtianya@gmail.com\n"
+"POT-Creation-Date: 2025-07-19 18:21+0800\n"
+"PO-Revision-Date: 2025-07-19 18:21+0800\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:72
+msgid "浅色系"
+msgstr "Light"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:72
+msgid "深色系"
+msgstr "Dark"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:77
+msgid "启动时"
+msgstr "On Boot"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:77
+msgid "按需"
+msgstr "When Needed"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:82
+msgid "开"
+msgstr "On"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:82
+msgid "关"
+msgstr "Off"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:87
+msgid "界面语言: "
+msgstr "UI Language: "
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:99
+msgid "应用标题语言: "
+msgstr "Application Title Language: "
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:145
+msgid "内置金手指数据库语言: "
+msgstr "Built-in Cheat Database Language: "
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:157
+msgid "ZIP 压缩等级: "
+msgstr "ZIP Deflate Level: "
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:162
+msgid " (最快速度)"
+msgstr " (Fastest)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:164
+msgid " (标准压缩)"
+msgstr " (Normal)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:166
+msgid " (极限压缩)"
+msgstr " (Best Compression)"

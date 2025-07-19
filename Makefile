@@ -45,7 +45,7 @@ APP_DESCRIPTION :=	3DS Save Studio
 
 VERSION_MAJOR	:=	1
 VERSION_MINOR	:=	0
-VERSION_MICRO	:=	8
+VERSION_MICRO	:=	9
 MAKEROM_VERARGS := -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO)
 APP_VERSION		:= v$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_MICRO)
 
@@ -172,13 +172,13 @@ endif
 .PHONY: all clean cheats pot mo
 
 #---------------------------------------------------------------------------------
-all: cheats $(ROMFS_T3XFILES) $(T3XHFILES)
+all: cheats mo $(ROMFS_T3XFILES) $(T3XHFILES)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(GFXBUILD) $(ROMFS)/cheats $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET)-strip.elf $(TARGET).cia $(TARGET)_mode3.cia
+	@rm -fr $(BUILD) $(GFXBUILD) $(ROMFS)/cheats $(ROMFS)/locale $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET)-strip.elf $(TARGET).cia $(TARGET)_mode3.cia
 
 cheats:
 	@mkdir -p $(BUILD) $(ROMFS)/cheats

@@ -41,6 +41,7 @@ int main(int argc, const char *argv[])
     fs::init();
     cfg::initToDefault();
     cfg::load();
+    cfg::setUILanguage(cfg::config["uilang"]);
     ui::init();
 
 #ifdef ENABLE_DRIVE

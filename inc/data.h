@@ -117,6 +117,7 @@ namespace data
     smdh_s *loadSMDH(const uint32_t& low, const uint32_t& high, const uint8_t& media);
     void loadCheatsDB(void *a);
     void loadTitles(void *a);
+    void scanTitles(std::vector<titleData>& titles);
     void deleteExtData(void *a);
 
     void loadBlacklist();
@@ -130,19 +131,19 @@ namespace data
     void favAdd(titleData& t);
     void favRem(titleData& t);
 
-    //Reads icon to C2D_image
+    // Reads icon to C2D_image
     C2D_Image readIconFromSMDH(smdh_s *smdh);
     C2D_Image readDSIcon(const u8* banner);
 
-    //Writes title data cache to path
+    // Writes title data cache to path
     bool readCache(std::vector<titleData>& vect, const std::string& path);
     void createCache(std::vector<titleData>& vect, const std::string& path);
 
-    //Just functions to draw while data load thread runs
+    // Just functions to draw while data load thread runs
     void datDrawTop();
     void datDrawBot();
 
-    //For fav feat
+    // For fav feat
     int findTitleNewIndex(std::vector<titleData>& _t, const uint64_t& tid);
 }
 

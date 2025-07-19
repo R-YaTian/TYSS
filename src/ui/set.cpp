@@ -69,22 +69,22 @@ static void toggleUInt(void *b, int step, int max, const std::vector<int>& black
 
 static std::string getLightDarkText(const bool& g)
 {
-    return g ? "浅色系" : "深色系";
+    return g ? getTextFromMap("浅色系") : getTextFromMap("深色系");
 }
 
 static std::string getCheatDBText(const bool& g)
 {
-    return g ? "启动时" : "按需";
+    return g ? getTextFromMap("启动时") : getTextFromMap("按需");
 }
 
 static std::string getBoolText(const bool& g)
 {
-    return g ? "开" : "关";
+    return g ? getTextFromMap("开") : getTextFromMap("关");
 }
 
 static std::string getUILangText(const int& g)
 {
-    std::string s = "界面语言: ";
+    std::string s = getTextFromMap("界面语言: ");
 
     if (g == 0)
         s += "简体中文";
@@ -96,7 +96,7 @@ static std::string getUILangText(const int& g)
 
 static std::string getTitleLangText(const int& g)
 {
-    std::string s = "应用标题语言: ";
+    std::string s = getTextFromMap("应用标题语言: ");
 
     switch (g) {
     case CFG_LANGUAGE_JP:
@@ -142,7 +142,7 @@ static std::string getTitleLangText(const int& g)
 
 static std::string getCheatLangText(const int& g)
 {
-    std::string s = "内置金手指数据库语言: ";
+    std::string s = getTextFromMap("内置金手指数据库语言: ");
 
     if (g == 0)
         s += "简体中文";
@@ -154,16 +154,16 @@ static std::string getCheatLangText(const int& g)
 
 static std::string getDeflateLevelText(const int& g)
 {
-    std::string s = "ZIP 压缩等级: ";
+    std::string s = getTextFromMap("ZIP 压缩等级: ");
 
     s += std::to_string(g);
 
     if (g == 1)
-        s += " (最快速度)";
+        s += getTextFromMap(" (最快速度)");
     else if (g == 6)
-        s += " (标准压缩)";
+        s += getTextFromMap(" (标准压缩)");
     else if (g == 9)
-        s += " (极限压缩)";
+        s += getTextFromMap(" (极限压缩)");
 
     return s;
 }
@@ -330,11 +330,13 @@ static void setMenuDecreaseTitleLang(void *a)
 static void setMenuIncreaseUILang(void *a)
 {
     toggleUInt(a, 1, 1);
+    cfg::setUILanguage(*(int*)a);
 }
 
 static void setMenuDecreaseUILang(void *a)
 {
     toggleUInt(a, -1, 1);
+    cfg::setUILanguage(*(int*)a);
 }
 
 static void setMenuToggleCheatLang(void *a)

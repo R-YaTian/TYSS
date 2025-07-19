@@ -21,6 +21,7 @@
 
 #include "cfg.h"
 #include "fs.h"
+#include "3dsgettext.h"
 
 #ifdef ENABLE_DRIVE
 #include "json.h"
@@ -46,6 +47,19 @@ void cfg::initToDefault()
     cfg::config["titlelang"] = syslang;
     cfg::config["uilang"] = (syslang == CFG_LANGUAGE_ZH ? 0 : 1);
     cfg::config["cheatdblang"] = (syslang == CFG_LANGUAGE_ZH ? 0 : 1);
+}
+
+void cfg::setUILanguage(u8 langIndex)
+{
+    switch(langIndex)
+    {
+        case 1:
+            setLanguage("en_US");
+            break;
+        default:
+            setLanguage("zh_Hans");
+            break;
+    }
 }
 
 void cfg::load()

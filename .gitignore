@@ -11,3 +11,5 @@ adrivehelper/target
 *.smdh
 3dslink.exe
 Cargo.lock
+*.pot
+*.mo

@@ -26,7 +26,7 @@
 namespace cfg
 {
     void initToDefault();
-
+    void setUILanguage(u8 langIndex);
     void load();
     void saveCommon();
 
