@@ -69,22 +69,23 @@ static void toggleUInt(void *b, int step, int max, const std::vector<int>& black
 
 static std::string getLightDarkText(const bool& g)
 {
-    return g ? getTextFromMap("浅色系") : getTextFromMap("深色系");
+    return g ? getText("浅色系") : getText("深色系");
 }
 
 static std::string getCheatDBText(const bool& g)
 {
-    return g ? getTextFromMap("启动时") : getTextFromMap("按需");
+    return g ? getText("启动时") : getText("按需");
 }
 
 static std::string getBoolText(const bool& g)
 {
-    return g ? getTextFromMap("开") : getTextFromMap("关");
+    return g ? getText("开") : getText("关");
 }
 
 static std::string getUILangText(const int& g)
 {
-    std::string s = getTextFromMap("界面语言: ");
+    std::string s = getText("界面语言");
+    s += ": ";
 
     if (g == 0)
         s += "简体中文";
@@ -96,7 +97,8 @@ static std::string getUILangText(const int& g)
 
 static std::string getTitleLangText(const int& g)
 {
-    std::string s = getTextFromMap("应用标题语言: ");
+    std::string s = getText("应用标题语言");
+    s += ": ";
 
     switch (g) {
     case CFG_LANGUAGE_JP:
@@ -142,7 +144,8 @@ static std::string getTitleLangText(const int& g)
 
 static std::string getCheatLangText(const int& g)
 {
-    std::string s = getTextFromMap("内置金手指数据库语言: ");
+    std::string s = getText("内置金手指数据库语言");
+    s += ": ";
 
     if (g == 0)
         s += "简体中文";
@@ -154,16 +157,17 @@ static std::string getCheatLangText(const int& g)
 
 static std::string getDeflateLevelText(const int& g)
 {
-    std::string s = getTextFromMap("ZIP 压缩等级: ");
+    std::string s = getText("ZIP 压缩等级");
+    s += ": ";
 
     s += std::to_string(g);
 
     if (g == 1)
-        s += getTextFromMap(" (最快速度)");
+        s += getText(" (最快速度)");
     else if (g == 6)
-        s += getTextFromMap(" (标准压缩)");
+        s += getText(" (标准压缩)");
     else if (g == 9)
-        s += getTextFromMap(" (极限压缩)");
+        s += getText(" (极限压缩)");
 
     return s;
 }
@@ -360,46 +364,46 @@ void ui::setInit(void *a)
     threadInfo *t = (threadInfo *)a;
     sconfig = cfg::config;
 
-    setMenu.addOpt("重载 Titles", 320);
+    setMenu.addOpt(getText("重载 Titles"), 320);
     setMenu.addOptEvent(0, KEY_A, setMenuReloadTitles, NULL);
 
-    setMenu.addOpt("导出到 ZIP", 320);
+    setMenu.addOpt(getText("导出到 ZIP"), 320);
     setMenu.addOptEvent(1, KEY_A, setMenuToggleBOOL, &cfg::config["zip"]);
 
-    setMenu.addOpt("ZIP 压缩等级", 320);
+    setMenu.addOpt(getText("ZIP 压缩等级"), 320);
     setMenu.addOptEvent(2, KEY_B, setMenuDecreaseDeflateLevel, &cfg::config["deflateLevel"]);
     setMenu.addOptEvent(2, KEY_A, setMenuIncreaseDeflateLevel, &cfg::config["deflateLevel"]);
 
-    setMenu.addOpt("界面主题色", 320);
+    setMenu.addOpt(getText("界面主题色"), 320);
     setMenu.addOptEvent(3, KEY_A, setMenuToggleColor, &cfg::config["lightback"]);
 
-    setMenu.addOpt("界面语言", 320);
+    setMenu.addOpt(getText("界面语言"), 320);
     setMenu.addOptEvent(4, KEY_B, setMenuDecreaseUILang, &cfg::config["uilang"]);
     setMenu.addOptEvent(4, KEY_A, setMenuIncreaseUILang, &cfg::config["uilang"]);
 
-    setMenu.addOpt("应用标题语言", 320);
+    setMenu.addOpt(getText("应用标题语言"), 320);
     setMenu.addOptEvent(5, KEY_B, setMenuDecreaseTitleLang, &cfg::config["titlelang"]);
     setMenu.addOptEvent(5, KEY_A, setMenuIncreaseTitleLang, &cfg::config["titlelang"]);
 
-    setMenu.addOpt("内置金手指数据库语言", 320);
+    setMenu.addOpt(getText("内置金手指数据库语言"), 320);
     setMenu.addOptEvent(6, KEY_A, setMenuToggleCheatLang, &cfg::config["cheatdblang"]);
 
-    setMenu.addOpt("金手指数据库载入时机", 320);
+    setMenu.addOpt(getText("金手指数据库载入时机"), 320);
     setMenu.addOptEvent(7, KEY_A, setMenuToggleBOOL, &cfg::config["bootwithcheatdb"]);
 
-    setMenu.addOpt("GBAVC存档备份成功时保留原始数据", 320);
+    setMenu.addOpt(getText("GBAVC存档备份成功时保留原始数据"), 320);
     setMenu.addOptEvent(8, KEY_A, setMenuToggleBOOL, &cfg::config["rawvcsave"]);
 
-    setMenu.addOpt("切换LR按键功能", 320);
+    setMenu.addOpt(getText("切换LR按键功能"), 320);
     setMenu.addOptEvent(9, KEY_A, setMenuToggleBOOL, &cfg::config["swaplrfunc"]);
 
 #ifdef ENABLE_DRIVE
     if(util::fexists("/TYSS/drive.json"))
     {
-        setMenu.addOpt("云端存储服务随软件启动", 320);
+        setMenu.addOpt(getText("云端存储服务随软件启动"), 320);
         setMenu.addOptEvent(setMenu.getCount() - 1, KEY_A, setMenuToggleDriveBOOL, &cfg::driveInitOnBoot);
 
-        setMenu.addOpt("重载云端存储列表", 320);
+        setMenu.addOpt(getText("重载云端存储列表"), 320);
         setMenu.addOptEvent(setMenu.getCount() - 1, KEY_A, setMenuReloadDriveList, NULL);
     }
 #endif
@@ -473,18 +477,18 @@ void ui::setUpdate()
             ui::state = USR;
         }
 
-        setMenu.editOpt(1, "导出到 ZIP: " + getBoolText(cfg::config["zip"]));
+        setMenu.editOpt(1, getText("导出到 ZIP") + std::string(": ") + getBoolText(cfg::config["zip"]));
         setMenu.editOpt(2, getDeflateLevelText(cfg::config["deflateLevel"]));
-        setMenu.editOpt(3, "界面主题色: " + getLightDarkText(cfg::config["lightback"]));
+        setMenu.editOpt(3, getText("界面主题色") + std::string(": ") + getLightDarkText(cfg::config["lightback"]));
         setMenu.editOpt(4, getUILangText(cfg::config["uilang"]));
         setMenu.editOpt(5, getTitleLangText(cfg::config["titlelang"]));
         setMenu.editOpt(6, getCheatLangText(cfg::config["cheatdblang"]));
-        setMenu.editOpt(7, "金手指数据库载入时机: " + getCheatDBText(cfg::config["bootwithcheatdb"]));
-        setMenu.editOpt(8, "GBAVC存档备份成功时保留原始数据: " + getBoolText(cfg::config["rawvcsave"]));
-        setMenu.editOpt(9, "切换LR按键功能: " + getBoolText(cfg::config["swaplrfunc"]));
+        setMenu.editOpt(7, getText("金手指数据库载入时机") + std::string(": ") + getCheatDBText(cfg::config["bootwithcheatdb"]));
+        setMenu.editOpt(8, getText("GBAVC存档备份成功时保留原始数据") + std::string(": ") + getBoolText(cfg::config["rawvcsave"]));
+        setMenu.editOpt(9, getText("切换LR按键功能") + std::string(": ") + getBoolText(cfg::config["swaplrfunc"]));
 #ifdef ENABLE_DRIVE
         if(util::fexists("/TYSS/drive.json"))
-            setMenu.editOpt(setMenu.getCount() - 2, "云端存储服务随软件启动: " + getBoolText(cfg::driveInitOnBoot));
+            setMenu.editOpt(setMenu.getCount() - 2, getText("云端存储服务随软件启动") + std::string(": ") + getBoolText(cfg::driveInitOnBoot));
 #endif
 
         setMenu.update();
@@ -497,10 +501,10 @@ void ui::setDrawTop()
 {
     if (!setSubMenuOpen)
     {
-        ui::drawUIBar(TITLE_TEXT + "- 设置与杂项", ui::SCREEN_TOP, true);
+        ui::drawUIBar(TITLE_TEXT + getText("- 设置与杂项"), ui::SCREEN_TOP, true);
         setMenu.draw(0, 22, gfx::txtCont, 400);
     } else {
-        ui::drawUIBar(TITLE_TEXT + "- 工具箱", ui::SCREEN_TOP, true);
+        ui::drawUIBar(TITLE_TEXT + getText("- 工具箱"), ui::SCREEN_TOP, true);
         setSubMenu.draw(0, 22, gfx::txtCont, 400);
     }
 }

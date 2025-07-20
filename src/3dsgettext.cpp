@@ -194,7 +194,7 @@ void setLanguage(char const *const language_)
 
 char const *getText(char const *const text_)
 {
-	return text_;
+	return getTextFromMap(text_);
 }
 
 char const *getTextFromMap(char const *const text_)

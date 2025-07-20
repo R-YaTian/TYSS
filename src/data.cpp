@@ -192,7 +192,7 @@ void data::exit()
         t.freeIcon();
 }
 
-bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt, bool isAGB)
+bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt, bool probeAGB)
 {
     m = mt;
     id = _id;
@@ -213,14 +213,14 @@ bool data::titleData::init(const uint64_t& _id, const FS_MediaType& mt, bool isA
     if(mt != MEDIATYPE_GAME_CARD && isFavorite(id))
         fav = true;
 
-    if (isAGB || IsGbaVirtualConsole(low, high, m))
+    if (strncmp(tmp, "AGB-", 4) == 0 || strncmp(tmp, "GBA-", 4) == 0 ||
+        (probeAGB && strncmp(tmp, "CTR-N", 5) == 0 && (high & 0xFFFF) == 0 && IsGbaVirtualConsole()))
     {
         if (fs::openArchive(*this, ARCHIVE_SAVEDATA_AND_CONTENT, false))
         {
             types.hasUser = true;
             fs::closePxiSaveArch();
-            if (!isAGB)
-                prodCode.replace(0, 3, "AGB");
+            prodCode.replace(0, 3, "AGB");
         }
     } else
         testMounts();
@@ -406,11 +406,8 @@ bool data::titleData::hasSaveData()
     return types.hasUser || types.hasExt || types.hasSys || types.hasBoss;
 }
 
-bool data::titleData::IsGbaVirtualConsole(const uint32_t& low, const uint32_t& high, const uint8_t& media)
+bool data::titleData::IsGbaVirtualConsole()
 {
-    if (!(prodCode.compare(0, 5, "CTR-N") == 0) || (high & 0xFFFF) != 0)
-        return false;
-
     FSPXI_File handle;
 
     if (fs::openArchive(*this, ARCHIVE_SAVEDATA_AND_CONTENT, false))
@@ -695,16 +692,9 @@ void data::scanTitles(std::vector<titleData>& titles)
     {
         if(checkHigh(ids[i]) && !isBlacklisted(ids[i]))
         {
-            char tmp[16];
-            AM_GetTitleProductCode(MEDIATYPE_SD, ids[i], tmp);
             titleData newTitle;
-            if (strncmp(tmp, "AGB-", 4) == 0 || strncmp(tmp, "GBA-", 4) == 0) {
-                if(newTitle.init(ids[i], MEDIATYPE_SD, true) && newTitle.hasSaveData())
-                    titles.push_back(newTitle);
-            } else {
-                if(newTitle.init(ids[i], MEDIATYPE_SD) && newTitle.hasSaveData())
-                    titles.push_back(newTitle);
-            }
+            if(newTitle.init(ids[i], MEDIATYPE_SD, true) && newTitle.hasSaveData())
+                titles.push_back(newTitle);
         }
     }
     delete[] ids;

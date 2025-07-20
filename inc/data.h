@@ -51,12 +51,12 @@ namespace data
     class titleData
     {
         public:
-            bool init(const uint64_t& _id, const FS_MediaType& mt, bool isAGB = false);
+            bool init(const uint64_t& _id, const FS_MediaType& mt, bool probeAGB = false);
             bool initTWL(const uint64_t& _id, const FS_MediaType& mt);
             bool initFromCache(const uint64_t& _id, const std::u16string& _title, const std::u16string& _pub, const std::string& code, const data::titleSaveTypes& _st, const uint8_t& mt);
             void testMounts();
             bool hasSaveData();
-            bool IsGbaVirtualConsole(const uint32_t& low, const uint32_t& high, const uint8_t& media);
+            bool IsGbaVirtualConsole();
 
             uint64_t getID() const { return id; }
             uint32_t getLow() const { return low; }

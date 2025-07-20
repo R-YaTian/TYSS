@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TYSS v1.0.9\n"
 "Report-Msgid-Bugs-To: gmtianya@gmail.com\n"
-"POT-Creation-Date: 2025-07-19 18:21+0800\n"
+"POT-Creation-Date: 2025-07-20 22:48+0800\n"
 "PO-Revision-Date: 2025-07-19 18:21+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,54 +17,94 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:72
+#: /d/SrcNin/TYSS/src/ui/set.cpp:72
 msgid "浅色系"
 msgstr "Light"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:72
+#: /d/SrcNin/TYSS/src/ui/set.cpp:72
 msgid "深色系"
 msgstr "Dark"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:77
+#: /d/SrcNin/TYSS/src/ui/set.cpp:77
 msgid "启动时"
 msgstr "On Boot"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:77
+#: /d/SrcNin/TYSS/src/ui/set.cpp:77
 msgid "按需"
 msgstr "When Needed"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:82
+#: /d/SrcNin/TYSS/src/ui/set.cpp:82
 msgid "开"
 msgstr "On"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:82
+#: /d/SrcNin/TYSS/src/ui/set.cpp:82
 msgid "关"
 msgstr "Off"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:87
-msgid "界面语言: "
-msgstr "UI Language: "
+#: /d/SrcNin/TYSS/src/ui/set.cpp:87 /d/SrcNin/TYSS/src/ui/set.cpp:380
+msgid "界面语言"
+msgstr "UI Language"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:99
-msgid "应用标题语言: "
-msgstr "Application Title Language: "
+#: /d/SrcNin/TYSS/src/ui/set.cpp:100 /d/SrcNin/TYSS/src/ui/set.cpp:384
+msgid "应用标题语言"
+msgstr "Application Title Language"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:145
-msgid "内置金手指数据库语言: "
-msgstr "Built-in Cheat Database Language: "
+#: /d/SrcNin/TYSS/src/ui/set.cpp:147 /d/SrcNin/TYSS/src/ui/set.cpp:388
+msgid "内置金手指数据库语言"
+msgstr "Built-in Cheat Database Language"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:157
-msgid "ZIP 压缩等级: "
-msgstr "ZIP Deflate Level: "
+#: /d/SrcNin/TYSS/src/ui/set.cpp:160 /d/SrcNin/TYSS/src/ui/set.cpp:373
+msgid "ZIP 压缩等级"
+msgstr "ZIP Deflate Level"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:162
+#: /d/SrcNin/TYSS/src/ui/set.cpp:166
 msgid " (最快速度)"
 msgstr " (Fastest)"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:164
+#: /d/SrcNin/TYSS/src/ui/set.cpp:168
 msgid " (标准压缩)"
 msgstr " (Normal)"
 
-#: /e/SrcPri/TYSS/src/ui/set.cpp:166
+#: /d/SrcNin/TYSS/src/ui/set.cpp:170
 msgid " (极限压缩)"
 msgstr " (Best Compression)"
+
+#: /d/SrcNin/TYSS/src/ui/set.cpp:367
+msgid "重载 Titles"
+msgstr "Reload Titles"
+
+#: /d/SrcNin/TYSS/src/ui/set.cpp:370 /d/SrcNin/TYSS/src/ui/set.cpp:480
+msgid "导出到 ZIP"
+msgstr "Save export to ZIP"
+
+#: /d/SrcNin/TYSS/src/ui/set.cpp:377 /d/SrcNin/TYSS/src/ui/set.cpp:482
+msgid "界面主题色"
+msgstr "Theme Color"
+
+#: /d/SrcNin/TYSS/src/ui/set.cpp:391 /d/SrcNin/TYSS/src/ui/set.cpp:486
+msgid "金手指数据库载入时机"
+msgstr "Loading Cheat Database"
+
+#: /d/SrcNin/TYSS/src/ui/set.cpp:394 /d/SrcNin/TYSS/src/ui/set.cpp:487
+msgid "GBAVC存档备份成功时保留原始数据"
+msgstr ""
+
+#: /d/SrcNin/TYSS/src/ui/set.cpp:397 /d/SrcNin/TYSS/src/ui/set.cpp:488
+msgid "切换LR按键功能"
+msgstr "Swap LR button functions"
+
+#: /d/SrcNin/TYSS/src/ui/set.cpp:403 /d/SrcNin/TYSS/src/ui/set.cpp:491
+msgid "云端存储服务随软件启动"
+msgstr ""
+
+#: /d/SrcNin/TYSS/src/ui/set.cpp:406
+msgid "重载云端存储列表"
+msgstr "Reload cloud drive list"
+
+#: /d/SrcNin/TYSS/src/ui/set.cpp:504
+msgid "- 设置与杂项"
+msgstr "- Settings and misc"
+
+#: /d/SrcNin/TYSS/src/ui/set.cpp:507
+msgid "- 工具箱"
+msgstr "- Toolkit"
