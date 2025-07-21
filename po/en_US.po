@@ -7,104 +7,978 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TYSS v1.1.0\n"
 "Report-Msgid-Bugs-To: gmtianya@gmail.com\n"
-"POT-Creation-Date: 2025-07-20 22:48+0800\n"
-"PO-Revision-Date: 2025-07-19 18:21+0800\n"
-"Last-Translator: Automatically generated\n"
+"POT-Creation-Date: 2025-07-21 16:05+0800\n"
+"PO-Revision-Date: 2025-07-21 16:05+0800\n"
+"Last-Translator: R-YaTian\n"
 "Language-Team: none\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:72
+#: /e/SrcPri/TYSS/src/data.cpp:449
+msgid "游戏卡带"
+msgstr "Game Cartridge"
+
+#: /e/SrcPri/TYSS/src/data.cpp:607
+msgid "正在加载金手指数据库..."
+msgstr "Loading cheat database..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:620
+msgid "正在加载 Titles..."
+msgstr "Loading Titles..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:643
+msgid "正在写入缓存..."
+msgstr "Writing cache..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:729
+msgid "正在删除追加数据..."
+msgstr "Deleting ExtData..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:746
+msgid "正在重写缓存并刷新..."
+msgstr "Rewriting cache and refreshing..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:766
+msgid "追加数据删除成功!"
+msgstr "ExtData deleted successfully!"
+
+#: /e/SrcPri/TYSS/src/data.cpp:768
+#, c-format
+msgid "追加数据删除失败!\n错误: 0x%08X"
+msgstr "Failed to delete ExtData!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/data.cpp:805
+msgid "正在保存黑名单..."
+msgstr "Saving blacklist..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:867
+msgid "正在重置黑名单..."
+msgstr "Resetting blacklist..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:907
+msgid "正在重置收藏列表..."
+msgstr "Resetting favorites list..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:1166
+msgid "正在加载..."
+msgstr "Loading..."
+
+#: /e/SrcPri/TYSS/src/fs.cpp:107
+msgid "正在启动云端存储服务..."
+msgstr "Starting cloud storage service..."
+
+#: /e/SrcPri/TYSS/src/fs.cpp:152
+msgid "云端存储: 服务初始化完成!"
+msgstr "Cloud Storage: Service initialization complete!"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:154
+msgid "云端存储: 服务初始化失败!\n请检查云端存储服务配置信息。"
+msgstr "Cloud Storage: Service initialization failed!\nPlease check the cloud storage service configuration."
+
+#: /e/SrcPri/TYSS/src/fs.cpp:288
+#, c-format
+msgid "无法打开该存档位. 该存档类型可能不存在适用此 title 的数据.\n错误: 0x%08X\nTitle: %s"
+msgstr "The archive could not be opened. The save data type may not exist for this title.\nError: 0x%08X\nTitle: %s"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:306
+#, c-format
+msgid "提交存档数据失败!\n错误: 0x%08X"
+msgstr "Failed to commit save data!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:324
+#, c-format
+msgid "删除安全值失败.\n错误: 0x%08X"
+msgstr "Failed to delete secure value.\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:348
+#, c-format
+msgid "获取安全值失败.\n错误: 0x%08X"
+msgstr "Failed to get secure value.\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:370
+#, c-format
+msgid "导入安全值失败.\n错误: 0x%08X"
+msgstr "Failed to import secure value.\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:726
+msgid "正在复制 "
+msgstr "Copying "
+
+#: /e/SrcPri/TYSS/src/fs.cpp:735
+msgid "原始GBAVC存档数据大小不符,无法恢复!"
+msgstr "Raw GBAVC save data size mismatch, cannot restore!"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:867
+msgid "正在压缩 "
+msgstr "Compressing "
+
+#: /e/SrcPri/TYSS/src/fs.cpp:891
+msgid "正在压缩存档位到 zip 文件..."
+msgstr "Compressing save slot to zip file..."
+
+#: /e/SrcPri/TYSS/src/fs.cpp:927
+msgid "正在解压 "
+msgstr "Decompressing "
+
+#: /e/SrcPri/TYSS/src/fs.cpp:958
+msgid "正在解压数据到存档位..."
+msgstr "Decompressing data to save slot..."
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1004
+msgid "正在处理 '"
+msgstr "Processing '"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1015
+#, c-format
+msgid "%s:\n存档数据无效, 备份失败!"
+msgstr "%s:\nSave data invalid, backup failed!"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1019
+msgid "原始 GBAVC 存档数据"
+msgstr "Raw GBAVC save data"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1114
+msgid "读取 DS 卡带存档数据时发生错误!"
+msgstr "Error occurred while reading DS cartridge save data!"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1143
+msgid "读取备份数据时发生错误!"
+msgstr "Error occurred while reading save backup!"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1154
+msgid "写入数据到游戏卡带时发生错误!"
+msgstr "Error occurred while writing data to game cartridge!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:39
+msgid "输入 0-300 之间的数值"
+msgstr "Enter a value between 0 and 300"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:55
+msgid "正在清除步数历史记录..."
+msgstr "Clearing step history..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:64
+#, c-format
+msgid "清除步数历史记录失败!\n错误: 0x%08X"
+msgstr "Failed to clear step history!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:66
+msgid "步数历史记录清除成功!"
+msgstr "Step history cleared successfully!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:74
+msgid "正在清除游玩时间历史记录及软件图鉴..."
+msgstr "Clearing playtime history and software library..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:81
+#, c-format
+msgid "获取系统区域失败,无法完成操作!\n错误: 0x%08X"
+msgstr "Failed to get system region, operation cannot be completed!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:97
+#, c-format
+msgid "清除软件图鉴记录失败!\n错误: 0x%08X"
+msgstr "Failed to clear software library records!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:107
+#, c-format
+msgid "清除游玩时间历史记录失败!\n错误: 0x%08X"
+msgstr "Failed to clear playtime history!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:109
+msgid "清除游玩时间历史记录及软件图鉴成功!"
+msgstr "Successfully cleared playtime history and software library!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:118
+msgid "正在清除共享图标缓存数据..."
+msgstr "Clearing shared icon cache..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:132
+msgid "清除共享图标缓存数据成功!"
+msgstr "Successfully cleared shared icon cache!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:134
+#, c-format
+msgid "清除共享图标缓存数据失败!\n代码(idb.dat): 0x%08X\n代码(idbt.dat): 0x%08X"
+msgstr "Failed to clear shared icon cache!\nCode (idb.dat): 0x%08X\nCode (idbt.dat): 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:143
+msgid "正在清除主菜单图标缓存数据..."
+msgstr "Clearing homemenu icon cache..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:166
+msgid "清除主菜单图标缓存数据成功!"
+msgstr "Successfully cleared homemenu icon cache!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:168
+#, c-format
+msgid "清除主菜单图标缓存数据失败!\n代码(Cache.dat): 0x%08X\n代码(CacheD.dat): 0x%08X"
+msgstr "Failed to clear homemenu icon cache!\nCode (Cache.dat): 0x%08X\nCode (CacheD.dat): 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:177
+msgid "正在重置试玩版游戏游玩计数..."
+msgstr "Resetting demo game play count..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:182
+#, c-format
+msgid "重置试玩版游戏游玩计数失败!\n错误: 0x%08X"
+msgstr "Failed to reset demo game play count!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:184
+msgid "重置试玩版游戏游玩计数成功!"
+msgstr "Successfully reset demo game play count!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:192
+msgid "正在清除游戏笔记..."
+msgstr "Clearing game notes..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:222
+#, c-format
+msgid "清除游戏笔记数据失败!\n错误: 0x%08X"
+msgstr "Failed to clear game notes data!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:224
+msgid "清除游戏笔记数据成功!"
+msgstr "Successfully cleared game notes data!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:233
+msgid "正在清除软件更新通知..."
+msgstr "Clearing software update notifications..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:245
+#, c-format
+msgid "清除软件更新通知失败!\n错误: 0x%08X"
+msgstr "Failed to clear software update notifications!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:247
+msgid "清除软件更新通知成功!"
+msgstr "Successfully cleared software update notifications!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:256
+msgid "正在打开所有软件礼包..."
+msgstr "Unpacking all gift-wrapped software..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:287
+msgid "主菜单数据写入失败,无法完成操作!"
+msgstr "Failed to write homemenu data, operation cannot be completed!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:289
+msgid "所有的软件礼包打开成功!"
+msgstr "All gift-wrapped software unpacked successfully!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:291
+msgid "主菜单数据读取失败,无法完成操作!"
+msgstr "Failed to read homemenu data, operation cannot be completed!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:331
+#, c-format
+msgid "获取当前小时步数失败!\n错误: 0x%08X"
+msgstr "Failed to get current hour step count!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:335
+#, c-format
+msgid "今日步数为: %d\n当前小时步数为: %d"
+msgstr "Today's step count: %d\nCurrent hour step count: %d"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:339
+msgid "输入 0-18000 之间的数值"
+msgstr "Enter a value between 0 and 18000"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:346
+#, c-format
+msgid "修改当前小时步数失败!\n错误: 0x%08X"
+msgstr "Failed to modify current hour step count!\nError: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:348
+#, c-format
+msgid "修改当前小时步数成功!\n今日总步数: %d"
+msgstr "Successfully modified current hour step count!\nToday's total steps: %d"
+
+#: /e/SrcPri/TYSS/src/ui.cpp:62
+msgid "确定 "
+msgstr "Ok "
+
+#: /e/SrcPri/TYSS/src/ui.cpp:63
+msgid "是 "
+msgstr "Yes "
+
+#: /e/SrcPri/TYSS/src/ui.cpp:64
+msgid "否 "
+msgstr "No "
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:119 /e/SrcPri/TYSS/src/ui/ext.cpp:127
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:218
+msgid "为避免发生问题, 禁止将卡带游戏添加到黑名单!"
+msgstr "To avoid issues, adding game cartridge to the blacklist is prohibited!"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:122 /e/SrcPri/TYSS/src/ui/ext.cpp:130
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:118 /e/SrcPri/TYSS/src/ui/ttl.cpp:221
+msgid "你确定要将 "
+msgstr "Are you sure you want to add "
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:122 /e/SrcPri/TYSS/src/ui/ext.cpp:130
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:118 /e/SrcPri/TYSS/src/ui/ttl.cpp:221
+msgid " 添加到黑名单吗?\n这将使其在所有视图中不可见!"
+msgstr " to the blacklist?\nThis will make it invisible in all views!"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:136 /e/SrcPri/TYSS/src/ui/ext.cpp:144
+msgid "你确定要备份此页所有的数据吗?\n这或许需要耗费一定时间, 视 Title 数量而定。\n请耐心等待!"
+msgstr "Are you sure you want to backup all titles on this page?\nThis may take some time depending on the number of titles.\nPlease wait!"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:147 /e/SrcPri/TYSS/src/ui/ext.cpp:157
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:156 /e/SrcPri/TYSS/src/ui/ttl.cpp:277
+msgid "添加到黑名单"
+msgstr "Add to blacklist"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:149
+msgid "备份所有的 BOSS 追加数据"
+msgstr "Backup all BOSS ExtData"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:188
+msgid "- BOSS 追加数据"
+msgstr "- BOSS ExtData"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:205 /e/SrcPri/TYSS/src/ui/ext.cpp:215
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:216 /e/SrcPri/TYSS/src/ui/ttl.cpp:339
+msgid " 选择  关闭"
+msgstr " Select  Close"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:211 /e/SrcPri/TYSS/src/ui/ext.cpp:221
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:222 /e/SrcPri/TYSS/src/ui/ttl.cpp:345
+msgid " 打开  选项  收藏  视图类型"
+msgstr " Open  Options  Favorites  View Type"
+
+#: /e/SrcPri/TYSS/src/ui/ext.cpp:118 /e/SrcPri/TYSS/src/ui/fld.cpp:183
+msgid "你确定要删除 "
+msgstr "Are you sure you want to delete "
+
+#: /e/SrcPri/TYSS/src/ui/ext.cpp:118
+msgid " 的追加数据吗?\n删除后将重写缓存"
+msgstr " 's ExtData?\nCache will be rewritten after deletion"
+
+#: /e/SrcPri/TYSS/src/ui/ext.cpp:155
+msgid "删除追加数据"
+msgstr "Delete ExtData"
+
+#: /e/SrcPri/TYSS/src/ui/ext.cpp:159
+msgid "备份所有的追加数据"
+msgstr "Backup all ExtData"
+
+#: /e/SrcPri/TYSS/src/ui/ext.cpp:198
+msgid "- 追加数据"
+msgstr "- ExtData"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:38
+msgid "正在准备..."
+msgstr "Preparing..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:50
+msgid "输入新备份名称"
+msgstr "Enter new backup name"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:66 /e/SrcPri/TYSS/src/ui/fld.cpp:132
+msgid "正在备份 GBAVC 存档数据..."
+msgstr "Backing up GBAVC save data..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:69 /e/SrcPri/TYSS/src/ui/fld.cpp:136
+msgid "GBAVC 存档数据无效, 备份失败!"
+msgstr "Invalid GBAVC save data, backup failed!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:71 /e/SrcPri/TYSS/src/ui/fld.cpp:138
+msgid "GBAVC 存档数据备份成功!"
+msgstr "GBAVC save data backup successful!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:87 /e/SrcPri/TYSS/src/ui/fld.cpp:146
+msgid "正在导出 DS 卡带存档数据..."
+msgstr "Exporting DS cartridge save data..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:93 /e/SrcPri/TYSS/src/ui/fld.cpp:151
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:230 /e/SrcPri/TYSS/src/ui/fld.cpp:451
+msgid "不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!"
+msgstr "Unsupported save chip type for this DS game cartridge\nor the cartridge does not have a save chip!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:109
+msgid "正在覆盖存档..."
+msgstr "Overwriting save..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:160
+msgid "是否覆盖 "
+msgstr "Overwrite? "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:168
+msgid "正在删除存档..."
+msgstr "Deleting save..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:197
+msgid "正在恢复数据到存档位..."
+msgstr "Restoring data to save slot..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:211 /e/SrcPri/TYSS/src/ui/fld.cpp:438
+msgid "正在恢复 GBAVC 存档数据..."
+msgstr "Restoring GBAVC save data..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:214 /e/SrcPri/TYSS/src/ui/fld.cpp:441
+msgid "GBAVC 存档数据无效, 恢复失败!"
+msgstr "Invalid GBAVC save data, restore failed!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:216 /e/SrcPri/TYSS/src/ui/fld.cpp:443
+msgid "GBAVC 存档数据恢复成功!"
+msgstr "GBAVC save data restored successfully!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:225 /e/SrcPri/TYSS/src/ui/fld.cpp:446
+msgid "正在恢复数据到 DS 游戏卡带..."
+msgstr "Restoring data to DS game cartridge..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:240
+msgid "你确定要恢复 "
+msgstr "Are you sure you want to restore "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:253 /e/SrcPri/TYSS/src/ui/fld.cpp:283
+msgid "正在上传 "
+msgstr "Uploading "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:271
+msgid "云端存储: 云盘中已存在该存档,已覆盖"
+msgstr "Cloud Storage: Save already exists in cloud disk, overwritten"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:314
+msgid "云端存储: 仅支持上传压缩包或SAV及BIN存档文件"
+msgstr "Cloud Storage: Only supports uploading ZIP, SAV and BIN save files"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:316
+msgid "云端存储: 服务尚未初始化"
+msgstr "Cloud Storage: Service not initialized"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:324 /e/SrcPri/TYSS/src/ui/fld.cpp:342
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:405 /e/SrcPri/TYSS/src/ui/fld.cpp:416
+msgid "正在下载 "
+msgstr "Downloading "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:368
+msgid "下载此存档将会替换 SD 卡中的数据.\n你确定仍要进行下载吗?"
+msgstr "Downloading this save will replace data on the SD card.\nAre you sure you want to continue?"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:379 /e/SrcPri/TYSS/src/ui/fld.cpp:386
+msgid "正在删除 "
+msgstr "Deleting "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:398
+msgid "你确定要删除云盘中的 "
+msgstr "Are you sure you want to delete "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:398
+msgid " 文件吗?\n若相对应的.sv文件存在,将同时被删除!"
+msgstr " file from cloud storage?\nIf the corresponding .sv file exists, it will also be deleted!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:426
+msgid "正在解压存档到存档位..."
+msgstr "Extracting save to save slot..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:435
+msgid "正在复制原始 GBAVC 存档数据到存档位..."
+msgstr "Copying raw GBAVC save data to save slot..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:464
+msgid "你确定要下载并恢复 "
+msgstr "Are you sure you want to download and restore "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:476 /e/SrcPri/TYSS/src/ui/fld.cpp:519
+msgid "新建"
+msgstr "New"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:491 /e/SrcPri/TYSS/src/ui/fld.cpp:534
+msgid "[云] "
+msgstr "[Cloud] "
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:74
 msgid "浅色系"
 msgstr "Light"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:72
+#: /e/SrcPri/TYSS/src/ui/set.cpp:74
 msgid "深色系"
 msgstr "Dark"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:77
+#: /e/SrcPri/TYSS/src/ui/set.cpp:79
 msgid "启动时"
-msgstr "On Boot"
+msgstr "At Startup"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:77
+#: /e/SrcPri/TYSS/src/ui/set.cpp:79
 msgid "按需"
-msgstr "When Needed"
+msgstr "On Demand"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:82
+#: /e/SrcPri/TYSS/src/ui/set.cpp:84
 msgid "开"
 msgstr "On"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:82
+#: /e/SrcPri/TYSS/src/ui/set.cpp:84
 msgid "关"
 msgstr "Off"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:87 /d/SrcNin/TYSS/src/ui/set.cpp:380
+#: /e/SrcPri/TYSS/src/ui/set.cpp:89 /e/SrcPri/TYSS/src/ui/set.cpp:386
 msgid "界面语言"
 msgstr "UI Language"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:100 /d/SrcNin/TYSS/src/ui/set.cpp:384
+#: /e/SrcPri/TYSS/src/ui/set.cpp:104 /e/SrcPri/TYSS/src/ui/set.cpp:390
 msgid "应用标题语言"
 msgstr "Application Title Language"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:147 /d/SrcNin/TYSS/src/ui/set.cpp:388
+#: /e/SrcPri/TYSS/src/ui/set.cpp:151 /e/SrcPri/TYSS/src/ui/set.cpp:394
 msgid "内置金手指数据库语言"
 msgstr "Built-in Cheat Database Language"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:160 /d/SrcNin/TYSS/src/ui/set.cpp:373
+#: /e/SrcPri/TYSS/src/ui/set.cpp:164 /e/SrcPri/TYSS/src/ui/set.cpp:379
 msgid "ZIP 压缩等级"
-msgstr "ZIP Deflate Level"
+msgstr "ZIP Compression Level"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:166
+#: /e/SrcPri/TYSS/src/ui/set.cpp:170
 msgid " (最快速度)"
-msgstr " (Fastest)"
+msgstr " (Fastest Speed)"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:168
+#: /e/SrcPri/TYSS/src/ui/set.cpp:172
 msgid " (标准压缩)"
 msgstr " (Normal)"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:170
+#: /e/SrcPri/TYSS/src/ui/set.cpp:174
 msgid " (极限压缩)"
 msgstr " (Best Compression)"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:367
+#: /e/SrcPri/TYSS/src/ui/set.cpp:181
+msgid "你确定要清除步数历史记录吗?"
+msgstr "Are you sure you want to clear step history?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:187
+msgid "确定要清除游玩时间历史记录及软件图鉴?"
+msgstr "Are you sure you want to clear playtime history and software library?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:193
+msgid "你确定要清除共享图标缓存数据吗?"
+msgstr "Are you sure you want to clear shared icon cache?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:199
+msgid "你确定要清除主菜单图标缓存数据吗?"
+msgstr "Are you sure you want to clear homemenu icon cache?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:205
+msgid "你确定要重置试玩版游戏的游玩计数吗?"
+msgstr "Are you sure you want to reset play count for demo games?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:211
+msgid "你确定要清除所有的游戏笔记吗?"
+msgstr "Are you sure you want to clear all game notes?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:217
+msgid "你确定要清除所有的软件更新通知吗?"
+msgstr "Are you sure you want to clear all software update notifications?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:223
+msgid "你确定要打开所有的软件礼包吗?"
+msgstr "Are you sure you want to unpack all gift-wrapped software?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:229
+msgid "你确定要修改主菜单上显示的今日步数吗?"
+msgstr "Are you sure you want to modify today's step count displayed on the homemenu?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:240
+msgid "你确定要重置收藏列表吗?"
+msgstr "Are you sure you want to reset the favorites list?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:246
+msgid "你确定要重置黑名单吗?"
+msgstr "Are you sure you want to reset the blacklist?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:260
+msgid "正在重载云端存储列表..."
+msgstr "Reloading cloud storage list..."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:270
+msgid "云端存储: 服务尚未初始化\n是否立即启动服务并加载云端存储列表?"
+msgstr "Cloud Storage: Service not initialized\nStart service and load cloud storage list now?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:278 /e/SrcPri/TYSS/src/ui/set.cpp:297
+msgid "正在保存设置..."
+msgstr "Saving settings..."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:373
 msgid "重载 Titles"
 msgstr "Reload Titles"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:370 /d/SrcNin/TYSS/src/ui/set.cpp:480
+#: /e/SrcPri/TYSS/src/ui/set.cpp:376 /e/SrcPri/TYSS/src/ui/set.cpp:488
 msgid "导出到 ZIP"
-msgstr "Save export to ZIP"
+msgstr "Export to ZIP"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:377 /d/SrcNin/TYSS/src/ui/set.cpp:482
+#: /e/SrcPri/TYSS/src/ui/set.cpp:383 /e/SrcPri/TYSS/src/ui/set.cpp:490
 msgid "界面主题色"
 msgstr "Theme Color"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:391 /d/SrcNin/TYSS/src/ui/set.cpp:486
+#: /e/SrcPri/TYSS/src/ui/set.cpp:397 /e/SrcPri/TYSS/src/ui/set.cpp:494
 msgid "金手指数据库载入时机"
 msgstr "Loading Cheat Database"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:394 /d/SrcNin/TYSS/src/ui/set.cpp:487
+#: /e/SrcPri/TYSS/src/ui/set.cpp:400 /e/SrcPri/TYSS/src/ui/set.cpp:495
 msgid "GBAVC存档备份成功时保留原始数据"
-msgstr ""
+msgstr "Keep raw data when GBAVC save backup succeeds"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:397 /d/SrcNin/TYSS/src/ui/set.cpp:488
+#: /e/SrcPri/TYSS/src/ui/set.cpp:403 /e/SrcPri/TYSS/src/ui/set.cpp:496
 msgid "切换LR按键功能"
-msgstr "Swap LR button functions"
+msgstr "Switch LR button functions"
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:403 /d/SrcNin/TYSS/src/ui/set.cpp:491
+#: /e/SrcPri/TYSS/src/ui/set.cpp:409 /e/SrcPri/TYSS/src/ui/set.cpp:499
 msgid "云端存储服务随软件启动"
+msgstr "Cloud storage service starts with software"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:412
+msgid "重载云端存储列表"
+msgstr "Reload cloud storage list"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:417
+msgid "修改 PlayCoin"
+msgstr "Modify PlayCoin"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:420
+msgid "清除步数历史记录"
+msgstr "Clear step history"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:423
+msgid "清除游玩时间历史记录以及软件图鉴"
+msgstr "Clear playtime history and software library"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:426
+msgid "清除共享图标缓存"
+msgstr "Clear shared icon cache"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:429
+msgid "清除主菜单图标缓存"
+msgstr "Clear homemenu icon cache"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:432
+msgid "重置试玩版游戏游玩计数"
+msgstr "Reset demo game play count"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:435
+msgid "清除游戏笔记"
+msgstr "Clear game notes"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:438
+msgid "清除软件更新通知"
+msgstr "Clear software update notifications"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:441
+msgid "打开所有软件礼包"
+msgstr "Unpack all gift-wrapped software"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:444
+msgid "修改今日步数"
+msgstr "Modify today's step count"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:447
+msgid "重置 TYSS 收藏列表"
+msgstr "Reset TYSS favorites list"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:450
+msgid "重置 TYSS 黑名单"
+msgstr "Reset TYSS blacklist"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:512
+msgid "- 设置与杂项"
+msgstr "- Settings and Miscellaneous"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:515
+msgid "- 工具箱"
+msgstr "- Toolbox"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:528
+msgid "清除 Title 缓存并重新扫描应用列表。\n这或许需要耗费一定时间, 视 Title 数量而定。"
+msgstr "Clear Title cache and rescan application list.\nThis may take some time depending on the number of titles."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:531
+msgid "备份存档时是否使用 ZIP 压缩存储。\n注:仅支持3DS应用(下载版与卡带)及DSiWare存档\n当备份DS游戏卡带或GBAVC存档时,无论是否开启\n该项设置,存档都将直接转储为.sav或.bin格式!"
+msgstr "Whether to use ZIP compression when backing up saves.\nNote: Only supports 3DS applications (download and cartridge) and DSiWare saves.\nWhen backing up DS game cartridges or GBAVC saves, regardless of this setting,\nsaves will be directly dumped as .sav or .bin files!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:534
+msgid "选择 ZIP 压缩等级。\n(等级越高, 速度越慢, 压缩率越高)"
+msgstr "Select ZIP compression level.\n(Higher level means slower speed but better compression)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:537
+msgid "选择 UI 界面主题色。\n(浅色系/深色系)"
+msgstr "Select UI theme color.\n(Light or Dark)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:540
+msgid "选择 UI 界面显示语言。"
+msgstr "Select UI display language."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:543
+msgid "以何种语言显示应用程序标题。\n这将影响存放应用程序数据备份的文件夹名称,\n一经设置不建议再修改,并且需要重载Titles才生效!"
+msgstr "Language for displaying application titles.\nThis affects the folder name where application data backups are stored.\nOnce set, it is not recommended to change it, and Titles need to be reloaded to take effect!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:546
+msgid "选择内置金手指数据库语言(目前仅支持简中与英语)\n软件优先加载TYSS文件夹中外置金手指数据库文件\ncheats.json,该选项仅决定内置金手指数据库语言,\n当外置数据库存在时无效!\n该项设置更改时,已载入的金手指数据库会被卸载,\n并且将在需要使用时重载!"
+msgstr "Select built-in cheat database language (currently only Simplified Chinese and English supported).\nThe software prioritizes loading external cheat database file cheats.json in the TYSS folder.\nThis option only determines the built-in cheat database language,\nand is ineffective when an external database exists!\nWhen this setting changes, the loaded cheat database will be unloaded,\nand reloaded when needed!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:549
+msgid "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将增加。"
+msgstr "Determine the timing of cheat database loading.\nCan be set to load on demand (load when needed),\nor automatically load at application startup.\nChoosing load on demand increases the time for the first cheat search."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:552
+msgid "当GBAVC存档备份成功时保留一份原始(.bin)数据。\n一般情况下不需要开启此项,因为原始数据不可用于\nGBAVC虚拟主机之外的任何地方(GBA模拟器等等)\n注:覆盖备份文件或还原数据时,将根据后缀自动判断"
+msgstr "Keep a copy of the original raw (.bin) data when GBAVC save backup succeeds.\nGenerally not needed as original raw data cannot be used outside GBAVC Virtual Console\nNote: Overwrite backup files or restore save data will be automatically determined by suffix."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:555
+msgid "将LR按键的功能与ZLZR按键的功能对调。\n在老三上启用则LR按键将用于UI页面切换,而LR快速\n浏览应用列表功能将被禁用(由于老三无ZLZR按键)"
+msgstr "Swap LR button functions with ZLZR buttons.\nEnabling on Old 3DS uses LR buttons for UI view type switching,\nand disables LR quick app list browsing (Old 3DS lacks ZLZR buttons)."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:562
+msgid "云端存储服务是否随软件启动并加载云端存储列表。\n这可能导致应用程序启动耗时增加。"
+msgstr "Whether cloud storage service starts with application and loads cloud storage list.\nThis may increase application startup time."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:564
+msgid "从云端同步存档文件列表。\n这或许需要耗费一定时间, 视网络环境而定。"
+msgstr "Sync save file list from cloud storage.\nThis may take some time depending on network conditions."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:567
+msgid " 选择/切换  启动工具箱  视图类型"
+msgstr " Select/Toggle  Launch Toolbox  View Type"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:572
+msgid "修改游戏币数量。(范围: 0-300)"
+msgstr "Modify PlayCoin amount. (Range: 0-300)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:575
+msgid "这将清除回忆记录册中的总步数记录!\n该操作无法撤销!"
+msgstr "This will clear the total step count in the Activity Log!\nThis action cannot be undone!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:578
+msgid "这将清除回忆记录册中的软件图鉴记录以及所有游玩\n时间历史记录!\n操作无法撤销!执行此操作前强烈建议备份系统存档\n页的回忆记录册数据!"
+msgstr "This will clear the software library records and all playtime history in the Activity Log!\nThis action cannot be undone! It is strongly recommended to backup the Activity Log data on the system save view before performing this action!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:581
+msgid ""
+"将使得回忆记录册中的软件图鉴列表被清空。\n"
+"操作无法撤销!执行此操作前强烈建议备份共享追加\n"
+"数据页的FB记录以及系统存档页的回忆记录册数据!\n"
+"恢复备份时需要同时恢复上述两项记录!"
 msgstr ""
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:406
-msgid "重载云端存储列表"
-msgstr "Reload cloud drive list"
+#: /e/SrcPri/TYSS/src/ui/set.cpp:584
+msgid ""
+"清除主菜单图标缓存(老三需用本软件的Mode3版本)\n"
+"操作无法撤销!执行此操作前强烈建议备份追加数据\n"
+"页的主菜单(CTR-N-HMM*)记录!"
+msgstr ""
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:504
-msgid "- 设置与杂项"
-msgstr "- Settings and misc"
+#: /e/SrcPri/TYSS/src/ui/set.cpp:587
+msgid ""
+"重置试玩版 (Demo) 应用的游玩次数。\n"
+"该操作无法撤销!"
+msgstr ""
 
-#: /d/SrcNin/TYSS/src/ui/set.cpp:507
-msgid "- 工具箱"
-msgstr "- Toolkit"
+#: /e/SrcPri/TYSS/src/ui/set.cpp:590
+msgid ""
+"清除所有游戏笔记数据。\n"
+"操作无法撤销!执行此操作前强烈建议备份系统存档\n"
+"页的游戏笔记数据!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:593
+msgid ""
+"这将移除所有已安装程序启动前的更新提示。\n"
+"(直到主菜单再次联网下载软件版本数据库)\n"
+"注意: 这对某些游戏内置的版本检查无效!\n"
+"操作无法撤销!执行此操作前强烈建议备份共享追加\n"
+"数据页的FE记录!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:596
+msgid "打开主菜单中所有的软件礼包。该操作无法撤销!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:599
+msgid ""
+"修改主菜单上显示的今日步数数据。\n"
+"由于部分限制因素, 该项功能仅影响当前小时步数。\n"
+"此前产生的步数不会被修改!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:602
+msgid "这将会清空本程序收藏列表, 请谨慎操作。"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:605
+msgid "清空本程序黑名单列表, 随后将自动执行重载 Titles"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:608
+msgid " 选择  退出工具箱"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:94
+msgid ""
+"你确定要备份所有的共享追加数据吗?\n"
+"这或许需要耗费一定时间, 请耐心等待!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:141
+msgid "- 共享追加数据"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:162
+msgid ""
+"F1 - NAND JPEG/MPO 文件和 phtcache.bin 由相机应用程序存储在这里. 这也包含 "
+"UploadData.dat."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:165
+msgid "F2 - 声音应用程序中的 NAND M4A 文件存储在这里."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:168
+msgid "F9 - 适用于通知的 SpotPass 内容存储."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:171
+msgid ""
+"FB - 包含 idb.dat, idbt.dat, gamecoin.dat, ubll.lst, CFL_DB.dat 以及\n"
+"CFL_OldDB.dat. 这些文件包含明文 Miis 数据和一些与播放/使用记录相关的数据 (也"
+"包括缓存的图标数据)."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:174
+msgid "FC - 包含 bashotorya.dat 以及 bashotorya2.dat."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:177
+msgid "FD - 主页菜单的 SpotPass 内容存储."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:180
+msgid ""
+"FE - 包含 versionList.dat, 用于 7.0.0-13 系统引入的主页菜单软件更新通知."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:184
+msgid " 打开  备份所有  视图类型"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:132
+msgid ""
+"你确定要备份此页所有的系统存档吗?\n"
+"这或许需要耗费一定时间, 视Title数量而定。\n"
+"请耐心等待!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:145 /e/SrcPri/TYSS/src/ui/ttl.cpp:248
+msgid ""
+"你确定要备份此页所有的DSiWare存档吗?\n"
+"这或许需要耗费一定时间, 视Title数量而定。\n"
+"请耐心等待!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:158
+msgid "备份所有的系统存档"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:160 /e/SrcPri/TYSS/src/ui/ttl.cpp:281
+msgid "备份所有的 DSiWare 存档"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:199
+msgid "- 系统存档"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:126
+msgid "正在重置存档数据..."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:131
+msgid "正在重置GBAVC存档数据..."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:142
+msgid "DS卡带游戏以及 DSiWare 不支持此操作!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:145 /e/SrcPri/TYSS/src/ui/ttl.cpp:200
+msgid "你确定要为 "
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:145
+msgid ""
+" 重置存档数据吗?\n"
+"注意: GBAVC存档重置后需运行一次游戏才能\n"
+"再次管理存档!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:152
+msgid "正在安装金手指文件..."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:161
+msgid "金手指文件安装成功!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:163
+msgid "金手指文件安装失败!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:174
+msgid "金手指文件已删除!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:188
+msgid "GBAVC,DSiWare及DS卡带不支持此操作!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:197
+msgid "该应用的金手指文件已安装, 是否删除?"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:200
+msgid " 安装金手指文件?"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:203
+msgid "数据库中未找到该应用可用的金手指."
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:235
+msgid ""
+"你确定要备份此页所有的用户存档吗?\n"
+"这或许需要耗费一定时间, 视Title数量而定。\n"
+"请耐心等待!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:261
+msgid ""
+"你确定要备份此页所有的GBAVC存档吗?\n"
+"这或许需要耗费一定时间, 视Title数量而定。\n"
+"请耐心等待!"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:273
+msgid "安装或删除该应用的金手指文件"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:275
+msgid "重置存档数据"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:279
+msgid "备份所有的用户存档(DS 游戏卡带除外)"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:283
+msgid "备份所有的 GBAVC 存档"
+msgstr ""
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:322
+msgid "- 用户存档"
+msgstr ""
+
+#: inc/ui.h:70
+msgid " 选择  删除  恢复  上传  关闭"
+msgstr ""
+
+#: inc/ui.h:72
+msgid " 选择  删除  恢复  关闭"
+msgstr ""
