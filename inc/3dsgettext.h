@@ -40,9 +40,13 @@
 /// \param language_ Language to set
 void setLanguage(char const *language_);
 
-/// \brief Translate message
+/// \brief Pseudo getText function used to mark strings for translation
 /// \param text_ Text to translate
 __attribute__ ((__format_arg__ (1))) char const *getText(char const *text_);
+
+/// \brief Get translated text, delegates to getTextFromMap
+/// \param text_ Text to translate
+__attribute__ ((__format_arg__ (1))) char const *getTxt(char const *text_);
 
 /// \brief Get translated text from string map
 /// \param text_ Text to translate

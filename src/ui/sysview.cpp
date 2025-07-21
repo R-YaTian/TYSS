@@ -115,7 +115,7 @@ static void sysOptCallback(void *a)
 
 static void sysOptAddtoBlackList(void *a)
 {
-    std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
+    std::string q = getTxt("你确定要将 ") + util::toUtf8(data::curData.getTitle()) + getTxt(" 添加到黑名单吗?\n这将使其在所有视图中不可见!");
     void *arg = &data::curData;
     ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
@@ -129,7 +129,7 @@ static void sysOptBackupAll_t(void *a)
 
 static void sysOptBackupAll(void *a)
 {
-    std::string q = "你确定要备份此页所有的系统存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!";
+    std::string q = getTxt("你确定要备份此页所有的系统存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!");
     ui::confirm(q, sysOptBackupAll_t, NULL, NULL);
 }
 
@@ -142,7 +142,7 @@ static void sysOptBackupAllDSiWare_t(void *a)
 
 static void sysOptBackupAllDSiWare(void *a)
 {
-    std::string q = "你确定要备份此页所有的DSiWare存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!";
+    std::string q = getTxt("你确定要备份此页所有的DSiWare存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!");
     ui::confirm(q, sysOptBackupAllDSiWare_t, NULL, NULL);
 }
 
@@ -153,11 +153,11 @@ void ui::sysInit(void *a)
 
     sysOpts = new ui::menu;
     sysOpts->setCallback(sysOptCallback, NULL);
-    sysOpts->addOpt("添加到黑名单", 320);
+    sysOpts->addOpt(getText("添加到黑名单"), 320);
     sysOpts->addOptEvent(0, KEY_A, sysOptAddtoBlackList, NULL);
-    sysOpts->addOpt("备份所有的系统存档", 320);
+    sysOpts->addOpt(getText("备份所有的系统存档"), 320);
     sysOpts->addOptEvent(1, KEY_A, sysOptBackupAll, NULL);
-    sysOpts->addOpt("备份所有的 DSiWare 存档", 320);
+    sysOpts->addOpt(getText("备份所有的 DSiWare 存档"), 320);
     sysOpts->addOptEvent(2, KEY_A, sysOptBackupAllDSiWare, NULL);
 
     t->finished = true;
@@ -196,7 +196,7 @@ void ui::sysRefresh(int op)
 void ui::sysDrawTop()
 {
     sysView->draw();
-    ui::drawUIBar(TITLE_TEXT + "- 系统存档", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + getTxt("- 系统存档"), ui::SCREEN_TOP, true);
 }
 
 void ui::sysDrawBot()
@@ -213,12 +213,12 @@ void ui::sysDrawBot()
     else if(sysOptsOpen)
     {
         sysOpts->draw(0, 2, gfx::txtCont, 320);
-        ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
+        ui::drawUIBar(getTxt("\ue000 选择 \ue001 关闭"), ui::SCREEN_BOT, false);
     }
     else
     {
         if (!data::sysDataTitles.empty())
             data::sysDataTitles[sysView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 视图类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar(getTxt("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 视图类型"), ui::SCREEN_BOT, false);
     }
 }

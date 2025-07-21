@@ -35,7 +35,7 @@ static std::string uploadParent;
 static void fldMenuNew_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在准备...");
+    t->status->setStatus(getTxt("正在准备..."));
 
     FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, targetDir.data()), 0);
 
@@ -47,7 +47,7 @@ static void fldMenuNew_t(void *a)
     else if(held & KEY_R)
         newFolder = util::toUtf16(util::getDateString(util::DATE_FMT_YMD));
     else
-        newFolder = util::safeString(util::toUtf16(util::getString("输入新备份名称", true)));
+        newFolder = util::safeString(util::toUtf16(util::getString(getTxt("输入新备份名称"), true)));
 
     if(!newFolder.empty()
         && cfg::config["zip"]
@@ -63,15 +63,15 @@ static void fldMenuNew_t(void *a)
     {
         std::u16string fullOut = targetDir + newFolder;
         if (data::curData.isAGB()) {
-            t->status->setStatus("正在备份 GBAVC 存档数据...");
+            t->status->setStatus(getTxt("正在备份 GBAVC 存档数据..."));
             bool res = fs::pxiFileToSaveFile(fullOut);
             if (!res)
-                ui::showMessage("GBAVC 存档数据无效, 备份失败!");
+                ui::showMessage(getTxt("GBAVC 存档数据无效, 备份失败!"));
             else {
-                ui::showMessage("GBAVC 存档数据备份成功!");
+                ui::showMessage(getTxt("GBAVC 存档数据备份成功!"));
                 if (cfg::config["rawvcsave"]) {
                     std::u16string savPath = fullOut + util::toUtf16(".bin");
-                    fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16("原始 GBAVC 存档数据"), fs::getSDMCArch(), savPath, false, true);
+                    fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16(getTxt("原始 GBAVC 存档数据")), fs::getSDMCArch(), savPath, false, true);
                 }
             }
         } else if (!data::curData.getExtInfos().isDSCard) {
@@ -84,13 +84,13 @@ static void fldMenuNew_t(void *a)
 
             fs::copyDirToDirThreaded(fs::getSaveArch(), util::toUtf16("/"), fs::getSDMCArch(), fullOut, false);
         } else {
-            t->status->setStatus("正在导出 DS 卡带存档数据...");
+            t->status->setStatus(getTxt("正在导出 DS 卡带存档数据..."));
             std::u16string savPath = fullOut + util::toUtf16(".sav");
             CardType cardType = data::curData.getExtInfos().spiCardType;
             if (cardType != NO_CHIP)
                 fs::backupSPI(savPath, cardType);
             else
-                ui::showMessage("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!");
+                ui::showMessage(getTxt("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!"));
         }
     }
 
@@ -106,7 +106,7 @@ void fldMenuOverwrite_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
-    t->status->setStatus("正在覆盖存档...");
+    t->status->setStatus(getTxt("正在覆盖存档..."));
     if(in->isDir)
     {
         std::u16string overwrite = targetDir + in->name;
@@ -127,15 +127,15 @@ void fldMenuOverwrite_t(void *a)
 
         if (data::curData.isAGB()) {
             if (util::endsWith(overwrite, util::toUtf16(".bin")))
-                fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16("原始 GBAVC 存档数据"), fs::getSDMCArch(), overwrite, false, true);
+                fs::copyFileThreaded(fs::getSaveArch(), util::toUtf16(getTxt("原始 GBAVC 存档数据")), fs::getSDMCArch(), overwrite, false, true);
             else {
-                t->status->setStatus("正在备份 GBAVC 存档数据...");
+                t->status->setStatus(getTxt("正在备份 GBAVC 存档数据..."));
                 std::u16string savPath = util::removeSuffix(overwrite, util::toUtf16(".sav"));
                 bool res = fs::pxiFileToSaveFile(savPath);
                 if (!res)
-                    ui::showMessage("GBAVC 存档数据无效, 备份失败!");
+                    ui::showMessage(getTxt("GBAVC 存档数据无效, 备份失败!"));
                 else
-                    ui::showMessage("GBAVC 存档数据备份成功!");
+                    ui::showMessage(getTxt("GBAVC 存档数据备份成功!"));
             }
         } else if (!data::curData.getExtInfos().isDSCard) {
             std::u16string svOut = overwrite + util::toUtf16(".sv");
@@ -143,12 +143,12 @@ void fldMenuOverwrite_t(void *a)
 
             fs::copyArchToZipThreaded(fs::getSaveArch(), util::toUtf16("/"), overwrite);
         } else {
-            t->status->setStatus("正在导出 DS 卡带存档数据...");
+            t->status->setStatus(getTxt("正在导出 DS 卡带存档数据..."));
             CardType cardType = data::curData.getExtInfos().spiCardType;
             if (cardType != NO_CHIP)
                 fs::backupSPI(overwrite, cardType);
             else
-                ui::showMessage("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!");
+                ui::showMessage(getTxt("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!"));
         }
     }
     t->finished = true;
@@ -157,7 +157,7 @@ void fldMenuOverwrite_t(void *a)
 void fldMenuOverwrite(void *a)
 {
     fs::dirItem *in = (fs::dirItem *)a;
-    std::string q = "是否覆盖 " + in->nameUTF8 + "?";
+    std::string q = getTxt("是否覆盖 ") + in->nameUTF8 + "?";
     ui::confirm(q, fldMenuOverwrite_t, NULL, a);
 }
 
@@ -165,7 +165,7 @@ void fldMenuDelete_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
-    t->status->setStatus("正在删除存档...");
+    t->status->setStatus(getTxt("正在删除存档..."));
     std::u16string del = targetDir + in->name;
     if(in->isDir)
         fs::delDirRec(fs::getSDMCArch(), del);
@@ -180,7 +180,7 @@ void fldMenuDelete_t(void *a)
 void fldMenuDelete(void *a)
 {
     fs::dirItem *in = (fs::dirItem *)a;
-    std::string q = "你确定要删除 " + in->nameUTF8 + "?";
+    std::string q = getTxt("你确定要删除 ") + in->nameUTF8 + "?";
     ui::confirm(q, fldMenuDelete_t, NULL, a);
 }
 
@@ -194,7 +194,7 @@ void fldMenuRestore_t(void *a)
         std::u16string rest = targetDir + in->name + util::toUtf16("/");
         fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
         fs::commitData(fs::getSaveMode());
-        t->status->setStatus("正在恢复数据到存档位...");
+        t->status->setStatus(getTxt("正在恢复数据到存档位..."));
         fs::copyDirToDir(fs::getSDMCArch(), rest, fs::getSaveArch(), util::toUtf16("/"), true, NULL);
 
         // Try to import secure value if exists
@@ -208,12 +208,12 @@ void fldMenuRestore_t(void *a)
             if (util::endsWith(savPath, util::toUtf16(".bin")))
                 fs::copyFileThreaded(fs::getSDMCArch(), savPath, fs::getSaveArch(), util::toUtf16("/"), false, true);
             else {
-                t->status->setStatus("正在恢复 GBAVC 存档数据...");
+                t->status->setStatus(getTxt("正在恢复 GBAVC 存档数据..."));
                 bool res = fs::saveFileToPxiFile(savPath);
                 if (!res)
-                    ui::showMessage("GBAVC 存档数据无效, 恢复失败!");
+                    ui::showMessage(getTxt("GBAVC 存档数据无效, 恢复失败!"));
                 else
-                    ui::showMessage("GBAVC 存档数据恢复成功!");
+                    ui::showMessage(getTxt("GBAVC 存档数据恢复成功!"));
             }
         } else if (!data::curData.getExtInfos().isDSCard) {
             fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
@@ -222,12 +222,12 @@ void fldMenuRestore_t(void *a)
             std::u16string rest = targetDir + in->name;
             fs::copyZipToArchThreaded(fs::getSaveArch(), rest);
         } else {
-            t->status->setStatus("正在恢复数据到 DS 游戏卡带...");
+            t->status->setStatus(getTxt("正在恢复数据到 DS 游戏卡带..."));
             CardType cardType = data::curData.getExtInfos().spiCardType;
             if (cardType != NO_CHIP)
                 fs::restoreSPI(targetDir + in->name, cardType);
             else
-                ui::showMessage("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!");
+                ui::showMessage(getTxt("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!"));
         }
     }
     t->finished = true;
@@ -237,7 +237,7 @@ void fldMenuRestore_t(void *a)
 void fldMenuRestore(void *a)
 {
     fs::dirItem *in = (fs::dirItem *)a;
-    std::string q = "你确定要恢复 " + in->nameUTF8 + "?";
+    std::string q = getTxt("你确定要恢复 ") + in->nameUTF8 + "?";
     ui::confirm(q, fldMenuRestore_t, NULL, a);
 }
 
@@ -250,7 +250,7 @@ void fldMenuUpload_t(void *a)
     fs::dirItem *in = (fs::dirItem *)t->argPtr;
     std::u16string src = targetDir + in->name;
     std::string utf8Name = in->nameUTF8;
-    t->status->setStatus("正在上传 " + utf8Name + "...");
+    t->status->setStatus(getTxt("正在上传 ") + utf8Name + "...");
 
     FS_Path srcPath = fsMakePath(PATH_UTF16, src.c_str());
     FS_Path tmpPath = fsMakePath(PATH_ASCII, "/TYSS/tmp.zip");
@@ -268,7 +268,7 @@ void fldMenuUpload_t(void *a)
         fs::netDrive->updateFile(fileID, upload);
         if (fs::netDrive->getDriveType() == drive::DriveType::ADrive)
              fs::netDrive->uploadFile(utf8Name, uploadParent, upload);
-        ui::showMessage("云端存储: 云盘中已存在该存档,已覆盖");
+        ui::showMessage(getTxt("云端存储: 云盘中已存在该存档,已覆盖"));
     } else
         fs::netDrive->uploadFile(utf8Name, uploadParent, upload);
 
@@ -280,7 +280,7 @@ void fldMenuUpload_t(void *a)
     if (fs::fsfexists(fs::getSDMCArch(), srcSV))
     {
         std::string utf8NameSV = util::removeSuffix(utf8Name, std::string(".sav")) + ".sv";
-        t->status->setStatus("正在上传 " + utf8NameSV + "...");
+        t->status->setStatus(getTxt("正在上传 ") + utf8NameSV + "...");
 
         FS_Path srcPathSV = fsMakePath(PATH_UTF16, srcSV.c_str());
         FS_Path tmpSV = fsMakePath(PATH_ASCII, "/TYSS/tmp.sv");
@@ -311,9 +311,9 @@ void fldMenuUpload(void *a)
     if(fs::netDrive && !in->isDir)
         ui::newThread(fldMenuUpload_t, a, NULL);
     else if (in->isDir)
-        ui::showMessage("云端存储: 仅支持上传压缩包或SAV及BIN存档文件");
+        ui::showMessage(getTxt("云端存储: 仅支持上传压缩包或SAV及BIN存档文件"));
     else
-        ui::showMessage("云端存储: 服务尚未初始化");
+        ui::showMessage(getTxt("云端存储: 服务尚未初始化"));
 }
 
 void fldMenuDriveDownload_t(void *a)
@@ -321,7 +321,7 @@ void fldMenuDriveDownload_t(void *a)
     threadInfo *t = (threadInfo *)a;
     drive::driveItem *in = (drive::driveItem *)t->argPtr;
 
-    t->status->setStatus("正在下载 " + in->name + "...");
+    t->status->setStatus(getTxt("正在下载 ") + in->name + "...");
 
     std::u16string target = targetDir + util::toUtf16(in->name);
     FS_Path targetPath = fsMakePath(PATH_UTF16, target.c_str());
@@ -339,7 +339,7 @@ void fldMenuDriveDownload_t(void *a)
     std::string svName = util::removeSuffix(in->name, std::string(".sav")) + ".sv";
     if (fs::netDrive->fileExists(svName, in->parent))
     {
-        t->status->setStatus("正在下载 " + svName + "...");
+        t->status->setStatus(getTxt("正在下载 ") + svName + "...");
 
         std::u16string targetSV = targetDir + util::toUtf16(svName);
         FS_Path targetPathSV = fsMakePath(PATH_UTF16, targetSV.c_str());
@@ -365,7 +365,7 @@ void fldMenuDriveDownload(void *a)
     drive::driveItem *in = (drive::driveItem *)a;
     std::u16string checkPath = targetDir + util::toUtf16(in->name);
     if (fs::fsfexists(fs::getSDMCArch(), checkPath))
-        ui::confirm("下载此存档将会替换 SD 卡中的数据.\n你确定仍要进行下载吗?", fldMenuDriveDownload_t, NULL, a);
+        ui::confirm(getTxt("下载此存档将会替换 SD 卡中的数据.\n你确定仍要进行下载吗?"), fldMenuDriveDownload_t, NULL, a);
     else
         ui::newThread(fldMenuDriveDownload_t, a, NULL);
 }
@@ -376,14 +376,14 @@ void fldMenuDriveDelete_t(void *a)
     drive::driveItem *in = (drive::driveItem *)t->argPtr;
     std::string tmpParent = in->parent;
     std::string tmpName = in->name;
-    t->status->setStatus("正在删除 " + tmpName + "...");
+    t->status->setStatus(getTxt("正在删除 ") + tmpName + "...");
     fs::netDrive->deleteFile(in->id);
 
     // Delete sv file (if found)
     std::string svName = util::removeSuffix(tmpName, std::string(".sav")) + ".sv";
     if (fs::netDrive->fileExists(svName, tmpParent))
     {
-        t->status->setStatus("正在删除 " + svName + "...");
+        t->status->setStatus(getTxt("正在删除 ") + svName + "...");
         std::string fileID = fs::netDrive->getFileID(svName, tmpParent);
         fs::netDrive->deleteFile(fileID);
     }
@@ -395,14 +395,14 @@ void fldMenuDriveDelete_t(void *a)
 void fldMenuDriveDelete(void *a)
 {
     drive::driveItem *in = (drive::driveItem *)a;
-    ui::confirm("你确定要删除云盘中的 " + in->name + " 文件吗?\n若相对应的.sv文件存在,将同时被删除!", fldMenuDriveDelete_t, NULL, a);
+    ui::confirm(getTxt("你确定要删除云盘中的 ") + in->name + getTxt(" 文件吗?\n若相对应的.sv文件存在,将同时被删除!"), fldMenuDriveDelete_t, NULL, a);
 }
 
 void fldMenuDriveRestore_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     drive::driveItem *in = (drive::driveItem *)t->argPtr;
-    t->status->setStatus("正在下载 " + in->name + "...");
+    t->status->setStatus(getTxt("正在下载 ") + in->name + "...");
 
     FILE *tmp = fopen("/TYSS/tmp.zip", "wb");
     fs::netDrive->downloadFile(in->id, tmp);
@@ -413,7 +413,7 @@ void fldMenuDriveRestore_t(void *a)
     std::string svName = util::removeSuffix(in->name, std::string(".sav")) + ".sv";
     if (fs::netDrive->fileExists(svName, in->parent))
     {
-        t->status->setStatus("正在下载 " + svName + "...");
+        t->status->setStatus(getTxt("正在下载 ") + svName + "...");
         tmp = fopen("/TYSS/tmp.zip.sv", "wb");
         std::string fileID = fs::netDrive->getFileID(svName, in->parent);
         fs::netDrive->downloadFile(fileID, tmp);
@@ -423,7 +423,7 @@ void fldMenuDriveRestore_t(void *a)
 
     if (util::endsWith(in->name, std::string(".zip")))
     {
-        t->status->setStatus("正在解压存档到存档位...");
+        t->status->setStatus(getTxt("正在解压存档到存档位..."));
         unzFile unz = unzOpen64("/TYSS/tmp.zip");
         fs::copyZipToArch(fs::getSaveArch(), unz, NULL);
         unzClose(unz);
@@ -432,23 +432,23 @@ void fldMenuDriveRestore_t(void *a)
     } else if (data::curData.isAGB()) {
         if (util::endsWith(in->name, std::string(".bin")))
         {
-            t->status->setStatus("正在复制原始 GBAVC 存档数据到存档位...");
+            t->status->setStatus(getTxt("正在复制原始 GBAVC 存档数据到存档位..."));
             fs::copyFile(fs::getSDMCArch(), util::toUtf16("/TYSS/tmp.zip"), fs::getSaveArch(), util::toUtf16("/"), false, true, NULL);
         } else {
-            t->status->setStatus("正在恢复 GBAVC 存档数据...");
+            t->status->setStatus(getTxt("正在恢复 GBAVC 存档数据..."));
             bool res = fs::saveFileToPxiFile(util::toUtf16("/TYSS/tmp.zip"));
             if (!res)
-                ui::showMessage("GBAVC 存档数据无效, 恢复失败!");
+                ui::showMessage(getTxt("GBAVC 存档数据无效, 恢复失败!"));
             else
-                ui::showMessage("GBAVC 存档数据恢复成功!");
+                ui::showMessage(getTxt("GBAVC 存档数据恢复成功!"));
         }
     } else {
-        t->status->setStatus("正在恢复数据到 DS 游戏卡带...");
+        t->status->setStatus(getTxt("正在恢复数据到 DS 游戏卡带..."));
         CardType cardType = data::curData.getExtInfos().spiCardType;
         if (cardType != NO_CHIP)
             fs::restoreSPI(util::toUtf16("/TYSS/tmp.zip"), cardType);
         else
-            ui::showMessage("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!");
+            ui::showMessage(getTxt("不支持该 DS 游戏卡带的存档芯片类型\n或是该卡带不存在存档芯片!"));
     }
 
     FSUSER_DeleteFile(fs::getSDMCArch(), fsMakePath(PATH_ASCII, "/TYSS/tmp.zip"));
@@ -461,7 +461,7 @@ void fldMenuDriveRestore_t(void *a)
 void fldMenuDriveRestore(void *a)
 {
     drive::driveItem *in = (drive::driveItem *)a;
-    ui::confirm("你确定要下载并恢复 " + in->name + "?", fldMenuDriveRestore_t, NULL, a);
+    ui::confirm(getTxt("你确定要下载并恢复 ") + in->name + "?", fldMenuDriveRestore_t, NULL, a);
 }
 #endif
 
@@ -473,7 +473,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
     targetDir = _path;
     uploadParent = _uploadParent;
 
-    fldMenu.addOpt("新建", 0);
+    fldMenu.addOpt(getText("新建"), 0);
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
@@ -488,7 +488,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
 
         for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt("[云] " + driveList[i]->name, 320);
+            fldMenu.addOpt(getText("[云] ") + driveList[i]->name, 320);
 
             fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, driveList[i]);
             fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, driveList[i]);
@@ -516,7 +516,7 @@ void ui::fldRefresh()
     fldMenu.reset();
     fldList.reassign(fs::getSDMCArch(), targetDir, true);
 
-    fldMenu.addOpt("新建", 0);
+    fldMenu.addOpt(getText("新建"), 0);
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
@@ -531,7 +531,7 @@ void ui::fldRefresh()
 
         for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt("[云] " + driveList[i]->name, 320);
+            fldMenu.addOpt(getText("[云] ") + driveList[i]->name, 320);
 
             fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, driveList[i]);
             fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, driveList[i]);

@@ -189,6 +189,6 @@ void ui::menu::draw(const int &x, const int &y, const uint32_t &baseClr, const u
             C2D_DrawRectSolid(x + 4, y + 1 + ((i - start) * 18), GFX_DEPTH_DEFAULT, 2, 12, 0xFFC5FF00);
         }
 
-        gfx::drawText(opt[i].txt, x + 8, (y - 1) + ((i - start) * 18), GFX_DEPTH_DEFAULT, 0.5f, baseClr);
+        gfx::drawText(getTextFromMap(opt[i].txt.c_str()), x + 8, (y - 1) + ((i - start) * 18), GFX_DEPTH_DEFAULT, 0.5f, baseClr);
     }
 }

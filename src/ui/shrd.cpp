@@ -91,7 +91,7 @@ static void shrdViewCallback(void *)
 
         case KEY_X:
             {
-                std::string q = "你确定要备份所有的共享追加数据吗?\n这或许需要耗费一定时间, 请耐心等待!";
+                std::string q = getTxt("你确定要备份所有的共享追加数据吗?\n这或许需要耗费一定时间, 请耐心等待!");
                 ui::confirm(q, shrdViewBackupAll, NULL, NULL);
             }
             break;
@@ -138,7 +138,7 @@ void ui::shrdUpdate()
 void ui::shrdDrawTop()
 {
     shrdView->draw();
-    ui::drawUIBar(TITLE_TEXT + "- 共享追加数据", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + getTxt("- 共享追加数据"), ui::SCREEN_TOP, true);
 }
 
 void ui::shrdDrawBot()
@@ -159,28 +159,28 @@ void ui::shrdDrawBot()
         switch(shrdView->getSelected())
         {
             case 0:
-                sharedDesc = "F1: NAND JPEG/MPO 文件和 phtcache.bin 由相机应用程序存储在这里. 这也包含 UploadData.dat.";
+                sharedDesc = getTxt("F1: NAND JPEG/MPO 文件和 phtcache.bin 由相机应用程序存储在这里. 这也包含 UploadData.dat.");
                 break;
             case 1:
-                sharedDesc = "F2: 声音应用程序中的 NAND M4A 文件存储在这里.";
+                sharedDesc = getTxt("F2: 声音应用程序中的 NAND M4A 文件存储在这里.");
                 break;
             case 2:
-                sharedDesc = "F9: 适用于通知的 SpotPass 内容存储.";
+                sharedDesc = getTxt("F9: 适用于通知的 SpotPass 内容存储.");
                 break;
             case 3:
-                sharedDesc = "FB: 包含 idb.dat, idbt.dat, gamecoin.dat, ubll.lst, CFL_DB.dat 以及 CFL_OldDB.dat. 这些文件包含明文 Miis 数据和一些与播放/使用记录相关的数据 (也包括缓存的图标数据).";
+                sharedDesc = getTxt("FB: 包含 idb.dat, idbt.dat, gamecoin.dat, ubll.lst, CFL_DB.dat 以及 CFL_OldDB.dat. 这些文件包含明文 Miis 数据和一些与播放/使用记录相关的数据 (也包括缓存的图标数据).");
                 break;
             case 4:
-                sharedDesc = "FC: 包含 bashotorya.dat 以及 bashotorya2.dat.";
+                sharedDesc = getTxt("FC: 包含 bashotorya.dat 以及 bashotorya2.dat.");
                 break;
             case 5:
-                sharedDesc = "FD: 主页菜单的 SpotPass 内容存储.";
+                sharedDesc = getTxt("FD: 主页菜单的 SpotPass 内容存储.");
                 break;
             case 6:
-                sharedDesc = "FE: 包含 versionList.dat, 用于 7.0.0-13 系统引入的主页菜单软件更新通知.";
+                sharedDesc = getTxt("FE: 包含 versionList.dat, 用于 7.0.0-13 系统引入的主页菜单软件更新通知.");
                 break;
         }
         gfx::drawTextWrap("3DBREW: " + sharedDesc, 8, 8, GFX_DEPTH_DEFAULT, 0.5f, 304, gfx::txtCont);
-        ui::drawUIBar("\ue000 打开 \ue002 备份所有 \ue01A\ue077\ue019 视图类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar(getTxt("\ue000 打开 \ue002 备份所有 \ue01A\ue077\ue019 视图类型"), ui::SCREEN_BOT, false);
     }
 }

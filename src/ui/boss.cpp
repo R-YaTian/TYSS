@@ -116,10 +116,10 @@ static void bossViewOptAddtoBlackList(void *a)
 {
     if(data::curData.getMedia() == MEDIATYPE_GAME_CARD)
     {
-        ui::showMessage("为避免发生问题, 禁止将卡带游戏添加到黑名单!");
+        ui::showMessage(getTxt("为避免发生问题, 禁止将卡带游戏添加到黑名单!"));
         return;
     }
-    std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
+    std::string q = getTxt("你确定要将 ") + util::toUtf8(data::curData.getTitle()) + getTxt(" 添加到黑名单吗?\n这将使其在所有视图中不可见!");
     void *arg = &data::curData;
     ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
@@ -133,7 +133,7 @@ static void bossViewOptBackupAll_t(void *a)
 
 static void bossViewOptBackupAll(void *a)
 {
-    std::string q = "你确定要备份此页所有的数据吗?\n这或许需要耗费一定时间, 视 Title 数量而定。\n请耐心等待!";
+    std::string q = getTxt("你确定要备份此页所有的数据吗?\n这或许需要耗费一定时间, 视 Title 数量而定。\n请耐心等待!");
     ui::confirm(q, bossViewOptBackupAll_t, NULL, NULL);
 }
 
@@ -144,9 +144,9 @@ void ui::bossViewInit(void *a)
 
     bossViewOpts = new ui::menu;
     bossViewOpts->setCallback(bossViewOptCallback, NULL);
-    bossViewOpts->addOpt("添加到黑名单", 320);
+    bossViewOpts->addOpt(getText("添加到黑名单"), 320);
     bossViewOpts->addOptEvent(0, KEY_A, bossViewOptAddtoBlackList, NULL);
-    bossViewOpts->addOpt("备份所有的 BOSS 追加数据", 320);
+    bossViewOpts->addOpt(getText("备份所有的 BOSS 追加数据"), 320);
     bossViewOpts->addOptEvent(1, KEY_A, bossViewOptBackupAll, NULL);
 
     t->finished = true;
@@ -185,7 +185,7 @@ void ui::bossViewRefresh(int op)
 void ui::bossViewDrawTop()
 {
     bossView->draw();
-    ui::drawUIBar(TITLE_TEXT + "- BOSS 追加数据", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + getTxt("- BOSS 追加数据"), ui::SCREEN_TOP, true);
 }
 
 void ui::bossViewDrawBot()
@@ -202,12 +202,12 @@ void ui::bossViewDrawBot()
     else if(bossViewOptsOpen)
     {
         bossViewOpts->draw(0, 2, gfx::txtCont, 320);
-        ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
+        ui::drawUIBar(getTxt("\ue000 选择 \ue001 关闭"), ui::SCREEN_BOT, false);
     }
     else
     {
         if (!data::bossDataTitles.empty())
             data::bossDataTitles[bossView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 视图类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar(getTxt("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 视图类型"), ui::SCREEN_BOT, false);
     }
 }

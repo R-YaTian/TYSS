@@ -220,7 +220,7 @@ po/%.po: $(TOPDIR)/$(notdir $(TARGET)).pot
 
 pot: $(CFILES) $(CPPFILES)
 	@echo "Building $(TARGET).pot"
-	xgettext -o $(TARGET).pot $^ -kgetText -c \
+	xgettext -o $(TARGET).pot $^ inc/ui.h -kgetText -kgetTxt -c \
 		--from-code="UTF-8" \
 		--copyright-holder="R-YaTian" \
 		--package-name="$(APP_TITLE)" \

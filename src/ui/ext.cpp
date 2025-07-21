@@ -115,7 +115,7 @@ static void extOptCallback(void *a)
 static void extOptDeleteExtData(void *a)
 {
     data::titleData *t = &data::extDataTitles[extView->getSelected()];
-    std::string q = "你确定要删除 " + util::toUtf8(t->getTitle()) + " 的追加数据吗?\n删除后将重写缓存";
+    std::string q = getTxt("你确定要删除 ") + util::toUtf8(t->getTitle()) + getTxt(" 的追加数据吗?\n删除后将重写缓存");
     void *arg = &data::curData;
     ui::confirm(q, data::deleteExtData, NULL, arg);
 }
@@ -124,10 +124,10 @@ static void extOptAddtoBlackList(void *a)
 {
     if(data::curData.getMedia() == MEDIATYPE_GAME_CARD)
     {
-        ui::showMessage("为避免发生问题, 禁止将卡带游戏添加到黑名单!");
+        ui::showMessage(getTxt("为避免发生问题, 禁止将卡带游戏添加到黑名单!"));
         return;
     }
-    std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
+    std::string q = getTxt("你确定要将 ") + util::toUtf8(data::curData.getTitle()) + getTxt(" 添加到黑名单吗?\n这将使其在所有视图中不可见!");
     void *arg = &data::curData;
     ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
@@ -141,7 +141,7 @@ static void extOptBackupAll_t(void *a)
 
 static void extOptBackupAll(void *a)
 {
-    std::string q = "你确定要备份此页所有的数据吗?\n这或许需要耗费一定时间, 视 Title 数量而定。\n请耐心等待!";
+    std::string q = getTxt("你确定要备份此页所有的数据吗?\n这或许需要耗费一定时间, 视 Title 数量而定。\n请耐心等待!");
     ui::confirm(q, extOptBackupAll_t, NULL, NULL);
 }
 
@@ -152,11 +152,11 @@ void ui::extInit(void *a)
 
     extOpts = new ui::menu;
     extOpts->setCallback(extOptCallback, NULL);
-    extOpts->addOpt("删除追加数据", 320);
+    extOpts->addOpt(getText("删除追加数据"), 320);
     extOpts->addOptEvent(0, KEY_A, extOptDeleteExtData, NULL);
-    extOpts->addOpt("添加到黑名单", 320);
+    extOpts->addOpt(getText("添加到黑名单"), 320);
     extOpts->addOptEvent(1, KEY_A, extOptAddtoBlackList, NULL);
-    extOpts->addOpt("备份所有的追加数据", 320);
+    extOpts->addOpt(getText("备份所有的追加数据"), 320);
     extOpts->addOptEvent(2, KEY_A, extOptBackupAll, NULL);
 
     t->finished = true;
@@ -195,7 +195,7 @@ void ui::extRefresh(int op)
 void ui::extDrawTop()
 {
     extView->draw();
-    ui::drawUIBar(TITLE_TEXT + "- 追加数据", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + getTxt("- 追加数据"), ui::SCREEN_TOP, true);
 }
 
 void ui::extDrawBot()
@@ -212,12 +212,12 @@ void ui::extDrawBot()
     else if(extOptsOpen)
     {
         extOpts->draw(0, 2, gfx::txtCont, 320);
-        ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
+        ui::drawUIBar(getTxt("\ue000 选择 \ue001 关闭"), ui::SCREEN_BOT, false);
     }
     else
     {
         if (!data::extDataTitles.empty())
             data::extDataTitles[extView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 视图类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar(getTxt("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 视图类型"), ui::SCREEN_BOT, false);
     }
 }

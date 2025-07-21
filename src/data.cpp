@@ -446,7 +446,7 @@ void data::titleData::drawInfo(unsigned x, unsigned y)
     switch(getMedia())
     {
         case MEDIATYPE_GAME_CARD:
-            media = "游戏卡带";
+            media = getTxt("游戏卡带");
             break;
 
         case MEDIATYPE_SD:
@@ -604,7 +604,7 @@ static inline bool checkHigh(const uint64_t& id)
 void data::loadCheatsDB(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在加载金手指数据库...");
+    t->status->setStatus(getTxt("正在加载金手指数据库..."));
 
     auto future = std::async(std::launch::async, []() {
         CheatManager::getInstance().init(); // Initialize the cheats db
@@ -617,7 +617,7 @@ void data::loadCheatsDB(void *a)
 void data::loadTitles(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在加载 Titles...");
+    t->status->setStatus(getTxt("正在加载 Titles..."));
 
     if (titleLoaded && !titles.empty())
     {
@@ -640,7 +640,7 @@ void data::loadTitles(void *a)
         });
         future.get();
 
-        t->status->setStatus("正在写入缓存...");
+        t->status->setStatus(getTxt("正在写入缓存..."));
         createCache(titles, titlePath);
     }
 
@@ -726,7 +726,7 @@ void data::deleteExtData(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     titleData *in = (titleData *)t->argPtr;
-    t->status->setStatus("正在删除追加数据...");
+    t->status->setStatus(getTxt("正在删除追加数据..."));
 
     FS_ExtSaveDataInfo del = { MEDIATYPE_SD, 0, 0, in->getExtData(), 0 };
     Result res = FSUSER_DeleteExtSaveData(del);
@@ -743,7 +743,7 @@ void data::deleteExtData(void *a)
             }
         }
 
-        t->status->setStatus("正在重写缓存并刷新...");
+        t->status->setStatus(getTxt("正在重写缓存并刷新..."));
 
         // Erase cart if it's there
         if(titles[0].getMedia() == MEDIATYPE_GAME_CARD)
@@ -763,9 +763,9 @@ void data::deleteExtData(void *a)
 
         ui::extRefresh();
         ui::extOptBack();
-        ui::showMessage("追加数据删除成功!");
+        ui::showMessage(getTxt("追加数据删除成功!"));
     } else
-        ui::showMessage("追加数据删除失败!\n错误: 0x%08X", (unsigned) res);
+        ui::showMessage(getTxt("追加数据删除失败!\n错误: 0x%08X"), (unsigned) res);
 
     t->lock();
     t->argPtr = NULL;
@@ -802,7 +802,7 @@ void data::blacklistAdd(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     titleData *in = (titleData *)t->argPtr;
-    t->status->setStatus("正在保存黑名单...");
+    t->status->setStatus(getTxt("正在保存黑名单..."));
 
     blacklist.push_back(in->getID());
     saveBlacklist();
@@ -864,7 +864,7 @@ void data::blacklistAdd(void *a)
 void data::clearBlacklist(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在重置黑名单...");
+    t->status->setStatus(getTxt("正在重置黑名单..."));
 
     blacklist.clear();
     remove("/TYSS/blacklist.txt");
@@ -904,7 +904,7 @@ void data::saveFav()
 void data::clearFav(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在重置收藏列表...");
+    t->status->setStatus(getTxt("正在重置收藏列表..."));
 
     favorites.clear();
     remove("/TYSS/favorites.txt");
@@ -1163,7 +1163,7 @@ bool data::readCache(std::vector<titleData>& vect, const std::string& path)
 
 void data::datDrawTop()
 {
-    ui::drawUIBar("正在加载...", ui::SCREEN_TOP, true);
+    ui::drawUIBar(getTxt("正在加载..."), ui::SCREEN_TOP, true);
 }
 
 void data::datDrawBot()

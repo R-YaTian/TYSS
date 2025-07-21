@@ -36,7 +36,7 @@ void misc::setPC()
         playCoin.seek(0x4, fs::seek_set);
         coinAmount = playCoin.getByte() | playCoin.getByte() << 8;
 
-        coinAmount = util::getInt("输入 0-300 之间的数值", coinAmount, 300);
+        coinAmount = util::getInt(getTxt("输入 0-300 之间的数值"), coinAmount, 300);
         if (coinAmount != -1)
         {
             playCoin.seek(-2, fs::seek_cur);
@@ -52,7 +52,7 @@ void misc::setPC()
 void misc::clearStepHistory(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在清除步数历史记录...");
+    t->status->setStatus(getTxt("正在清除步数历史记录..."));
 
     Result ret;
 
@@ -61,9 +61,9 @@ void misc::clearStepHistory(void *a)
     ptmSysmExit();
 
     if (R_FAILED(ret))
-        ui::showMessage("清除步数历史记录失败!\n错误: 0x%08X", (unsigned) ret);
+        ui::showMessage(getTxt("清除步数历史记录失败!\n错误: 0x%08X"), (unsigned) ret);
     else
-        ui::showMessage("步数历史记录清除成功!");
+        ui::showMessage(getTxt("步数历史记录清除成功!"));
 
     t->finished = true;
 }
@@ -71,14 +71,14 @@ void misc::clearStepHistory(void *a)
 void misc::clearSoftwareLibraryAndPlayHistory(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在清除游玩时间历史记录及软件图鉴...");
+    t->status->setStatus(getTxt("正在清除游玩时间历史记录及软件图鉴..."));
 
     Result res;
     u8 region = 0;
 
     res = CFGU_SecureInfoGetRegion(&region);
     if (R_FAILED(res)) {
-        ui::showMessage("获取系统区域失败,无法完成操作!\n错误: 0x%08X", (unsigned) res);
+        ui::showMessage(getTxt("获取系统区域失败,无法完成操作!\n错误: 0x%08X"), (unsigned) res);
         t->finished = true;
         return;
     }
@@ -94,7 +94,7 @@ void misc::clearSoftwareLibraryAndPlayHistory(void *a)
         fs::closeSaveArch();
         if (R_FAILED(res)) 
         {
-            ui::showMessage("清除软件图鉴记录失败!\n错误: 0x%08X", (unsigned) res);
+            ui::showMessage(getTxt("清除软件图鉴记录失败!\n错误: 0x%08X"), (unsigned) res);
             t->finished = true;
             return;
         }
@@ -104,9 +104,9 @@ void misc::clearSoftwareLibraryAndPlayHistory(void *a)
         ptmSysmExit();
 
         if (R_FAILED(res))
-            ui::showMessage("清除游玩时间历史记录失败!\n错误: 0x%08X", (unsigned) res);
+            ui::showMessage(getTxt("清除游玩时间历史记录失败!\n错误: 0x%08X"), (unsigned) res);
         else
-            ui::showMessage("清除游玩时间历史记录及软件图鉴成功!");
+            ui::showMessage(getTxt("清除游玩时间历史记录及软件图鉴成功!"));
     }
 
     t->finished = true;
@@ -115,7 +115,7 @@ void misc::clearSoftwareLibraryAndPlayHistory(void *a)
 void misc::clearSharedIconCache(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在清除共享图标缓存数据...");
+    t->status->setStatus(getTxt("正在清除共享图标缓存数据..."));
 
     Result res, ret;
     data::titleData tmp;
@@ -129,9 +129,9 @@ void misc::clearSharedIconCache(void *a)
         fs::closeSaveArch();
 
         if (R_SUCCEEDED(res) && R_SUCCEEDED(ret))
-            ui::showMessage("清除共享图标缓存数据成功!");
+            ui::showMessage(getTxt("清除共享图标缓存数据成功!"));
         else
-            ui::showMessage("清除共享图标缓存数据失败!\n代码(idb.dat): 0x%08X\n代码(idbt.dat): 0x%08X", (unsigned) res, (unsigned) ret);
+            ui::showMessage(getTxt("清除共享图标缓存数据失败!\n代码(idb.dat): 0x%08X\n代码(idbt.dat): 0x%08X"), (unsigned) res, (unsigned) ret);
     }
 
     t->finished = true;
@@ -140,14 +140,14 @@ void misc::clearSharedIconCache(void *a)
 void misc::clearHomeMenuIconCache(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在清除主菜单图标缓存数据...");
+    t->status->setStatus(getTxt("正在清除主菜单图标缓存数据..."));
 
     Result res, ret;
     u8 region = 0;
 
     res = CFGU_SecureInfoGetRegion(&region);
     if (R_FAILED(res)) {
-        ui::showMessage("获取系统区域失败,无法完成操作!\n错误: 0x%08X", (unsigned) res);
+        ui::showMessage(getTxt("获取系统区域失败,无法完成操作!\n错误: 0x%08X"), (unsigned) res);
         t->finished = true;
         return;
     }
@@ -163,9 +163,9 @@ void misc::clearHomeMenuIconCache(void *a)
         fs::closeSaveArch();
 
         if (R_SUCCEEDED(res) && R_SUCCEEDED(ret))
-            ui::showMessage("清除主菜单图标缓存数据成功!");
+            ui::showMessage(getTxt("清除主菜单图标缓存数据成功!"));
         else
-            ui::showMessage("清除主菜单图标缓存数据失败!\n代码(Cache.dat): 0x%08X\n代码(CacheD.dat): 0x%08X", (unsigned) res, (unsigned) ret);
+            ui::showMessage(getTxt("清除主菜单图标缓存数据失败!\n代码(Cache.dat): 0x%08X\n代码(CacheD.dat): 0x%08X"), (unsigned) res, (unsigned) ret);
     }
 
     t->finished = true;
@@ -174,14 +174,14 @@ void misc::clearHomeMenuIconCache(void *a)
 void misc::resetDemoPlayCount(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在重置试玩版游戏游玩计数...");
+    t->status->setStatus(getTxt("正在重置试玩版游戏游玩计数..."));
 
     Result res = AM_DeleteAllDemoLaunchInfos();
 
     if (R_FAILED(res))
-        ui::showMessage("重置试玩版游戏游玩计数失败!\n错误: 0x%08X", (unsigned) res);
+        ui::showMessage(getTxt("重置试玩版游戏游玩计数失败!\n错误: 0x%08X"), (unsigned) res);
     else
-        ui::showMessage("重置试玩版游戏游玩计数成功!");
+        ui::showMessage(getTxt("重置试玩版游戏游玩计数成功!"));
 
     t->finished = true;
 }
@@ -189,14 +189,14 @@ void misc::resetDemoPlayCount(void *a)
 void misc::clearGameNotes(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在清除游戏笔记...");
+    t->status->setStatus(getTxt("正在清除游戏笔记..."));
 
     Result res;
     u8 region = 0;
 
     res = CFGU_SecureInfoGetRegion(&region);
     if (R_FAILED(res)) {
-        ui::showMessage("获取系统区域失败,无法完成操作!\n错误: 0x%08X", (unsigned) res);
+        ui::showMessage(getTxt("获取系统区域失败,无法完成操作!\n错误: 0x%08X"), (unsigned) res);
         t->finished = true;
         return;
     }
@@ -219,9 +219,9 @@ void misc::clearGameNotes(void *a)
         fs::closeSaveArch();
 
         if (R_FAILED(res))
-            ui::showMessage("清除游戏笔记数据失败!\n错误: 0x%08X", (unsigned) res);
+            ui::showMessage(getTxt("清除游戏笔记数据失败!\n错误: 0x%08X"), (unsigned) res);
         else
-            ui::showMessage("清除游戏笔记数据成功!");
+            ui::showMessage(getTxt("清除游戏笔记数据成功!"));
     }
 
     t->finished = true;
@@ -230,7 +230,7 @@ void misc::clearGameNotes(void *a)
 void misc::removeSoftwareUpdateNag(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在清除软件更新通知...");
+    t->status->setStatus(getTxt("正在清除软件更新通知..."));
 
     Result res;
     data::titleData tmp;
@@ -242,9 +242,9 @@ void misc::removeSoftwareUpdateNag(void *a)
         fs::closeSaveArch();
 
         if (R_FAILED(res))
-            ui::showMessage("清除软件更新通知失败!\n错误: 0x%08X", (unsigned) res);
+            ui::showMessage(getTxt("清除软件更新通知失败!\n错误: 0x%08X"), (unsigned) res);
         else
-            ui::showMessage("清除软件更新通知成功!");
+            ui::showMessage(getTxt("清除软件更新通知成功!"));
     }
 
     t->finished = true;
@@ -253,14 +253,14 @@ void misc::removeSoftwareUpdateNag(void *a)
 void misc::unpackWrappedSoftware(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在打开所有软件礼包...");
+    t->status->setStatus(getTxt("正在打开所有软件礼包..."));
 
     Result res;
     u8 region = 0;
 
     res = CFGU_SecureInfoGetRegion(&region);
     if (R_FAILED(res)) {
-        ui::showMessage("获取系统区域失败,无法完成操作!\n错误: 0x%08X", (unsigned) res);
+        ui::showMessage(getTxt("获取系统区域失败,无法完成操作!\n错误: 0x%08X"), (unsigned) res);
         t->finished = true;
         return;
     }
@@ -284,11 +284,11 @@ void misc::unpackWrappedSoftware(void *a)
             svHomemenu.seek(0xB48, fs::seek_set);
             writeSize = svHomemenu.write(flags, 0x168);
             if (writeSize < 0x168)
-                ui::showMessage("主菜单数据写入失败,无法完成操作!");
+                ui::showMessage(getTxt("主菜单数据写入失败,无法完成操作!"));
             else
-                ui::showMessage("所有的软件礼包打开成功!");
+                ui::showMessage(getTxt("所有的软件礼包打开成功!"));
         } else {
-            ui::showMessage("主菜单数据读取失败,无法完成操作!");
+            ui::showMessage(getTxt("主菜单数据读取失败,无法完成操作!"));
         }
 
         delete flags;
@@ -328,24 +328,24 @@ void misc::hackStepCount(void *a)
 
     if (R_FAILED(ret))
     {
-        ui::showMessage("获取当前小时步数失败!\n错误: 0x%08X", (unsigned) ret);
+        ui::showMessage(getTxt("获取当前小时步数失败!\n错误: 0x%08X"), (unsigned) ret);
         t->finished = true;
         return;
     } else {
-        ui::showMessage("今日步数为: %d\n当前小时步数为: %d", stepValue, stepCount);
+        ui::showMessage(getTxt("今日步数为: %d\n当前小时步数为: %d"), stepValue, stepCount);
     }
 
     stepValue = stepValue - stepCount;
-    stepCount = util::getInt("输入 0-18000 之间的数值", stepCount, 18000);
+    stepCount = util::getInt(getTxt("输入 0-18000 之间的数值"), stepCount, 18000);
 
     ptmSysmInit();
     ret = PTMSYSM_SetStepHistory(2, &stepCount);
     ptmSysmExit();
 
     if (R_FAILED(ret)) {
-        ui::showMessage("修改当前小时步数失败!\n错误: 0x%08X", (unsigned) ret);
+        ui::showMessage(getTxt("修改当前小时步数失败!\n错误: 0x%08X"), (unsigned) ret);
     } else {
-        ui::showMessage("修改当前小时步数成功!\n今日总步数: %d", stepValue + stepCount);
+        ui::showMessage(getTxt("修改当前小时步数成功!\n今日总步数: %d"), stepValue + stepCount);
     }
 
     t->finished = true;

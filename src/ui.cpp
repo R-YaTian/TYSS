@@ -59,9 +59,9 @@ touchPosition ui::pos;
 void ui::init()
 {
     thrdMgr = new ui::threadProcMngr;
-    ok = new ui::button("好 \ue000", 96, 184, 128, 32);
-    yes = new ui::button("是 \ue000", 32, 184, 120, 32);
-    no  = new ui::button("否 \ue001", 168, 184, 120, 32);
+    ok = new ui::button(getTxt("确定 \ue000"), 96, 184, 128, 32);
+    yes = new ui::button(getTxt("是 \ue000"), 32, 184, 120, 32);
+    no  = new ui::button(getTxt("否 \ue001"), 168, 184, 120, 32);
     prog = new ui::progressBar(100);
 
     gfx::setColor(cfg::config["lightback"]);

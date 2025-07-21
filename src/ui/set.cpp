@@ -67,6 +67,8 @@ static void toggleUInt(void *b, int step, int max, const std::vector<int>& black
         *in = max;
 }
 
+#define getText getTxt
+
 static std::string getLightDarkText(const bool& g)
 {
     return g ? getText("浅色系") : getText("深色系");
@@ -174,55 +176,55 @@ static std::string getDeflateLevelText(const int& g)
 
 static void setMenuClearStepHistory(void *a)
 {
-    std::string q = "你确定要清除步数历史记录吗?";
+    std::string q = getText("你确定要清除步数历史记录吗?");
     ui::confirm(q, misc::clearStepHistory, NULL, NULL);
 }
 
 static void setMenuClearSoftwareLibraryAndPlayHistory(void *a)
 {
-    std::string q = "确定要清除游玩时间历史记录及软件图鉴?";
+    std::string q = getText("确定要清除游玩时间历史记录及软件图鉴?");
     ui::confirm(q, misc::clearSoftwareLibraryAndPlayHistory, NULL, NULL);
 }
 
 static void setMenuClearSharedIconCache(void *a)
 {
-    std::string q = "你确定要清除共享图标缓存数据吗?";
+    std::string q = getText("你确定要清除共享图标缓存数据吗?");
     ui::confirm(q, misc::clearSharedIconCache, NULL, NULL);
 }
 
 static void setMenuClearHomeMenuIconCache(void *a)
 {
-    std::string q = "你确定要清除主菜单图标缓存数据吗?";
+    std::string q = getText("你确定要清除主菜单图标缓存数据吗?");
     ui::confirm(q, misc::clearHomeMenuIconCache, NULL, NULL);
 }
 
 static void setMenuResetDemoPlayCount(void *a)
 {
-    std::string q = "你确定要重置试玩版游戏的游玩计数吗?";
+    std::string q = getText("你确定要重置试玩版游戏的游玩计数吗?");
     ui::confirm(q, misc::resetDemoPlayCount, NULL, NULL);
 }
 
 static void setMenuClearGameNotes(void *a)
 {
-    std::string q = "你确定要清除所有的游戏笔记吗?";
+    std::string q = getText("你确定要清除所有的游戏笔记吗?");
     ui::confirm(q, misc::clearGameNotes, NULL, NULL);
 }
 
 static void setMenuRemoveSoftwareUpdateNag(void *a)
 {
-    std::string q = "你确定要清除所有的软件更新通知吗?";
+    std::string q = getText("你确定要清除所有的软件更新通知吗?");
     ui::confirm(q, misc::removeSoftwareUpdateNag, NULL, NULL);
 }
 
 static void setMenuUnpackWrappedSoftware(void *a)
 {
-    std::string q = "你确定要打开所有的软件礼包吗?";
+    std::string q = getText("你确定要打开所有的软件礼包吗?");
     ui::confirm(q, misc::unpackWrappedSoftware, NULL, NULL);
 }
 
 static void setMenuHackStepCount(void *a)
 {
-    std::string q = "你确定要修改主菜单上显示的今日步数吗?";
+    std::string q = getText("你确定要修改主菜单上显示的今日步数吗?");
     ui::confirm(q, misc::hackStepCount, NULL, NULL);
 }
 
@@ -233,13 +235,13 @@ static void setMenuHackPlayCoin(void *a)
 
 static void setMenuClearFavList(void *a)
 {
-    std::string q = "你确定要重置收藏列表吗?";
+    std::string q = getText("你确定要重置收藏列表吗?");
     ui::confirm(q, data::clearFav, NULL, NULL);
 }
 
 static void setMenuClearBlackList(void *a)
 {
-    std::string q = "你确定要重置黑名单吗?";
+    std::string q = getText("你确定要重置黑名单吗?");
     ui::confirm(q, data::clearBlacklist, NULL, NULL);
 }
 
@@ -253,7 +255,7 @@ static void setMenuReloadTitles(void *a)
 static void setMenuReloadDriveList_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在重载云端存储列表...");
+    t->status->setStatus(getText("正在重载云端存储列表..."));
     fs::netDrive->loadDriveList();
     t->finished = true;
 }
@@ -263,7 +265,7 @@ static void setMenuReloadDriveList(void *a)
     if (fs::netDrive)
         ui::newThread(setMenuReloadDriveList_t, NULL, NULL);
     else {
-        std::string q = "云端存储: 服务尚未初始化\n是否立即启动服务并加载云端存储列表?";
+        std::string q = getText("云端存储: 服务尚未初始化\n是否立即启动服务并加载云端存储列表?");
         ui::confirm(q, fs::driveInit, NULL, NULL);
     }
 }
@@ -271,7 +273,7 @@ static void setMenuReloadDriveList(void *a)
 static void setMenuToggleDriveBOOL_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在保存设置...");
+    t->status->setStatus(getText("正在保存设置..."));
     toggleBool(t->argPtr);
     cfg::saveDrive();
     svcSleepThread(1e+9 / 4);
@@ -290,7 +292,7 @@ static void setMenuToggleDriveBOOL(void *a)
 static void setMenuSaveCommon(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在保存设置...");
+    t->status->setStatus(getText("正在保存设置..."));
     cfg::saveCommon();
     if (sconfig["cheatdblang"] != cfg::config["cheatdblang"] &&
         !util::fexists("/TYSS/cheats.json") && CheatManager::getInstance().cheats())
@@ -359,6 +361,8 @@ static void setSubMenuCallback(void *a)
     }
 }
 
+#undef getText
+
 void ui::setInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
@@ -408,40 +412,40 @@ void ui::setInit(void *a)
     }
 #endif
 
-    setSubMenu.addOpt("修改 PlayCoin", 320);
+    setSubMenu.addOpt(getText("修改 PlayCoin"), 320);
     setSubMenu.addOptEvent(0, KEY_A, setMenuHackPlayCoin, NULL);
 
-    setSubMenu.addOpt("清除步数历史记录", 320);
+    setSubMenu.addOpt(getText("清除步数历史记录"), 320);
     setSubMenu.addOptEvent(1, KEY_A, setMenuClearStepHistory, NULL);
 
-    setSubMenu.addOpt("清除游玩时间历史记录以及软件图鉴", 320);
+    setSubMenu.addOpt(getText("清除游玩时间历史记录以及软件图鉴"), 320);
     setSubMenu.addOptEvent(2, KEY_A, setMenuClearSoftwareLibraryAndPlayHistory, NULL);
 
-    setSubMenu.addOpt("清除共享图标缓存", 320);
+    setSubMenu.addOpt(getText("清除共享图标缓存"), 320);
     setSubMenu.addOptEvent(3, KEY_A, setMenuClearSharedIconCache, NULL);
 
-    setSubMenu.addOpt("清除主菜单图标缓存", 320);
+    setSubMenu.addOpt(getText("清除主菜单图标缓存"), 320);
     setSubMenu.addOptEvent(4, KEY_A, setMenuClearHomeMenuIconCache, NULL);
 
-    setSubMenu.addOpt("重置试玩版游戏游玩计数", 320);
+    setSubMenu.addOpt(getText("重置试玩版游戏游玩计数"), 320);
     setSubMenu.addOptEvent(5, KEY_A, setMenuResetDemoPlayCount, NULL);
 
-    setSubMenu.addOpt("清除游戏笔记", 320);
+    setSubMenu.addOpt(getText("清除游戏笔记"), 320);
     setSubMenu.addOptEvent(6, KEY_A, setMenuClearGameNotes, NULL);
 
-    setSubMenu.addOpt("清除软件更新通知", 320);
+    setSubMenu.addOpt(getText("清除软件更新通知"), 320);
     setSubMenu.addOptEvent(7, KEY_A, setMenuRemoveSoftwareUpdateNag, NULL);
 
-    setSubMenu.addOpt("打开所有软件礼包", 320);
+    setSubMenu.addOpt(getText("打开所有软件礼包"), 320);
     setSubMenu.addOptEvent(8, KEY_A, setMenuUnpackWrappedSoftware, NULL);
 
-    setSubMenu.addOpt("修改今日步数", 320);
+    setSubMenu.addOpt(getText("修改今日步数"), 320);
     setSubMenu.addOptEvent(9, KEY_A, setMenuHackStepCount, NULL);
 
-    setSubMenu.addOpt("重置 TYSS 收藏列表", 320);
+    setSubMenu.addOpt(getText("重置 TYSS 收藏列表"), 320);
     setSubMenu.addOptEvent(10, KEY_A, setMenuClearFavList, NULL);
 
-    setSubMenu.addOpt("重置 TYSS 黑名单", 320);
+    setSubMenu.addOpt(getText("重置 TYSS 黑名单"), 320);
     setSubMenu.addOptEvent(11, KEY_A, setMenuClearBlackList, NULL);
 
     setSubMenu.setCallback(setSubMenuCallback, NULL);
@@ -453,6 +457,8 @@ void ui::setExit()
 {
     cfg::saveCommon();
 }
+
+#define getText getTxt
 
 void ui::setUpdate()
 {
@@ -517,87 +523,89 @@ void ui::setDrawBottom()
         switch(setMenu.getSelected())
         {
             case 0:
-                setOptsDesc = "清除 Title 缓存并重新扫描应用列表。\n这或许需要耗费一定时间, 视 Title 数量而定。";
+                setOptsDesc = getText("清除 Title 缓存并重新扫描应用列表。\n这或许需要耗费一定时间, 视 Title 数量而定。");
                 break;
             case 1:
-                setOptsDesc = "备份存档时是否使用 ZIP 压缩存储。\n注:仅支持3DS应用(下载版与卡带)及DSiWare存档\n当备份DS游戏卡带或GBAVC存档时,无论是否开启\n该项设置,存档都将直接转储为.sav或.bin格式!";
+                setOptsDesc = getText("备份存档时是否使用 ZIP 压缩存储。\n注:仅支持3DS应用(下载版与卡带)及DSiWare存档\n当备份DS游戏卡带或GBAVC存档时,无论是否开启\n该项设置,存档都将直接转储为.sav或.bin格式!");
                 break;
             case 2:
-                setOptsDesc = "选择 ZIP 压缩等级。\n(等级越高, 速度越慢, 压缩率越高)";
+                setOptsDesc = getText("选择 ZIP 压缩等级。\n(等级越高, 速度越慢, 压缩率越高)");
                 break;
             case 3:
-                setOptsDesc = "选择 UI 界面主题色。\n(浅色/暗黑)";
+                setOptsDesc = getText("选择 UI 界面主题色。\n(浅色/暗黑)");
                 break;
             case 4:
-                setOptsDesc = "选择 UI 界面显示语言。";
+                setOptsDesc = getText("选择 UI 界面显示语言。");
                 break;
             case 5:
-                setOptsDesc = "以何种语言显示应用程序标题。\n这将影响存放应用程序数据备份的文件夹名称,\n一经设置不建议再修改,并且需要重载Titles才生效!";
+                setOptsDesc = getText("以何种语言显示应用程序标题。\n这将影响存放应用程序数据备份的文件夹名称,\n一经设置不建议再修改,并且需要重载Titles才生效!");
                 break;
             case 6:
-                setOptsDesc = "选择内置金手指数据库语言(目前仅支持简中与英语)\n软件优先加载TYSS文件夹中外置金手指数据库文件\ncheats.json,该选项仅决定内置金手指数据库语言,\n当外置数据库存在时无效!\n该项设置更改时,已载入的金手指数据库会被卸载,\n并且将在需要使用时重载!";
+                setOptsDesc = getText("选择内置金手指数据库语言(目前仅支持简中与英语)\n软件优先加载TYSS文件夹中外置金手指数据库文件\ncheats.json,该选项仅决定内置金手指数据库语言,\n当外置数据库存在时无效!\n该项设置更改时,已载入的金手指数据库会被卸载,\n并且将在需要使用时重载!");
                 break;
             case 7:
-                setOptsDesc = "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将增加。";
+                setOptsDesc = getText("决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将增加。");
                 break;
             case 8:
-                setOptsDesc = "当GBAVC存档备份成功时保留一份原始(.bin)数据。\n一般情况下不需要开启此项,因为原始数据不可用于\nGBAVC虚拟主机之外的任何地方(GBA模拟器等等)\n注:覆盖备份文件或还原数据时,将根据后缀自动判断";
+                setOptsDesc = getText("当GBAVC存档备份成功时保留一份原始(.bin)数据。\n一般情况下不需要开启此项,因为原始数据不可用于\nGBAVC虚拟主机之外的任何地方(GBA模拟器等等)\n注:覆盖备份文件或还原数据时,将根据后缀自动判断");
                 break;
             case 9:
-                setOptsDesc = "将LR按键的功能与ZLZR按键的功能对调。\n在老三上启用则LR按键将用于UI页面切换,而LR快速\n浏览应用列表功能将被禁用(由于老三无ZLZR按键)";
+                setOptsDesc = getText("将LR按键的功能与ZLZR按键的功能对调。\n在老三上启用则LR按键将用于UI页面切换,而LR快速\n浏览应用列表功能将被禁用(由于老三无ZLZR按键)");
                 break;
         }
 #ifdef ENABLE_DRIVE
         if(util::fexists("/TYSS/drive.json"))
         {
             if ((unsigned) setMenu.getSelected() == setMenu.getCount() - 2)
-                setOptsDesc = "云端存储服务是否随软件启动并加载云端存储列表。\n这可能导致应用程序启动耗时增加。";
+                setOptsDesc = getText("云端存储服务是否随软件启动并加载云端存储列表。\n这可能导致应用程序启动耗时增加。");
             else if ((unsigned) setMenu.getSelected() == setMenu.getCount() - 1)
-                setOptsDesc = "从云端同步存档文件列表。\n这或许需要耗费一定时间, 视网络环境而定。";
+                setOptsDesc = getText("从云端同步存档文件列表。\n这或许需要耗费一定时间, 视网络环境而定。");
         }
 #endif
-        ui::drawUIBar("\ue000 选择/切换 \ue003 启动工具箱 \ue01A\ue077\ue019 视图类型", ui::SCREEN_BOT, false);
+        ui::drawUIBar(getText("\ue000 选择/切换 \ue003 启动工具箱 \ue01A\ue077\ue019 视图类型"), ui::SCREEN_BOT, false);
     } else {
         switch(setSubMenu.getSelected())
         {
             case 0:
-                setOptsDesc = "修改游戏币数量。(范围: 0-300)";
+                setOptsDesc = getText("修改游戏币数量。(范围: 0-300)");
                 break;
             case 1:
-                setOptsDesc = "这将清除回忆记录册中的总步数记录!\n该操作无法撤销!";
+                setOptsDesc = getText("这将清除回忆记录册中的总步数记录!\n该操作无法撤销!");
                 break;
             case 2:
-                setOptsDesc = "这将清除回忆记录册中的软件图鉴记录以及所有游玩\n时间历史记录!\n操作无法撤销!执行此操作前强烈建议备份系统存档\n页的回忆记录册数据!";
+                setOptsDesc = getText("这将清除回忆记录册中的软件图鉴记录以及所有游玩\n时间历史记录!\n操作无法撤销!执行此操作前强烈建议备份系统存档\n页的回忆记录册数据!");
                 break;
             case 3:
-                setOptsDesc = "将使得回忆记录册中的软件图鉴列表被清空。\n操作无法撤销!执行此操作前强烈建议备份共享追加\n数据页的FB记录以及系统存档页的回忆记录册数据!\n恢复备份时需要同时恢复上述两项记录!";
+                setOptsDesc = getText("将使得回忆记录册中的软件图鉴列表被清空。\n操作无法撤销!执行此操作前强烈建议备份共享追加\n数据页的FB记录以及系统存档页的回忆记录册数据!\n恢复备份时需要同时恢复上述两项记录!");
                 break;
             case 4:
-                setOptsDesc = "清除主菜单图标缓存(老三需用本软件的Mode3版本)\n操作无法撤销!执行此操作前强烈建议备份追加数据\n页的主菜单(CTR-N-HMM*)记录!";
+                setOptsDesc = getText("清除主菜单图标缓存(老三需用本软件的Mode3版本)\n操作无法撤销!执行此操作前强烈建议备份追加数据\n页的主菜单(CTR-N-HMM*)记录!");
                 break;
             case 5:
-                setOptsDesc = "重置试玩版 (Demo) 应用的游玩次数。\n该操作无法撤销!";
+                setOptsDesc = getText("重置试玩版 (Demo) 应用的游玩次数。\n该操作无法撤销!");
                 break;
             case 6:
-                setOptsDesc = "清除所有游戏笔记数据。\n操作无法撤销!执行此操作前强烈建议备份系统存档\n页的游戏笔记数据!";
+                setOptsDesc = getText("清除所有游戏笔记数据。\n操作无法撤销!执行此操作前强烈建议备份系统存档\n页的游戏笔记数据!");
                 break;
             case 7:
-                setOptsDesc = "这将移除所有已安装程序启动前的更新提示。\n(直到主菜单再次联网下载软件版本数据库)\n注意: 这对某些游戏内置的版本检查无效!\n操作无法撤销!执行此操作前强烈建议备份共享追加\n数据页的FE记录!";
+                setOptsDesc = getText("这将移除所有已安装程序启动前的更新提示。\n(直到主菜单再次联网下载软件版本数据库)\n注意: 这对某些游戏内置的版本检查无效!\n操作无法撤销!执行此操作前强烈建议备份共享追加\n数据页的FE记录!");
                 break;
             case 8:
-                setOptsDesc = "打开主菜单中所有的软件礼包。该操作无法撤销!";
+                setOptsDesc = getText("打开主菜单中所有的软件礼包。该操作无法撤销!");
                 break;
             case 9:
-                setOptsDesc = "修改主菜单上显示的今日步数数据。\n由于部分限制因素, 该项功能仅影响当前小时步数。\n此前产生的步数不会被修改!";
+                setOptsDesc = getText("修改主菜单上显示的今日步数数据。\n由于部分限制因素, 该项功能仅影响当前小时步数。\n此前产生的步数不会被修改!");
                 break;
             case 10:
-                setOptsDesc = "这将会清空本程序收藏列表, 请谨慎操作。";
+                setOptsDesc = getText("这将会清空本程序收藏列表, 请谨慎操作。");
                 break;
             case 11:
-                setOptsDesc = "清空本程序黑名单列表, 随后将自动执行重载 Titles";
+                setOptsDesc = getText("清空本程序黑名单列表, 随后将自动执行重载 Titles");
                 break;
         }
-        ui::drawUIBar("\ue000 选择 \ue001 退出工具箱", ui::SCREEN_BOT, false);
+        ui::drawUIBar(getText("\ue000 选择 \ue001 退出工具箱"), ui::SCREEN_BOT, false);
     }
     gfx::drawTextWrap(setOptsDesc, 8, 8, GFX_DEPTH_DEFAULT, 0.5f, 304, gfx::txtCont);
 }
+
+#undef getText

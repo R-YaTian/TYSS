@@ -67,9 +67,9 @@ enum
 extern const std::string TITLE_TEXT;
 
 #ifdef ENABLE_DRIVE
-#define FLD_GUIDE_TEXT_DRIVE "\ue000 选择 \ue002 删除 \ue003 恢复 \ue005 上传 \ue001 关闭"
+#define FLD_GUIDE_TEXT_DRIVE getTxt("\ue000 选择 \ue002 删除 \ue003 恢复 \ue005 上传 \ue001 关闭")
 #endif
-#define FLD_GUIDE_TEXT "\ue000 选择 \ue002 删除 \ue003 恢复 \ue001 关闭"
+#define FLD_GUIDE_TEXT getTxt("\ue000 选择 \ue002 删除 \ue003 恢复 \ue001 关闭")
 
 namespace ui
 {

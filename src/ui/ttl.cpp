@@ -123,12 +123,12 @@ static void ttlOptResetSaveData_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     if(fs::openArchive(data::curData, ARCHIVE_USER_SAVEDATA, false)) {
-        t->status->setStatus("正在重置存档数据...");
+        t->status->setStatus(getTxt("正在重置存档数据..."));
         fs::delDirRec(fs::getSaveArch(), util::toUtf16("/"));
         fs::commitData(fs::getSaveMode());
         fs::closeSaveArch();
     } else if (data::curData.isAGB() && fs::openArchive(data::curData, ARCHIVE_SAVEDATA_AND_CONTENT, false)) {
-        t->status->setStatus("正在重置GBAVC存档数据...");
+        t->status->setStatus(getTxt("正在重置GBAVC存档数据..."));
         fs::resetPxiFile(fs::getSaveArch());
     }
     t->finished = true;
@@ -139,17 +139,17 @@ static void ttlOptResetSaveData(void *a)
     data::titleData *t = &data::usrSaveTitles[ttlView->getSelected()];
     if(t->getExtInfos().isDSCard || (t->getHigh() & 0x8000) == 0x8000)
     {
-        ui::showMessage("DS卡带游戏以及 DSiWare 不支持此操作!");
+        ui::showMessage(getTxt("DS卡带游戏以及 DSiWare 不支持此操作!"));
         return;
     }
-    std::string q = "你确定要为 " + util::toUtf8(t->getTitle()) + " 重置存档数据吗?\n注意: GBAVC存档重置后需运行一次游戏才能\n再次管理存档!";
+    std::string q = getTxt("你确定要为 ") + util::toUtf8(t->getTitle()) + getTxt(" 重置存档数据吗?\n注意: GBAVC存档重置后需运行一次游戏才能\n再次管理存档!");
     ui::confirm(q, ttlOptResetSaveData_t, NULL, NULL);
 }
 
 static void ttlOptInstallCheats_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在安装金手指文件...");
+    t->status->setStatus(getTxt("正在安装金手指文件..."));
 
     std::string key = data::curData.getIDStr();
     auto asyncTask = std::async(std::launch::async, [key]() {
@@ -158,9 +158,9 @@ static void ttlOptInstallCheats_t(void *a)
 
     bool ret = asyncTask.get();
     if (ret)
-        ui::showMessage("金手指文件安装成功!");
+        ui::showMessage(getTxt("金手指文件安装成功!"));
     else
-        ui::showMessage("金手指文件安装失败!");
+        ui::showMessage(getTxt("金手指文件安装失败!"));
 
     t->finished = true;
 }
@@ -171,7 +171,7 @@ static void ttlOptDeleteCheats_t(void *a)
 
     std::string key = data::curData.getIDStr();
     fs::fdelete("/cheats/" + key + ".txt");
-    ui::showMessage("金手指文件已删除!");
+    ui::showMessage(getTxt("金手指文件已删除!"));
 
     t->finished = true;
 }
@@ -185,7 +185,7 @@ static void ttlOptManageCheats_t(void *a)
 
     if(title->getExtInfos().isDSCard || (title->getHigh() & 0x8000) == 0x8000 || title->isAGB())
     {
-        ui::showMessage("GBAVC,DSiWare及DS卡带不支持此操作!");
+        ui::showMessage(getTxt("GBAVC,DSiWare及DS卡带不支持此操作!"));
         t->finished = true;
         return;
     }
@@ -194,13 +194,13 @@ static void ttlOptManageCheats_t(void *a)
         data::loadCheatsDB(a);
 
     if (util::fexists("/cheats/" + key + ".txt")) {
-        std::string q = "该应用的金手指文件已安装, 是否删除?";
+        std::string q = getTxt("该应用的金手指文件已安装, 是否删除?");
         ui::confirm(q, ttlOptDeleteCheats_t, NULL, NULL);
     } else if (CheatManager::getInstance().areCheatsAvailable(key)) {
-        std::string q = "你确定要为 " + util::toUtf8(title->getTitle()) + " 安装金手指文件?";
+        std::string q = getTxt("你确定要为 ") + util::toUtf8(title->getTitle()) + getTxt(" 安装金手指文件?");
         ui::confirm(q, ttlOptInstallCheats_t, NULL, NULL);
     } else {
-        ui::showMessage("数据库中未找到该应用可用的金手指.");
+        ui::showMessage(getTxt("数据库中未找到该应用可用的金手指."));
     }
 
     t->finished = true;
@@ -215,10 +215,10 @@ static void ttlOptAddtoBlackList(void *a)
 {
     if(data::curData.getMedia() == MEDIATYPE_GAME_CARD)
     {
-        ui::showMessage("为避免发生问题, 禁止将卡带游戏添加到黑名单!");
+        ui::showMessage(getTxt("为避免发生问题, 禁止将卡带游戏添加到黑名单!"));
         return;
     }
-    std::string q = "你确定要将 " + util::toUtf8(data::curData.getTitle()) + " 添加到黑名单吗?\n这将使其在所有视图中不可见!";
+    std::string q = getTxt("你确定要将 ") + util::toUtf8(data::curData.getTitle()) + getTxt(" 添加到黑名单吗?\n这将使其在所有视图中不可见!");
     void *arg = &data::curData;
     ui::confirm(q, data::blacklistAdd, NULL, arg);
 }
@@ -232,7 +232,7 @@ static void ttlOptBackupAll_t(void *a)
 
 static void ttlOptBackupAll(void *a)
 {
-    std::string q = "你确定要备份此页所有的用户存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!";
+    std::string q = getTxt("你确定要备份此页所有的用户存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!");
     ui::confirm(q, ttlOptBackupAll_t, NULL, NULL);
 }
 
@@ -245,7 +245,7 @@ static void ttlOptBackupAllDSiWare_t(void *a)
 
 static void ttlOptBackupAllDSiWare(void *a)
 {
-    std::string q = "你确定要备份此页所有的DSiWare存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!";
+    std::string q = getTxt("你确定要备份此页所有的DSiWare存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!");
     ui::confirm(q, ttlOptBackupAllDSiWare_t, NULL, NULL);
 }
 
@@ -258,7 +258,7 @@ static void ttlOptBackupAllAGBSave_t(void *a)
 
 static void ttlOptBackupAllAGBSave(void *a)
 {
-    std::string q = "你确定要备份此页所有的GBAVC存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!";
+    std::string q = getTxt("你确定要备份此页所有的GBAVC存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!");
     ui::confirm(q, ttlOptBackupAllAGBSave_t, NULL, NULL);
 }
 
@@ -270,17 +270,17 @@ void ui::ttlInit(void *a)
 
     ttlOpts = new ui::menu;
     ttlOpts->setCallback(ttlOptCallback, NULL);
-    ttlOpts->addOpt("安装或删除该应用的金手指文件", 320);
+    ttlOpts->addOpt(getText("安装或删除该应用的金手指文件"), 320);
     ttlOpts->addOptEvent(0, KEY_A, ttlOptManageCheats, NULL);
-    ttlOpts->addOpt("重置存档数据", 320);
+    ttlOpts->addOpt(getText("重置存档数据"), 320);
     ttlOpts->addOptEvent(1, KEY_A, ttlOptResetSaveData, NULL);
-    ttlOpts->addOpt("添加到黑名单", 320);
+    ttlOpts->addOpt(getText("添加到黑名单"), 320);
     ttlOpts->addOptEvent(2, KEY_A, ttlOptAddtoBlackList, NULL);
-    ttlOpts->addOpt("备份所有的用户存档(DS 游戏卡带除外)", 320);
+    ttlOpts->addOpt(getText("备份所有的用户存档(DS 游戏卡带除外)"), 320);
     ttlOpts->addOptEvent(3, KEY_A, ttlOptBackupAll, NULL);
-    ttlOpts->addOpt("备份所有的 DSiWare 存档", 320);
+    ttlOpts->addOpt(getText("备份所有的 DSiWare 存档"), 320);
     ttlOpts->addOptEvent(4, KEY_A, ttlOptBackupAllDSiWare, NULL);
-    ttlOpts->addOpt("备份所有的 GBAVC 存档", 320);
+    ttlOpts->addOpt(getText("备份所有的 GBAVC 存档"), 320);
     ttlOpts->addOptEvent(5, KEY_A, ttlOptBackupAllAGBSave, NULL);
 
     t->finished = true;
@@ -319,7 +319,7 @@ void ui::ttlUpdate()
 void ui::ttlDrawTop()
 {
     ttlView->draw();
-    ui::drawUIBar(TITLE_TEXT + "- 用户存档", ui::SCREEN_TOP, true);
+    ui::drawUIBar(TITLE_TEXT + getTxt("- 用户存档"), ui::SCREEN_TOP, true);
 }
 
 void ui::ttlDrawBot()
@@ -336,12 +336,12 @@ void ui::ttlDrawBot()
     else if(ttlOptsOpen)
     {
         ttlOpts->draw(0, 2, gfx::txtCont, 320);
-        ui::drawUIBar("\ue000 选择 \ue001 关闭", ui::SCREEN_BOT, false);
+        ui::drawUIBar(getTxt("\ue000 选择 \ue001 关闭"), ui::SCREEN_BOT, false);
     }
     else
     {
         if (!data::usrSaveTitles.empty())
             data::usrSaveTitles[ttlView->getSelected()].drawInfo(0, 0);
-        ui::drawUIBar("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 视图类型", ui::SCREEN_BOT, true);
+        ui::drawUIBar(getTxt("\ue000 打开 \ue002 选项 \ue003 收藏 \ue01A\ue077\ue019 视图类型"), ui::SCREEN_BOT, true);
     }
 }

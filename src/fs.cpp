@@ -104,7 +104,7 @@ void fs::debugWriteDriveList(drive::DriveBase* driveBase)
 void fs::driveInit(void *a)
 {
     threadInfo *t = (threadInfo *)a;
-    t->status->setStatus("正在启动云端存储服务...");
+    t->status->setStatus(getTxt("正在启动云端存储服务..."));
     if (!cfg::driveClientID.empty() && !cfg::driveClientSecret.empty())
         netDrive = std::make_unique<drive::gd>(cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken);
     else {
@@ -149,9 +149,9 @@ void fs::driveInit(void *a)
 
         sharedExtID = netDrive->getFolderID(DRIVE_SHARED_DIR, tyssDirID);
 
-        ui::showMessage("云端存储: 服务初始化完成!");
+        ui::showMessage(getTxt("云端存储: 服务初始化完成!"));
     } else {
-        ui::showMessage("云端存储: 服务初始化失败!\n请检查云端存储服务配置信息。");
+        ui::showMessage(getTxt("云端存储: 服务初始化失败!\n请检查云端存储服务配置信息。"));
         netDrive.reset();
     }
     t->finished = true;
@@ -285,7 +285,7 @@ bool fs::openArchive(data::titleData& dat, const uint32_t& mode, bool error, FS_
     if(R_FAILED(res))
     {
         if(error)
-            ui::showMessage("无法打开该存档位. 该存档类型可能不存在适用此 title 的数据.\n错误: 0x%08X\nTitle: %s", (unsigned)res, dat.getTitleUTF8().c_str());
+            ui::showMessage(getTxt("无法打开该存档位. 该存档类型可能不存在适用此 title 的数据.\n错误: 0x%08X\nTitle: %s"), (unsigned)res, dat.getTitleUTF8().c_str());
         return false;
     }
 
@@ -303,7 +303,7 @@ void fs::commitData(const uint32_t& mode)
     {
         Result res = FSUSER_ControlArchive(saveArch, ARCHIVE_ACTION_COMMIT_SAVE_DATA, NULL, 0, NULL, 0);
         if(R_FAILED(res))
-            ui::showMessage("提交存档数据失败!\n错误: 0x%08X", (unsigned)res);
+            ui::showMessage(getTxt("提交存档数据失败!\n错误: 0x%08X"), (unsigned)res);
     }
 }
 
@@ -321,7 +321,7 @@ void fs::deleteSv(const uint32_t& mode, const data::titleData& dat)
 
         res = FSUSER_ControlSecureSave(SECURESAVE_ACTION_DELETE, &in, 8, &out, 1);
         if(R_FAILED(res))
-            ui::showMessage("删除安全值失败.\n错误: 0x%08X", (unsigned)res);
+            ui::showMessage(getTxt("删除安全值失败.\n错误: 0x%08X"), (unsigned)res);
     }
 }
 
@@ -345,7 +345,7 @@ void fs::exportSv(const uint32_t& mode, const std::u16string& _dst, const data::
         }
 
         if(R_FAILED(res))
-            ui::showMessage("获取安全值失败.\n错误: 0x%08X", (unsigned)res);
+            ui::showMessage(getTxt("获取安全值失败.\n错误: 0x%08X"), (unsigned)res);
     }
 }
 
@@ -367,7 +367,7 @@ void fs::importSv(const uint32_t& mode, const std::u16string& _src, const data::
         res = FSUSER_SetSaveDataSecureValue(value, SECUREVALUE_SLOT_SD, dat.getUnique(), (u8) (dat.getLow() & 0xFF));
 
         if(R_FAILED(res))
-            ui::showMessage("导入安全值失败.\n错误: 0x%08X", (unsigned)res);
+            ui::showMessage(getTxt("导入安全值失败.\n错误: 0x%08X"), (unsigned)res);
     }
 }
 
@@ -723,7 +723,7 @@ void fs::dirList::reassign(const FS_Archive& arch, const std::u16string& p, bool
 void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const FS_Archive& _dstArch, const std::u16string& _dst, bool commit, bool isPxi, threadInfo *t)
 {
     if(t)
-        t->status->setStatus("正在复制 " + util::toUtf8(_src) +"...");
+        t->status->setStatus(getTxt("正在复制 ") + util::toUtf8(_src) +"...");
 
     fs::fsfile src(_srcArch, _src, FS_OPEN_READ);
 
@@ -732,7 +732,7 @@ void fs::copyFile(const FS_Archive& _srcArch, const std::u16string& _src, const 
         fs::fsfile tmp(_dstArch, _dst, FS_OPEN_READ);
         if (src.getSize() != tmp.getSize())
         {
-            ui::showMessage("原始GBAVC存档数据大小不符,无法恢复!");
+            ui::showMessage(getTxt("原始GBAVC存档数据大小不符,无法恢复!"));
             return;
         }
         tmp.close();
@@ -864,7 +864,7 @@ void fs::copyArchToZip(const FS_Archive& _arch, const std::u16string& _src, zipF
 
             std::string filename = util::toUtf8(archList->getItem(i));
             if (_dir) filename = util::toUtf8(*_dir) + filename; // Join dirname if exists
-            if(t) t->status->setStatus("正在压缩 " + filename + "...");
+            if(t) t->status->setStatus(getTxt("正在压缩 ") + filename + "...");
             int openZip = zipOpenNewFileInZip64(_zip, filename.c_str(), &inf, NULL, 0, NULL, 0, NULL, Z_DEFLATED, cfg::config["deflateLevel"], 0);
             if(openZip == 0)
             {
@@ -888,7 +888,7 @@ void copyArchToZip_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     cpyArgs *cpy = (cpyArgs *)t->argPtr;
-    t->status->setStatus("正在压缩存档位到 zip 文件...");
+    t->status->setStatus(getTxt("正在压缩存档位到 zip 文件..."));
 
     zipFile zip = zipOpen64("/TYSS/tmp.zip", 0);
     fs::copyArchToZip(cpy->srcArch, util::toUtf16("/"), zip, NULL, t);
@@ -924,7 +924,7 @@ void fs::copyZipToArch(const FS_Archive& arch, unzFile _unz, threadInfo *t)
         {
             memset(filename, 0, 0x301);
             unzGetCurrentFileInfo64(_unz, &info, filename, 0x300, NULL, 0, NULL, 0);
-            if(t) t->status->setStatus("正在解压 " + std::string(filename) + "...");
+            if(t) t->status->setStatus(getTxt("正在解压 ") + std::string(filename) + "...");
             if(unzOpenCurrentFile(_unz) == UNZ_OK)
             {
                 std::u16string nameUTF16 = util::toUtf16(filename);
@@ -955,7 +955,7 @@ void copyZipToArch_t(void *a)
 {
     threadInfo *t = (threadInfo *)a;
     cpyArgs *cpy = (cpyArgs *)t->argPtr;
-    t->status->setStatus("正在解压数据到存档位...");
+    t->status->setStatus(getTxt("正在解压数据到存档位..."));
 
     FS_Path srcPath = fsMakePath(PATH_UTF16, cpy->src.c_str());
     FS_Path dstPath = fsMakePath(PATH_ASCII, "/TYSS/tmp.zip");
@@ -1001,7 +1001,7 @@ void fs::backupAGBSaves_t(void *a)
     for(unsigned i = 0; i < vect.size(); i++)
     {
         if (!vect[i].isAGB()) continue;
-        std::string copyStr = "正在处理 '" + vect[i].getTitleUTF8() + "'...";
+        std::string copyStr = getTxt("正在处理 '") + vect[i].getTitleUTF8() + "'...";
         ui::prog->setText(copyStr);
         ui::prog->update(i);
 
@@ -1012,11 +1012,11 @@ void fs::backupAGBSaves_t(void *a)
 
             bool res = fs::pxiFileToSaveFile(outpath);
             if (!res)
-                ui::showMessage("%s:\n存档数据无效, 备份失败!", vect[i].getTitleUTF8().c_str());
+                ui::showMessage(getTxt("%s:\n存档数据无效, 备份失败!"), vect[i].getTitleUTF8().c_str());
             else {
                 if (cfg::config["rawvcsave"]) {
                     std::u16string savPath = outpath + util::toUtf16(".bin");
-                    fs::copyFile(fs::getSaveArch(), util::toUtf16("原始 GBAVC 存档数据"), fs::getSDMCArch(), savPath, false, true, NULL);
+                    fs::copyFile(fs::getSaveArch(), util::toUtf16(getTxt("原始 GBAVC 存档数据")), fs::getSDMCArch(), savPath, false, true, NULL);
                 }
             }
 
@@ -1043,7 +1043,7 @@ void fs::backupTitles_t(void *a)
         if (vect[i].isAGB()) continue;
         if (type != BunchType::Bunch_TWL && (vect[i].getHigh() & 0x8000) == 0x8000) continue;
         if (type == BunchType::Bunch_TWL && (vect[i].getHigh() & 0x8000) != 0x8000) continue;
-        std::string copyStr = "正在处理 '" + vect[i].getTitleUTF8() + "'...";
+        std::string copyStr = getTxt("正在处理 '") + vect[i].getTitleUTF8() + "'...";
         ui::prog->setText(copyStr);
         ui::prog->update(i);
 
@@ -1111,7 +1111,7 @@ void fs::backupSPI(const std::u16string& savPath, const CardType& cardType)
     }
     if (R_FAILED(res)) {
         delete[] saveFile;
-        ui::showMessage("读取 DS 卡带存档数据时发生错误!");
+        ui::showMessage(getTxt("读取 DS 卡带存档数据时发生错误!"));
         return;
     }
 
@@ -1140,7 +1140,7 @@ void fs::restoreSPI(const std::u16string& savPath, const CardType& cardType)
     if (!savFile.isOpen() || readSize != saveSize)
     {
         delete[] saveFile;
-        ui::showMessage("读取备份数据时发生错误!");
+        ui::showMessage(getTxt("读取备份数据时发生错误!"));
         return;
     }
     savFile.close();
@@ -1151,7 +1151,7 @@ void fs::restoreSPI(const std::u16string& savPath, const CardType& cardType)
         if (R_FAILED(res)) break;
     }
 
-    if (R_FAILED(res)) ui::showMessage("写入数据到游戏卡带时发生错误!");
+    if (R_FAILED(res)) ui::showMessage(getTxt("写入数据到游戏卡带时发生错误!"));
 
     delete[] saveFile;
 }

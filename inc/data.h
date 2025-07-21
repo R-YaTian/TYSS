@@ -91,7 +91,7 @@ namespace data
             void assignIcon(C3D_Tex *_icon, bool isDSIcon = false);
             void freeIcon() { if(icon.tex && bhaveIcon) { C3D_TexDelete(icon.tex); } }
 
-            bool isAGB() { return (prodCode.compare(0, 4, "AGB-") == 0 || prodCode.compare(0, 4, "GBA-") == 0); }
+            bool isAGB() { return (prodCode.compare(0, 4, "AGB-") == 0); }
 
         private:
             uint64_t id;
