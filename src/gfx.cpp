@@ -69,11 +69,13 @@ void gfx::init()
     top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
     bot = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
     font = C2D_FontLoad("romfs:/cbf_std.bcfnt");
+    font_kor = C2D_FontLoadSystem(CFG_REGION_KOR);
 }
 
 void gfx::exit()
 {
     C2D_FontFree(font);
+    C2D_FontFree(font_kor);
     C2D_SpriteSheetFree(spritesheet);
     C2D_Fini();
     C3D_Fini();
@@ -178,10 +180,11 @@ void gfx::drawU16Text(const std::u16string& str, const int& x, const int& y, con
 
     std::string tmp = util::toUtf8(str);
 
-    if (font)
+    if (fontHasAllTextChar(font, str))
         C2D_TextFontParse(&tmpTxt, font, tmpBuf, tmp.c_str());
     else
-        C2D_TextParse(&tmpTxt, tmpBuf, tmp.c_str());
+        C2D_TextFontParse(&tmpTxt, font_kor, tmpBuf, tmp.c_str());
+
     C2D_TextOptimize(&tmpTxt);
     C2D_DrawText(&tmpTxt, C2D_WithColor, (float)x, (float)y, depth, 0.5f, 0.5f, clr);
     C2D_TextBufDelete(tmpBuf);
@@ -212,4 +215,24 @@ void gfx::drawBoundingBox(const int& x, const int& y, const int& w, const int& h
     C2D_DrawRectSolid(x, y + 1, depth, 2, h - 2, clr);
     C2D_DrawRectSolid(x + 1, (y + h - 2), depth, w - 2, 2, clr);
     C2D_DrawRectSolid((x + w) - 2, y + 1, depth, 2, h - 2, clr);
+}
+
+bool gfx::fontHasAllTextChar(const C2D_Font& font, const std::u16string& str)
+{
+    const uint16_t* p = reinterpret_cast<const uint16_t*>(str.data());
+    const uint16_t* end = p + str.size();
+
+    while (p < end) {
+        uint32_t codepoint = 0;
+        ssize_t consumed = decode_utf16(&codepoint, p);
+        if (consumed <= 0)
+            return false;
+
+        if (codepoint != ' ' && !fontHasChar(font, codepoint))
+            return false;
+
+        p += consumed;
+    }
+
+    return true;
 }

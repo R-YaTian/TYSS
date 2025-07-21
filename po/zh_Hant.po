@@ -1,0 +1,1227 @@
+# Chinese translations for TYSS package.
+# Copyright (C) 2025 R-YaTian
+# This file is distributed under the same license as the TYSS package.
+# Automatically generated, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: TYSS v1.1.0\n"
+"Report-Msgid-Bugs-To: gmtianya@gmail.com\n"
+"POT-Creation-Date: 2025-07-21 14:10+0800\n"
+"PO-Revision-Date: 2025-07-21 14:10+0800\n"
+"Last-Translator: R-YaTian\n"
+"Language-Team: none\n"
+"Language: zh_Hant\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: /e/SrcPri/TYSS/src/data.cpp:449
+msgid "游戏卡带"
+msgstr "遊戲卡帶"
+
+#: /e/SrcPri/TYSS/src/data.cpp:607
+msgid "正在加载金手指数据库..."
+msgstr "正在載入金手指資料庫..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:620
+msgid "正在加载 Titles..."
+msgstr "正在載入 Titles..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:643
+msgid "正在写入缓存..."
+msgstr "正在寫入快取..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:729
+msgid "正在删除追加数据..."
+msgstr "正在刪除追加資料..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:746
+msgid "正在重写缓存并刷新..."
+msgstr "正在重寫快取並刷新..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:766
+msgid "追加数据删除成功!"
+msgstr "追加資料刪除成功!"
+
+#: /e/SrcPri/TYSS/src/data.cpp:768
+#, c-format
+msgid ""
+"追加数据删除失败!\n"
+"错误: 0x%08X"
+msgstr ""
+"追加資料刪除失敗!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/data.cpp:805
+msgid "正在保存黑名单..."
+msgstr "正在儲存黑名單..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:867
+msgid "正在重置黑名单..."
+msgstr "正在重置黑名單..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:907
+msgid "正在重置收藏列表..."
+msgstr "正在重置收藏清單..."
+
+#: /e/SrcPri/TYSS/src/data.cpp:1166
+msgid "正在加载..."
+msgstr "正在載入..."
+
+#: /e/SrcPri/TYSS/src/fs.cpp:107
+msgid "正在启动云端存储服务..."
+msgstr "正在啟動雲端儲存服務..."
+
+#: /e/SrcPri/TYSS/src/fs.cpp:152
+msgid "云端存储: 服务初始化完成!"
+msgstr "雲端儲存: 服務初始化完成!"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:154
+msgid ""
+"云端存储: 服务初始化失败!\n"
+"请检查云端存储服务配置信息。"
+msgstr ""
+"雲端儲存: 服務初始化失敗!\n"
+"請檢查雲端儲存服務設定資訊。"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:288
+#, c-format
+msgid ""
+"无法打开该存档位. 该存档类型可能不存在适用此 title 的数据.\n"
+"错误: 0x%08X\n"
+"Title: %s"
+msgstr ""
+"無法開啟該存檔位。該存檔類型可能不存在適用此 title 的資料。\n"
+"錯誤: 0x%08X\n"
+"Title: %s"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:306
+#, c-format
+msgid ""
+"提交存档数据失败!\n"
+"错误: 0x%08X"
+msgstr ""
+"提交存檔資料失敗!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:324
+#, c-format
+msgid ""
+"删除安全值失败.\n"
+"错误: 0x%08X"
+msgstr ""
+"刪除安全值失敗。\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:348
+#, c-format
+msgid ""
+"获取安全值失败.\n"
+"错误: 0x%08X"
+msgstr ""
+"取得安全值失敗。\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:370
+#, c-format
+msgid ""
+"导入安全值失败.\n"
+"错误: 0x%08X"
+msgstr ""
+"匯入安全值失敗。\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:726
+msgid "正在复制 "
+msgstr "正在複製 "
+
+#: /e/SrcPri/TYSS/src/fs.cpp:735
+msgid "原始GBAVC存档数据大小不符,无法恢复!"
+msgstr "原始GBAVC存檔資料大小不符,無法還原!"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:867
+msgid "正在压缩 "
+msgstr "正在壓縮 "
+
+#: /e/SrcPri/TYSS/src/fs.cpp:891
+msgid "正在压缩存档位到 zip 文件..."
+msgstr "正在壓縮存檔位到 zip 檔案..."
+
+#: /e/SrcPri/TYSS/src/fs.cpp:927
+msgid "正在解压 "
+msgstr "正在解壓 "
+
+#: /e/SrcPri/TYSS/src/fs.cpp:958
+msgid "正在解压数据到存档位..."
+msgstr "正在解壓資料到存檔位..."
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1004 /e/SrcPri/TYSS/src/fs.cpp:1046
+msgid "正在处理 '"
+msgstr "正在處理 '"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1015
+#, c-format
+msgid ""
+"%s:\n"
+"存档数据无效, 备份失败!"
+msgstr ""
+"%s:\n"
+"存檔資料無效, 備份失敗!"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1019 /e/SrcPri/TYSS/src/ui/fld.cpp:74
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:130
+msgid "原始 GBAVC 存档数据"
+msgstr "原始 GBAVC 存檔資料"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1114
+msgid "读取 DS 卡带存档数据时发生错误!"
+msgstr "讀取 DS 卡帶存檔資料時發生錯誤!"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1143
+msgid "读取备份数据时发生错误!"
+msgstr "讀取備份資料時發生錯誤!"
+
+#: /e/SrcPri/TYSS/src/fs.cpp:1154
+msgid "写入数据到游戏卡带时发生错误!"
+msgstr "寫入資料到遊戲卡帶時發生錯誤!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:39
+msgid "输入 0-300 之间的数值"
+msgstr "輸入 0-300 之間的數值"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:55
+msgid "正在清除步数历史记录..."
+msgstr "正在清除步數歷史記錄..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:64
+#, c-format
+msgid ""
+"清除步数历史记录失败!\n"
+"错误: 0x%08X"
+msgstr ""
+"清除步數歷史記錄失敗!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:66
+msgid "步数历史记录清除成功!"
+msgstr "步數歷史記錄清除成功!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:74
+msgid "正在清除游玩时间历史记录及软件图鉴..."
+msgstr "正在清除遊玩時間歷史記錄及軟體圖鑑..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:81 /e/SrcPri/TYSS/src/misc.cpp:150
+#: /e/SrcPri/TYSS/src/misc.cpp:199 /e/SrcPri/TYSS/src/misc.cpp:263
+#, c-format
+msgid ""
+"获取系统区域失败,无法完成操作!\n"
+"错误: 0x%08X"
+msgstr ""
+"取得系統區域失敗,無法完成操作!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:97
+#, c-format
+msgid ""
+"清除软件图鉴记录失败!\n"
+"错误: 0x%08X"
+msgstr ""
+"清除軟體圖鑑記錄失敗!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:107
+#, c-format
+msgid ""
+"清除游玩时间历史记录失败!\n"
+"错误: 0x%08X"
+msgstr ""
+"清除遊玩時間歷史記錄失敗!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:109
+msgid "清除游玩时间历史记录及软件图鉴成功!"
+msgstr "清除遊玩時間歷史記錄及軟體圖鑑成功!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:118
+msgid "正在清除共享图标缓存数据..."
+msgstr "正在清除共用圖示快取資料..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:132
+msgid "清除共享图标缓存数据成功!"
+msgstr "清除共用圖示快取資料成功!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:134
+#, c-format
+msgid ""
+"清除共享图标缓存数据失败!\n"
+"代码(idb.dat): 0x%08X\n"
+"代码(idbt.dat): 0x%08X"
+msgstr ""
+"清除共用圖示快取資料失敗!\n"
+"代碼(idb.dat): 0x%08X\n"
+"代碼(idbt.dat): 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:143
+msgid "正在清除主菜单图标缓存数据..."
+msgstr "正在清除主選單圖示快取資料..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:166
+msgid "清除主菜单图标缓存数据成功!"
+msgstr "清除主選單圖示快取資料成功!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:168
+#, c-format
+msgid ""
+"清除主菜单图标缓存数据失败!\n"
+"代码(Cache.dat): 0x%08X\n"
+"代码(CacheD.dat): 0x%08X"
+msgstr ""
+"清除主選單圖示快取資料失敗!\n"
+"代碼(Cache.dat): 0x%08X\n"
+"代碼(CacheD.dat): 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:177
+msgid "正在重置试玩版游戏游玩计数..."
+msgstr "正在重置試玩版遊戲遊玩計數..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:182
+#, c-format
+msgid ""
+"重置试玩版游戏游玩计数失败!\n"
+"错误: 0x%08X"
+msgstr ""
+"重置試玩版遊戲遊玩計數失敗!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:184
+msgid "重置试玩版游戏游玩计数成功!"
+msgstr "重置試玩版遊戲遊玩計數成功!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:192
+msgid "正在清除游戏笔记..."
+msgstr "正在清除遊戲筆記..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:222
+#, c-format
+msgid ""
+"清除游戏笔记数据失败!\n"
+"错误: 0x%08X"
+msgstr ""
+"清除遊戲筆記資料失敗!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:224
+msgid "清除游戏笔记数据成功!"
+msgstr "清除遊戲筆記資料成功!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:233
+msgid "正在清除软件更新通知..."
+msgstr "正在清除軟體更新通知..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:245
+#, c-format
+msgid ""
+"清除软件更新通知失败!\n"
+"错误: 0x%08X"
+msgstr ""
+"清除軟體更新通知失敗!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:247
+msgid "清除软件更新通知成功!"
+msgstr "清除軟體更新通知成功!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:256
+msgid "正在打开所有软件礼包..."
+msgstr "正在開啟所有軟體禮包..."
+
+#: /e/SrcPri/TYSS/src/misc.cpp:287
+msgid "主菜单数据写入失败,无法完成操作!"
+msgstr "主選單資料寫入失敗,無法完成操作!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:289
+msgid "所有的软件礼包打开成功!"
+msgstr "所有軟體禮包開啟成功!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:291
+msgid "主菜单数据读取失败,无法完成操作!"
+msgstr "主選單資料讀取失敗,無法完成操作!"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:331
+#, c-format
+msgid ""
+"获取当前小时步数失败!\n"
+"错误: 0x%08X"
+msgstr ""
+"取得當前小時步數失敗!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:335
+#, c-format
+msgid ""
+"今日步数为: %d\n"
+"当前小时步数为: %d"
+msgstr ""
+"今日步數為: %d\n"
+"當前小時步數為: %d"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:339
+msgid "输入 0-18000 之间的数值"
+msgstr "輸入 0-18000 之間的數值"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:346
+#, c-format
+msgid ""
+"修改当前小时步数失败!\n"
+"错误: 0x%08X"
+msgstr ""
+"修改當前小時步數失敗!\n"
+"錯誤: 0x%08X"
+
+#: /e/SrcPri/TYSS/src/misc.cpp:348
+#, c-format
+msgid ""
+"修改当前小时步数成功!\n"
+"今日总步数: %d"
+msgstr ""
+"修改當前小時步數成功!\n"
+"今日總步數: %d"
+
+#: /e/SrcPri/TYSS/src/ui.cpp:62
+msgid "确定 "
+msgstr "確定 "
+
+#: /e/SrcPri/TYSS/src/ui.cpp:63
+msgid "是 "
+msgstr "是 "
+
+#: /e/SrcPri/TYSS/src/ui.cpp:64
+msgid "否 "
+msgstr "否 "
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:119 /e/SrcPri/TYSS/src/ui/ext.cpp:127
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:218
+msgid "为避免发生问题, 禁止将卡带游戏添加到黑名单!"
+msgstr "為避免發生問題, 禁止將卡帶遊戲加入黑名單!"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:122 /e/SrcPri/TYSS/src/ui/ext.cpp:130
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:118 /e/SrcPri/TYSS/src/ui/ttl.cpp:221
+msgid "你确定要将 "
+msgstr "你確定要將 "
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:122 /e/SrcPri/TYSS/src/ui/ext.cpp:130
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:118 /e/SrcPri/TYSS/src/ui/ttl.cpp:221
+msgid ""
+" 添加到黑名单吗?\n"
+"这将使其在所有视图中不可见!"
+msgstr ""
+" 加入黑名單嗎?\n"
+"這將使其在所有視圖中不可見!"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:136 /e/SrcPri/TYSS/src/ui/ext.cpp:144
+msgid ""
+"你确定要备份此页所有的数据吗?\n"
+"这或许需要耗费一定时间, 视 Title 数量而定。\n"
+"请耐心等待!"
+msgstr ""
+"你確定要備份此頁所有的資料嗎?\n"
+"這可能需要花費一些時間, 視 Title 數量而定。\n"
+"請耐心等待!"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:147 /e/SrcPri/TYSS/src/ui/ext.cpp:157
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:156 /e/SrcPri/TYSS/src/ui/ttl.cpp:277
+msgid "添加到黑名单"
+msgstr "加入黑名單"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:149
+msgid "备份所有的 BOSS 追加数据"
+msgstr "備份所有的 BOSS 追加資料"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:188
+msgid "- BOSS 追加数据"
+msgstr "- BOSS 追加資料"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:205 /e/SrcPri/TYSS/src/ui/ext.cpp:215
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:216 /e/SrcPri/TYSS/src/ui/ttl.cpp:339
+msgid " 选择  关闭"
+msgstr " 選擇  關閉"
+
+#: /e/SrcPri/TYSS/src/ui/boss.cpp:211 /e/SrcPri/TYSS/src/ui/ext.cpp:221
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:222 /e/SrcPri/TYSS/src/ui/ttl.cpp:345
+msgid " 打开  选项  收藏  视图类型"
+msgstr " 開啟  選項  收藏  視圖類型"
+
+#: /e/SrcPri/TYSS/src/ui/ext.cpp:118
+msgid "你确定要删除 "
+msgstr "你確定要刪除 "
+
+#: /e/SrcPri/TYSS/src/ui/ext.cpp:118
+msgid ""
+" 的追加数据吗?\n"
+"删除后将重写缓存"
+msgstr ""
+" 的追加資料嗎?\n"
+"刪除後將重寫快取"
+
+#: /e/SrcPri/TYSS/src/ui/ext.cpp:155
+msgid "删除追加数据"
+msgstr "刪除追加資料"
+
+#: /e/SrcPri/TYSS/src/ui/ext.cpp:159
+msgid "备份所有的追加数据"
+msgstr "備份所有的追加資料"
+
+#: /e/SrcPri/TYSS/src/ui/ext.cpp:198
+msgid "- 追加数据"
+msgstr "- 追加資料"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:38
+msgid "正在准备..."
+msgstr "正在準備..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:50
+msgid "输入新备份名称"
+msgstr "輸入新備份名稱"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:66 /e/SrcPri/TYSS/src/ui/fld.cpp:132
+msgid "正在备份 GBAVC 存档数据..."
+msgstr "正在備份 GBAVC 存檔資料..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:69 /e/SrcPri/TYSS/src/ui/fld.cpp:136
+msgid "GBAVC 存档数据无效, 备份失败!"
+msgstr "GBAVC 存檔資料無效, 備份失敗!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:71 /e/SrcPri/TYSS/src/ui/fld.cpp:138
+msgid "GBAVC 存档数据备份成功!"
+msgstr "GBAVC 存檔資料備份成功!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:87 /e/SrcPri/TYSS/src/ui/fld.cpp:146
+msgid "正在导出 DS 卡带存档数据..."
+msgstr "正在匯出 DS 卡帶存檔資料..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:93 /e/SrcPri/TYSS/src/ui/fld.cpp:151
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:230 /e/SrcPri/TYSS/src/ui/fld.cpp:451
+msgid ""
+"不支持该 DS 游戏卡带的存档芯片类型\n"
+"或是该卡带不存在存档芯片!"
+msgstr ""
+"不支援該 DS 遊戲卡帶的存檔晶片類型\n"
+"或該卡帶不存在存檔晶片!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:109
+msgid "正在覆盖存档..."
+msgstr "正在覆蓋存檔..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:160
+msgid "是否覆盖 "
+msgstr "是否覆蓋 "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:168
+msgid "正在删除存档..."
+msgstr "正在刪除存檔..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:197
+msgid "正在恢复数据到存档位..."
+msgstr "正在還原資料到存檔位..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:211 /e/SrcPri/TYSS/src/ui/fld.cpp:438
+msgid "正在恢复 GBAVC 存档数据..."
+msgstr "正在還原 GBAVC 存檔資料..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:214 /e/SrcPri/TYSS/src/ui/fld.cpp:441
+msgid "GBAVC 存档数据无效, 恢复失败!"
+msgstr "GBAVC 存檔資料無效, 還原失敗!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:216 /e/SrcPri/TYSS/src/ui/fld.cpp:443
+msgid "GBAVC 存档数据恢复成功!"
+msgstr "GBAVC 存檔資料還原成功!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:225 /e/SrcPri/TYSS/src/ui/fld.cpp:446
+msgid "正在恢复数据到 DS 游戏卡带..."
+msgstr "正在還原資料到 DS 遊戲卡帶..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:240
+msgid "你确定要恢复 "
+msgstr "你確定要還原 "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:253 /e/SrcPri/TYSS/src/ui/fld.cpp:283
+msgid "正在上传 "
+msgstr "正在上傳 "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:271
+msgid "云端存储: 云盘中已存在该存档,已覆盖"
+msgstr "雲端儲存: 雲盤中已存在該存檔,已覆蓋"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:314
+msgid "云端存储: 仅支持上传压缩包或SAV及BIN存档文件"
+msgstr "雲端儲存: 僅支援上傳壓縮包或SAV及BIN存檔檔案"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:316
+msgid "云端存储: 服务尚未初始化"
+msgstr "雲端儲存: 服務尚未初始化"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:324 /e/SrcPri/TYSS/src/ui/fld.cpp:342
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:405 /e/SrcPri/TYSS/src/ui/fld.cpp:416
+msgid "正在下载 "
+msgstr "正在下載 "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:368
+msgid ""
+"下载此存档将会替换 SD 卡中的数据.\n"
+"你确定仍要进行下载吗?"
+msgstr ""
+"下載此存檔將會取代 SD 卡中的資料。\n"
+"你確定仍要進行下載嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:379 /e/SrcPri/TYSS/src/ui/fld.cpp:386
+msgid "正在删除 "
+msgstr "正在刪除 "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:398
+msgid "你确定要删除云盘中的 "
+msgstr "你確定要刪除雲盤中的 "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:398
+msgid ""
+" 文件吗?\n"
+"若相对应的.sv文件存在,将同时被删除!"
+msgstr ""
+" 檔案嗎?\n"
+"若相對應的.sv檔案存在,將同時被刪除!"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:426
+msgid "正在解压存档到存档位..."
+msgstr "正在解壓存檔到存檔位..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:435
+msgid "正在复制原始 GBAVC 存档数据到存档位..."
+msgstr "正在複製原始 GBAVC 存檔資料到存檔位..."
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:464
+msgid "你确定要下载并恢复 "
+msgstr "你確定要下載並還原 "
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:476 /e/SrcPri/TYSS/src/ui/fld.cpp:519
+msgid "新建"
+msgstr "新建"
+
+#: /e/SrcPri/TYSS/src/ui/fld.cpp:491 /e/SrcPri/TYSS/src/ui/fld.cpp:534
+msgid "[云] "
+msgstr "[雲] "
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:74
+msgid "浅色系"
+msgstr "淺色系"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:74
+msgid "深色系"
+msgstr "深色系"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:79
+msgid "启动时"
+msgstr "啟動時"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:79
+msgid "按需"
+msgstr "按需"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:84
+msgid "开"
+msgstr "開"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:84
+msgid "关"
+msgstr "關"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:89 /e/SrcPri/TYSS/src/ui/set.cpp:384
+msgid "界面语言"
+msgstr "介面語言"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:102 /e/SrcPri/TYSS/src/ui/set.cpp:388
+msgid "应用标题语言"
+msgstr "應用標題語言"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:149 /e/SrcPri/TYSS/src/ui/set.cpp:392
+msgid "内置金手指数据库语言"
+msgstr "內建金手指資料庫語言"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:162 /e/SrcPri/TYSS/src/ui/set.cpp:377
+msgid "ZIP 压缩等级"
+msgstr "ZIP 壓縮等級"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:168
+msgid " (最快速度)"
+msgstr " (最快速度)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:170
+msgid " (标准压缩)"
+msgstr " (標準壓縮)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:172
+msgid " (极限压缩)"
+msgstr " (極限壓縮)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:179
+msgid "你确定要清除步数历史记录吗?"
+msgstr "你確定要清除步數歷史記錄嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:185
+msgid "确定要清除游玩时间历史记录及软件图鉴?"
+msgstr "確定要清除遊玩時間歷史記錄及軟體圖鑑?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:191
+msgid "你确定要清除共享图标缓存数据吗?"
+msgstr "你確定要清除共享圖示快取資料嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:197
+msgid "你确定要清除主菜单图标缓存数据吗?"
+msgstr "你確定要清除主選單圖示快取資料嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:203
+msgid "你确定要重置试玩版游戏的游玩计数吗?"
+msgstr "你確定要重置試玩版遊戲的遊玩計數嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:209
+msgid "你确定要清除所有的游戏笔记吗?"
+msgstr "你確定要清除所有的遊戲筆記嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:215
+msgid "你确定要清除所有的软件更新通知吗?"
+msgstr "你確定要清除所有的軟體更新通知嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:221
+msgid "你确定要打开所有的软件礼包吗?"
+msgstr "你確定要打開所有的軟體禮包嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:227
+msgid "你确定要修改主菜单上显示的今日步数吗?"
+msgstr "你確定要修改主選單上顯示的今日步數嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:238
+msgid "你确定要重置收藏列表吗?"
+msgstr "你確定要重置收藏列表嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:244
+msgid "你确定要重置黑名单吗?"
+msgstr "你確定要重置黑名單嗎?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:258
+msgid "正在重载云端存储列表..."
+msgstr "正在重新載入雲端儲存列表..."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:268
+msgid ""
+"云端存储: 服务尚未初始化\n"
+"是否立即启动服务并加载云端存储列表?"
+msgstr ""
+"雲端儲存: 服務尚未初始化\n"
+"是否立即啟動服務並載入雲端儲存列表?"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:276 /e/SrcPri/TYSS/src/ui/set.cpp:295
+msgid "正在保存设置..."
+msgstr "正在儲存設定..."
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:371
+msgid "重载 Titles"
+msgstr "重新載入 Titles"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:374 /e/SrcPri/TYSS/src/ui/set.cpp:486
+msgid "导出到 ZIP"
+msgstr "匯出到 ZIP"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:381 /e/SrcPri/TYSS/src/ui/set.cpp:488
+msgid "界面主题色"
+msgstr "介面主題色"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:395 /e/SrcPri/TYSS/src/ui/set.cpp:492
+msgid "金手指数据库载入时机"
+msgstr "金手指資料庫載入時機"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:398 /e/SrcPri/TYSS/src/ui/set.cpp:493
+msgid "GBAVC存档备份成功时保留原始数据"
+msgstr "GBAVC存檔備份成功時保留原始資料"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:401 /e/SrcPri/TYSS/src/ui/set.cpp:494
+msgid "切换LR按键功能"
+msgstr "切換LR按鍵功能"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:407 /e/SrcPri/TYSS/src/ui/set.cpp:497
+msgid "云端存储服务随软件启动"
+msgstr "雲端儲存服務隨軟體啟動"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:410
+msgid "重载云端存储列表"
+msgstr "重新載入雲端儲存列表"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:415
+msgid "修改 PlayCoin"
+msgstr "修改 PlayCoin"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:418
+msgid "清除步数历史记录"
+msgstr "清除步數歷史記錄"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:421
+msgid "清除游玩时间历史记录以及软件图鉴"
+msgstr "清除遊玩時間歷史記錄以及軟體圖鑑"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:424
+msgid "清除共享图标缓存"
+msgstr "清除共享圖示快取"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:427
+msgid "清除主菜单图标缓存"
+msgstr "清除主選單圖示快取"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:430
+msgid "重置试玩版游戏游玩计数"
+msgstr "重置試玩版遊戲遊玩計數"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:433
+msgid "清除游戏笔记"
+msgstr "清除遊戲筆記"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:436
+msgid "清除软件更新通知"
+msgstr "清除軟體更新通知"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:439
+msgid "打开所有软件礼包"
+msgstr "開啟所有軟體禮包"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:442
+msgid "修改今日步数"
+msgstr "修改今日步數"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:445
+msgid "重置 TYSS 收藏列表"
+msgstr "重置 TYSS 收藏清單"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:448
+msgid "重置 TYSS 黑名单"
+msgstr "重置 TYSS 黑名單"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:510
+msgid "- 设置与杂项"
+msgstr "- 設定與雜項"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:513
+msgid "- 工具箱"
+msgstr "- 工具箱"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:526
+msgid ""
+"清除 Title 缓存并重新扫描应用列表。\n"
+"这或许需要耗费一定时间, 视 Title 数量而定。"
+msgstr ""
+"清除 Title 快取並重新掃描應用程式列表。\n"
+"這可能需要花費一些時間,視 Title 數量而定。"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:529
+msgid ""
+"备份存档时是否使用 ZIP 压缩存储。\n"
+"注:仅支持3DS应用(下载版与卡带)及DSiWare存档\n"
+"当备份DS游戏卡带或GBAVC存档时,无论是否开启\n"
+"该项设置,存档都将直接转储为.sav或.bin格式!"
+msgstr ""
+"備份存檔時是否使用 ZIP 壓縮存儲。\n"
+"僅支援3DS應用(下載版與卡帶)及DSiWare存檔\n"
+"當備份DS遊戲卡帶或GBAVC存檔時,無論是否開啟\n"
+"該設定,存檔都將直接轉存為.sav或.bin檔案!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:532
+msgid ""
+"选择 ZIP 压缩等级。\n"
+"(等级越高, 速度越慢, 压缩率越高)"
+msgstr ""
+"選擇 ZIP 壓縮等級。\n"
+"(等級越高, 速度越慢, 壓縮率越高)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:535
+msgid ""
+"选择 UI 界面主题色。\n"
+"(浅色系/深色系)"
+msgstr ""
+"選擇 UI 介面主題色。\n"
+"(淺色系/深色系)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:538
+msgid "选择 UI 界面显示语言。"
+msgstr "選擇 UI 介面顯示語言。"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:541
+msgid ""
+"以何种语言显示应用程序标题。\n"
+"这将影响存放应用程序数据备份的文件夹名称,\n"
+"一经设置不建议再修改,并且需要重载Titles才生效!"
+msgstr ""
+"以何種語言顯示應用程式標題。\n"
+"這將影響存放應用程式資料備份的資料夾名稱,\n"
+"設定後不建議再修改,且需重新載入Titles才會生效!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:544
+msgid ""
+"选择内置金手指数据库语言(目前仅支持简中与英语)\n"
+"软件优先加载TYSS文件夹中外置金手指数据库文件\n"
+"cheats.json,该选项仅决定内置金手指数据库语言,\n"
+"当外置数据库存在时无效!\n"
+"该项设置更改时,已载入的金手指数据库会被卸载,\n"
+"并且将在需要使用时重载!"
+msgstr ""
+"選擇內建金手指資料庫語言(目前僅支援簡中與英語)\n"
+"軟體優先載入TYSS資料夾中外置金手指資料庫檔案\n"
+"cheats.json,該選項僅決定內建金手指資料庫語言,\n"
+"當外置資料庫存在時無效!\n"
+"該設定變更時,已載入的金手指資料庫會被卸載,\n"
+"並且會在需要使用時重新載入!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:547
+msgid ""
+"决定金手指数据库的载入时机。\n"
+"可设置为按需加载(需要使用时再载入);\n"
+"或是应用程序启动时自动载入。\n"
+"若选择按需加载则首次检索金手指的耗时将增加。"
+msgstr ""
+"決定金手指資料庫的載入時機。\n"
+"可設定為按需載入(需要使用時再載入);\n"
+"或是應用程式啟動時自動載入。\n"
+"若選擇按需載入,首次檢索金手指的耗時將增加。"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:550
+msgid ""
+"当GBAVC存档备份成功时保留一份原始(.bin)数据。\n"
+"一般情况下不需要开启此项,因为原始数据不可用于\n"
+"GBAVC虚拟主机之外的任何地方(GBA模拟器等等)\n"
+"注:覆盖备份文件或还原数据时,将根据后缀自动判断"
+msgstr ""
+"當GBAVC存檔備份成功時保留一份原始(.bin)資料。\n"
+"一般情況下不需要開啟此項, 因為原始資料無法用於\n"
+"GBAVC虛擬主機之外的任何地方(GBA模擬器等等)\n"
+"覆蓋備份檔案或還原資料時,將根據副檔名自動判斷"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:553
+msgid ""
+"将LR按键的功能与ZLZR按键的功能对调。\n"
+"在老三上启用则LR按键将用于UI页面切换,而LR快速\n"
+"浏览应用列表功能将被禁用(由于老三无ZLZR按键)"
+msgstr ""
+"將LR按鍵的功能與ZLZR按鍵的功能對調。\n"
+"在老3DS上啟用則LR按鍵將用於視圖切換,而LR快速\n"
+"瀏覽應用列表功能將被禁用(由於老3DS無ZLZR鍵)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:560
+msgid ""
+"云端存储服务是否随软件启动并加载云端存储列表。\n"
+"这可能导致应用程序启动耗时增加。"
+msgstr ""
+"雲端儲存服務是否隨軟體啟動並載入雲端儲存列表。\n"
+"這可能導致應用程式啟動耗時增加。"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:562
+msgid ""
+"从云端同步存档文件列表。\n"
+"这或许需要耗费一定时间, 视网络环境而定。"
+msgstr ""
+"從雲端同步存檔檔案列表。\n"
+"這可能需要花費一些時間, 視網路環境而定。"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:565
+msgid " 选择/切换  启动工具箱  视图类型"
+msgstr " 選擇／切換  啟動工具箱  檢視類型"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:570
+msgid "修改游戏币数量。(范围: 0-300)"
+msgstr "修改遊戲幣數量。(範圍: 0-300)"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:573
+msgid ""
+"这将清除回忆记录册中的总步数记录!\n"
+"该操作无法撤销!"
+msgstr ""
+"這將清除回憶記錄冊中的總步數記錄!\n"
+"該操作無法復原!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:576
+msgid ""
+"这将清除回忆记录册中的软件图鉴记录以及所有游玩\n"
+"时间历史记录!\n"
+"操作无法撤销!执行此操作前强烈建议备份系统存档\n"
+"页的回忆记录册数据!"
+msgstr ""
+"這將清除回憶記錄冊中的軟體圖鑑記錄以及所有遊玩\n"
+"時間歷史記錄!\n"
+"操作無法復原!執行此操作前強烈建議備份系統存檔\n"
+"頁的回憶記錄冊資料!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:579
+msgid ""
+"将使得回忆记录册中的软件图鉴列表被清空。\n"
+"操作无法撤销!执行此操作前强烈建议备份共享追加\n"
+"数据页的FB记录以及系统存档页的回忆记录册数据!\n"
+"恢复备份时需要同时恢复上述两项记录!"
+msgstr ""
+"將使回憶記錄冊中的軟體圖鑑列表被清空。\n"
+"此操作無法復原!執行前強烈建議備份共享追加\n"
+"資料頁的FB紀錄及系統存檔頁的回憶記錄冊資料!\n"
+"恢復備份時需同時還原上述兩項紀錄!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:582
+msgid ""
+"清除主菜单图标缓存(老三需用本软件的Mode3版本)\n"
+"操作无法撤销!执行此操作前强烈建议备份追加数据\n"
+"页的主菜单(CTR-N-HMM*)记录!"
+msgstr ""
+"清除主選單圖示快取(老3DS需本軟體Mode3版本)\n"
+"此操作無法復原!執行前強烈建議備份追加資料\n"
+"頁的主選單(CTR-N-HMM*)紀錄!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:585
+msgid ""
+"重置试玩版 (Demo) 应用的游玩次数。\n"
+"该操作无法撤销!"
+msgstr ""
+"重置試玩版 (Demo) 應用的遊玩次數。\n"
+"此操作無法復原!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:588
+msgid ""
+"清除所有游戏笔记数据。\n"
+"操作无法撤销!执行此操作前强烈建议备份系统存档\n"
+"页的游戏笔记数据!"
+msgstr ""
+"清除所有遊戲筆記資料。\n"
+"此操作無法復原!執行前強烈建議備份系統存檔\n"
+"頁的遊戲筆記資料!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:591
+msgid ""
+"这将移除所有已安装程序启动前的更新提示。\n"
+"(直到主菜单再次联网下载软件版本数据库)\n"
+"注意: 这对某些游戏内置的版本检查无效!\n"
+"操作无法撤销!执行此操作前强烈建议备份共享追加\n"
+"数据页的FE记录!"
+msgstr ""
+"將移除所有已安裝程式啟動前的更新提示。\n"
+"(直到主選單再次連網下載軟體版本資料庫)\n"
+"注意: 此操作對某些遊戲內建的版本檢查無效!\n"
+"此操作無法復原!執行前強烈建議備份共享追加\n"
+"資料頁的FE紀錄!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:594
+msgid "打开主菜单中所有的软件礼包。该操作无法撤销!"
+msgstr "開啟主選單中所有的軟體禮包。此操作無法復原!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:597
+msgid ""
+"修改主菜单上显示的今日步数数据。\n"
+"由于部分限制因素, 该项功能仅影响当前小时步数。\n"
+"此前产生的步数不会被修改!"
+msgstr ""
+"修改主選單上顯示的今日步數資料。\n"
+"由於部分限制因素, 此功能僅影響當前小時步數。\n"
+"先前產生的步數不會被修改!"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:600
+msgid "这将会清空本程序收藏列表, 请谨慎操作。"
+msgstr "此操作將清空本程式收藏列表, 請謹慎操作。"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:603
+msgid "清空本程序黑名单列表, 随后将自动执行重载 Titles"
+msgstr "清空本程式黑名單列表, 隨後將自動執行重載 Titles"
+
+#: /e/SrcPri/TYSS/src/ui/set.cpp:606
+msgid " 选择  退出工具箱"
+msgstr " 選擇  退出工具箱"
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:94
+msgid ""
+"你确定要备份所有的共享追加数据吗?\n"
+"这或许需要耗费一定时间, 请耐心等待!"
+msgstr ""
+"你確定要備份所有的共享追加資料嗎?\n"
+"這可能需要一些時間, 請耐心等待!"
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:141
+msgid "- 共享追加数据"
+msgstr "- 共享追加資料"
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:162
+msgid ""
+"F1 - NAND JPEG/MPO 文件和 phtcache.bin 由相机应用程序存储在这里. 这也包含 "
+"UploadData.dat."
+msgstr ""
+"F1 - NAND JPEG/MPO 檔案及 phtcache.bin 由相機應用程式儲存在此處. 此處亦包含 "
+"UploadData.dat."
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:165
+msgid "F2 - 声音应用程序中的 NAND M4A 文件存储在这里."
+msgstr "F2 - 聲音應用程式中的 NAND M4A 檔案儲存在此處."
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:168
+msgid "F9 - 适用于通知的 SpotPass 内容存储."
+msgstr "F9 - 適用於通知的 SpotPass 內容儲存."
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:171
+msgid ""
+"FB - 包含 idb.dat, idbt.dat, gamecoin.dat, ubll.lst, CFL_DB.dat 以及 "
+"CFL_OldDB.dat. 这些文件包含明文 Miis 数据和一些与播放/使用记录相关的数据 (也"
+"包括缓存的图标数据)."
+msgstr ""
+"FB - 包含 idb.dat, idbt.dat, gamecoin.dat, ubll.lst, CFL_DB.dat 及\nCFL_OldDB."
+"dat. 這些檔案包含明文 Miis 資料及部分播放與使用紀錄相關資料\n(亦包含快取圖示資料)."
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:174
+msgid "FC - 包含 bashotorya.dat 以及 bashotorya2.dat."
+msgstr "FC - 包含 bashotorya.dat 及 bashotorya2.dat."
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:177
+msgid "FD - 主页菜单的 SpotPass 内容存储."
+msgstr "FD - 主頁選單的 SpotPass 內容儲存."
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:180
+msgid "FE - 包含 versionList.dat, 用于 7.0.0-13 系统引入的主页菜单软件更新通知."
+msgstr ""
+"FE - 包含 versionList.dat, 用於 7.0.0-13 系統引入的主頁選單軟體更新通知."
+
+#: /e/SrcPri/TYSS/src/ui/shrd.cpp:184
+msgid " 打开  备份所有  视图类型"
+msgstr " 開啟  備份所有  檢視類型"
+
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:132
+msgid ""
+"你确定要备份此页所有的系统存档吗?\n"
+"这或许需要耗费一定时间, 视Title数量而定。\n"
+"请耐心等待!"
+msgstr ""
+"你確定要備份此頁所有的系統存檔嗎?\n"
+"這可能需要一些時間, 視Title數量而定。\n"
+"請耐心等待!"
+
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:145 /e/SrcPri/TYSS/src/ui/ttl.cpp:248
+msgid ""
+"你确定要备份此页所有的DSiWare存档吗?\n"
+"这或许需要耗费一定时间, 视Title数量而定。\n"
+"请耐心等待!"
+msgstr ""
+"你確定要備份此頁所有的DSiWare存檔嗎?\n"
+"這可能需要一些時間, 視Title數量而定。\n"
+"請耐心等待!"
+
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:158
+msgid "备份所有的系统存档"
+msgstr "備份所有系統存檔"
+
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:160 /e/SrcPri/TYSS/src/ui/ttl.cpp:281
+msgid "备份所有的 DSiWare 存档"
+msgstr "備份所有 DSiWare 存檔"
+
+#: /e/SrcPri/TYSS/src/ui/sysview.cpp:199
+msgid "- 系统存档"
+msgstr "- 系統存檔"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:126
+msgid "正在重置存档数据..."
+msgstr "正在重置存檔資料..."
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:131
+msgid "正在重置GBAVC存档数据..."
+msgstr "正在重置GBAVC存檔資料..."
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:142
+msgid "DS卡带游戏以及 DSiWare 不支持此操作!"
+msgstr "DS卡帶遊戲及 DSiWare 不支援此操作!"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:145 /e/SrcPri/TYSS/src/ui/ttl.cpp:200
+msgid "你确定要为 "
+msgstr "你確定要為 "
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:145
+msgid ""
+" 重置存档数据吗?\n"
+"注意: GBAVC存档重置后需运行一次游戏才能\n"
+"再次管理存档!"
+msgstr ""
+" 重置存檔資料嗎?\n"
+"注意: GBAVC存檔重置後需執行一次遊戲才能\n"
+"再次管理存檔!"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:152
+msgid "正在安装金手指文件..."
+msgstr "正在安裝金手指檔案..."
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:161
+msgid "金手指文件安装成功!"
+msgstr "金手指檔案安裝成功!"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:163
+msgid "金手指文件安装失败!"
+msgstr "金手指檔案安裝失敗!"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:174
+msgid "金手指文件已删除!"
+msgstr "金手指檔案已刪除!"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:188
+msgid "GBAVC,DSiWare及DS卡带不支持此操作!"
+msgstr "GBAVC,DSiWare及DS卡帶不支援此操作!"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:197
+msgid "该应用的金手指文件已安装, 是否删除?"
+msgstr "該應用的金手指檔案已安裝, 是否刪除?"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:200
+msgid " 安装金手指文件?"
+msgstr " 安裝金手指檔案?"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:203
+msgid "数据库中未找到该应用可用的金手指."
+msgstr "資料庫中未找到該應用可用的金手指."
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:235
+msgid ""
+"你确定要备份此页所有的用户存档吗?\n"
+"这或许需要耗费一定时间, 视Title数量而定。\n"
+"请耐心等待!"
+msgstr ""
+"你確定要備份此頁所有的使用者存檔嗎?\n"
+"這可能需要一些時間, 視 Title 數量而定。\n"
+"請耐心等待!"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:261
+msgid ""
+"你确定要备份此页所有的GBAVC存档吗?\n"
+"这或许需要耗费一定时间, 视Title数量而定。\n"
+"请耐心等待!"
+msgstr ""
+"你確定要備份此頁所有的GBAVC存檔嗎?\n"
+"這可能需要一些時間, 視Title數量而定。\n"
+"請耐心等待!"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:273
+msgid "安装或删除该应用的金手指文件"
+msgstr "安裝或刪除該應用的金手指檔案"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:275
+msgid "重置存档数据"
+msgstr "重置存檔資料"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:279
+msgid "备份所有的用户存档(DS 游戏卡带除外)"
+msgstr "備份所有使用者存檔(DS 遊戲卡帶除外)"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:283
+msgid "备份所有的 GBAVC 存档"
+msgstr "備份所有 GBAVC 存檔"
+
+#: /e/SrcPri/TYSS/src/ui/ttl.cpp:322
+msgid "- 用户存档"
+msgstr "- 使用者存檔"
+
+#: inc/ui.h:70
+msgid " 选择  删除  恢复  上传  关闭"
+msgstr " 選擇  刪除  恢復  上傳  關閉"
+
+#: inc/ui.h:72
+msgid " 选择  删除  恢复  关闭"
+msgstr " 選擇  刪除  恢復  關閉"

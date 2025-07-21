@@ -93,6 +93,8 @@ static std::string getUILangText(const int& g)
         s += "简体中文";
     else if (g == 1)
         s += "English";
+    else if (g == 2)
+        s += "繁體中文";
 
     return s;
 }
@@ -325,23 +327,23 @@ static void setMenuDecreaseDeflateLevel(void *a)
 
 static void setMenuIncreaseTitleLang(void *a)
 {
-    toggleUInt(a, 1, 11, {CFG_LANGUAGE_KO}); // Our font table does not support Korean yet.
+    toggleUInt(a, 1, 11);
 }
 
 static void setMenuDecreaseTitleLang(void *a)
 {
-    toggleUInt(a, -1, 11, {CFG_LANGUAGE_KO}); // Our font table does not support Korean yet.
+    toggleUInt(a, -1, 11);
 }
 
 static void setMenuIncreaseUILang(void *a)
 {
-    toggleUInt(a, 1, 1);
+    toggleUInt(a, 1, 2);
     cfg::setUILanguage(*(int*)a);
 }
 
 static void setMenuDecreaseUILang(void *a)
 {
-    toggleUInt(a, -1, 1);
+    toggleUInt(a, -1, 2);
     cfg::setUILanguage(*(int*)a);
 }
 
@@ -532,7 +534,7 @@ void ui::setDrawBottom()
                 setOptsDesc = getText("选择 ZIP 压缩等级。\n(等级越高, 速度越慢, 压缩率越高)");
                 break;
             case 3:
-                setOptsDesc = getText("选择 UI 界面主题色。\n(浅色/暗黑)");
+                setOptsDesc = getText("选择 UI 界面主题色。\n(浅色系/深色系)");
                 break;
             case 4:
                 setOptsDesc = getText("选择 UI 界面显示语言。");

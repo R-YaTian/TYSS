@@ -56,6 +56,9 @@ void cfg::setUILanguage(u8 langIndex)
         case 1:
             setLanguage("en_US");
             break;
+        case 2:
+            setLanguage("zh_Hant");
+            break;
         default:
             setLanguage("zh_Hans");
             break;

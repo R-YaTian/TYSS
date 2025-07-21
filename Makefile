@@ -44,8 +44,8 @@ APP_AUTHOR  :=	R-YaTian
 APP_DESCRIPTION :=	3DS Save Studio
 
 VERSION_MAJOR	:=	1
-VERSION_MINOR	:=	0
-VERSION_MICRO	:=	9
+VERSION_MINOR	:=	1
+VERSION_MICRO	:=	0
 MAKEROM_VERARGS := -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_MICRO)
 APP_VERSION		:= v$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_MICRO)
 
@@ -72,7 +72,7 @@ LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 LIBS	:= -lcitro2d -lcitro3d -lcurl -lmbedtls -lmbedcrypto -lmbedx509 -lminizip -lctru -lz -lm
 
-MO_FILES	:=  $(foreach lang,en_US,$(ROMFS)/locale/$(lang).mo)
+MO_FILES	:=  $(foreach lang,en_US zh_Hant,$(ROMFS)/locale/$(lang).mo)
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

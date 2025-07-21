@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: TYSS v1.0.9\n"
+"Project-Id-Version: TYSS v1.1.0\n"
 "Report-Msgid-Bugs-To: gmtianya@gmail.com\n"
 "POT-Creation-Date: 2025-07-20 22:48+0800\n"
 "PO-Revision-Date: 2025-07-19 18:21+0800\n"

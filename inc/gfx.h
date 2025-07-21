@@ -28,6 +28,7 @@
 
 inline C2D_SpriteSheet spritesheet;
 inline C2D_Font font = NULL;
+inline C2D_Font font_kor = NULL;
 
 namespace gfx
 {
@@ -69,6 +70,13 @@ namespace gfx
     void drawTextWrap(const std::string& str, const int& x, int y, const float& depth, const float& txtScale, const int& maxWidth, const uint32_t& clr);
     void drawU16Text(const std::u16string& str, const int& x, const int& y, const float& depth, const uint32_t& clr);
     size_t getTextWidth(const std::string& str);
+    bool fontHasAllTextChar(const C2D_Font& font, const std::u16string& str);
+    inline bool fontHasChar(const C2D_Font& font, u32 codepoint)
+    {
+        if (C2D_FontGlyphIndexFromCodePoint(font, codepoint) == C2D_FontGetInfo(font)->alterCharIndex)
+            return false;
+        return true;
+    }
 
     void drawBoundingBox(const int& x, const int& y, const int& w, const int& h, const float& depth, const uint32_t& clr);
 }
