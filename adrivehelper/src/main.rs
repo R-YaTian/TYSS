@@ -2,6 +2,7 @@ use tiny_http::{Server, Response};
 use webbrowser;
 use std::fs::File;
 use std::io::Write;
+use std::env;
 
 fn main() {
     let port = 10304;
