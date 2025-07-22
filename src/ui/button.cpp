@@ -81,5 +81,16 @@ void ui::button::draw()
     else
         C2D_DrawRectSolid(x, y, GFX_DEPTH_DEFAULT, w, h, gfx::btnClr);
 
-    gfx::drawText(text, tx, ty, GFX_DEPTH_DEFAULT, 0.5f, gfx::txtCont);
+    unsigned _tx = tx;
+    unsigned _ty = ty;
+    std::string txt = getTextFromMap(text.c_str());
+    if (txt != text)
+    {
+        unsigned tw = gfx::getTextWidth(txt);
+        unsigned th = 14;
+        _tx = x + (w / 2) - (tw / 2);
+        _ty = y + (h / 2) - (th / 2);
+    }
+
+    gfx::drawText(txt, _tx, _ty, GFX_DEPTH_DEFAULT, 0.5f, gfx::txtCont);
 }

@@ -710,23 +710,23 @@ msgstr "Select UI display language."
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:543
 msgid "以何种语言显示应用程序标题。\n这将影响存放应用程序数据备份的文件夹名称,\n一经设置不建议再修改,并且需要重载Titles才生效!"
-msgstr "Language for displaying application titles.\nThis affects the folder name where application data backups are stored.\nOnce set, it is not recommended to change it, and Titles need to be reloaded to take effect!"
+msgstr "Language for displaying application titles.\nThis affects the folder name where application data backups are stored.\nOnce set, it is not recommended to change it. Require reload titles to take effect!"
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:546
 msgid "选择内置金手指数据库语言(目前仅支持简中与英语)\n软件优先加载TYSS文件夹中外置金手指数据库文件\ncheats.json,该选项仅决定内置金手指数据库语言,\n当外置数据库存在时无效!\n该项设置更改时,已载入的金手指数据库会被卸载,\n并且将在需要使用时重载!"
-msgstr "Select built-in cheat database language (currently only Simplified Chinese and English supported).\nThe software prioritizes loading external cheat database file cheats.json in the TYSS folder.\nThis option only determines the built-in cheat database language,\nand is ineffective when an external database exists!\nWhen this setting changes, the loaded cheat database will be unloaded,\nand reloaded when needed!"
+msgstr "Select built-in cheat database language (currently only Simplified Chinese and English supported).\nThe software prioritizes loading external cheat database file cheats.json in the TYSS folder.\nThis option only determines the built-in cheat database language, and is ineffective when an external database exists!\nWhen this setting changes, the loaded cheat database will be unloaded, and reloaded when needed!"
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:549
 msgid "决定金手指数据库的载入时机。\n可设置为按需加载(需要使用时再载入);\n或是应用程序启动时自动载入。\n若选择按需加载则首次检索金手指的耗时将增加。"
-msgstr "Determine the timing of cheat database loading.\nCan be set to load on demand (load when needed),\nor automatically load at application startup.\nChoosing load on demand increases the time for the first cheat search."
+msgstr "Determine the timing of cheat database loading.\nCan be set to load on demand, or automatically load at application startup.\nChoosing load on demand increases the time for first cheat file search."
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:552
 msgid "当GBAVC存档备份成功时保留一份原始(.bin)数据。\n一般情况下不需要开启此项,因为原始数据不可用于\nGBAVC虚拟主机之外的任何地方(GBA模拟器等等)\n注:覆盖备份文件或还原数据时,将根据后缀自动判断"
-msgstr "Keep a copy of the original raw (.bin) data when GBAVC save backup succeeds.\nGenerally not needed as original raw data cannot be used outside GBAVC Virtual Console\nNote: Overwrite backup files or restore save data will be automatically determined by suffix."
+msgstr "Keep a copy of the original raw (.bin) data when GBAVC save backup succeeds.\nGenerally not needed as original raw data cannot be used outside GBA Virtual Console\nNote: Overwrite backup files or restore save data will be automatically determined by suffix."
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:555
 msgid "将LR按键的功能与ZLZR按键的功能对调。\n在老三上启用则LR按键将用于UI页面切换,而LR快速\n浏览应用列表功能将被禁用(由于老三无ZLZR按键)"
-msgstr "Swap LR button functions with ZLZR buttons.\nEnabling on Old 3DS uses LR buttons for UI view type switching,\nand disables LR quick app list browsing (Old 3DS lacks ZLZR buttons)."
+msgstr "Swap L/R button functions with ZL/ZR buttons.\nEnabling on Old 3DS uses LR buttons for UI View Type switching, and disables LR quick application list browsing (Old 3DS lacks ZL/ZR buttons)."
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:562
 msgid "云端存储服务是否随软件启动并加载云端存储列表。\n这可能导致应用程序启动耗时增加。"
@@ -750,11 +750,11 @@ msgstr "This will clear the total step count in the Activity Log!\nThis action c
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:578
 msgid "这将清除回忆记录册中的软件图鉴记录以及所有游玩\n时间历史记录!\n操作无法撤销!执行此操作前强烈建议备份系统存档\n页的回忆记录册数据!"
-msgstr "This will clear the software library records and all playtime history in the Activity Log!\nThis action cannot be undone! It is strongly recommended to backup the Activity Log data on the system save view before performing this action!"
+msgstr "This will clear the software library records and all playtime history in the Activity Log!\nThis action cannot be undone! It is strongly recommended to backup the Activity Log data on the System Saves view before performing this action!"
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:581
 msgid "将使得回忆记录册中的软件图鉴列表被清空。\n操作无法撤销!执行此操作前强烈建议备份共享追加\n数据页的FB记录以及系统存档页的回忆记录册数据!\n恢复备份时需要同时恢复上述两项记录!"
-msgstr "This will clear the software library list in the Activity Log.\nThis action cannot be undone! It is strongly recommended to backup the FB records on the shared ExtData view and the Activity Log data on the system save view before proceeding!\nBoth records must be restored when restoring backups!"
+msgstr "This will clear the software library list in the Activity Log.\nThis action cannot be undone! It is strongly recommended to backup the FB records on the Shared ExtData view and the Activity Log data on the System Saves view before proceeding!\nBoth records must be restored when restoring backups!"
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:584
 msgid "清除主菜单图标缓存(老三需用本软件的Mode3版本)\n操作无法撤销!执行此操作前强烈建议备份追加数据\n页的主菜单(CTR-N-HMM*)记录!"
@@ -766,11 +766,11 @@ msgstr "Reset the play count of the Demo application.\nThis action cannot be und
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:590
 msgid "清除所有游戏笔记数据。\n操作无法撤销!执行此操作前强烈建议备份系统存档\n页的游戏笔记数据!"
-msgstr "Clear all game note data.\nThis action cannot be undone! It is strongly recommended to backup the game note data on the system save view before proceeding!"
+msgstr "Clear all game note data.\nThis action cannot be undone! It is strongly recommended to backup the game note data on the System Saves view before proceeding!"
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:593
 msgid "这将移除所有已安装程序启动前的更新提示。\n(直到主菜单再次联网下载软件版本数据库)\n注意: 这对某些游戏内置的版本检查无效!\n操作无法撤销!执行此操作前强烈建议备份共享追加\n数据页的FE记录!"
-msgstr "This will remove all update prompts before launching installed applications.\n(Until the Home Menu download the software version database again over network)\nNote: This does not affect some built-in version checks in certain games!\nThis action cannot be undone! It is strongly recommended to back up the FE records on the shared ExtData view before proceeding!"
+msgstr "This will remove all update prompts before launching installed applications.\n(Until the Home Menu download the software version database again over network)\nNote: This does not affect some built-in version checks in certain games!\nThis action cannot be undone! It is strongly recommended to backup the FE records on the Shared ExtData view before proceeding!"
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:596
 msgid "打开主菜单中所有的软件礼包。该操作无法撤销!"
@@ -794,7 +794,7 @@ msgstr " Select  Exit Toolbox"
 
 #: /e/SrcPri/TYSS/src/ui/shrd.cpp:94
 msgid "你确定要备份所有的共享追加数据吗?\n这或许需要耗费一定时间, 请耐心等待!"
-msgstr "Are you sure you want to backup all shared ExtData?\nThis may take some time, Please wait!"
+msgstr "Are you sure you want to backup all Shared ExtData?\nThis may take some time, Please wait!"
 
 #: /e/SrcPri/TYSS/src/ui/shrd.cpp:141
 msgid "- 共享追加数据"
@@ -830,7 +830,7 @@ msgstr "FE - Contains versionlist.dat, used by Home Menu for the software update
 
 #: /e/SrcPri/TYSS/src/ui/shrd.cpp:184
 msgid " 打开  备份所有  视图类型"
-msgstr " Open  Backup All  View Types"
+msgstr " Open  Backup All  View Type"
 
 #: /e/SrcPri/TYSS/src/ui/sysview.cpp:132
 msgid "你确定要备份此页所有的系统存档吗?\n这或许需要耗费一定时间, 视Title数量而定。\n请耐心等待!"
@@ -934,8 +934,8 @@ msgstr "- User Saves"
 
 #: inc/ui.h:70
 msgid " 选择  删除  恢复  上传  关闭"
-msgstr " Select  Delete  Restore  Upload  Close"
+msgstr " Select  Delete  Restore  Upload  Back"
 
 #: inc/ui.h:72
 msgid " 选择  删除  恢复  关闭"
-msgstr " Select  Delete  Restore  Close"
+msgstr " Select  Delete  Restore  Back"

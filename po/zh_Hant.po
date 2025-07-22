@@ -628,11 +628,11 @@ msgstr "按需"
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:84
 msgid "开"
-msgstr "開"
+msgstr "On"
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:84
 msgid "关"
-msgstr "關"
+msgstr "Off"
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:89 /e/SrcPri/TYSS/src/ui/set.cpp:384
 msgid "界面语言"
