@@ -1,5 +1,5 @@
 use tiny_http::{Server, Response};
-use open;
+use webbrowser;
 use std::fs::File;
 use std::io::Write;
 
@@ -17,9 +17,8 @@ fn main() {
     );
 
     println!("Opening browser for AliDrive authorization...");
-    if let Err(e) = open::that(&auth_url) {
-        eprintln!("Failed to open browser: {}", e);
-        println!("Please manually visit this URL:\n{}", auth_url);
+    if webbrowser::open(&auth_url).is_err() {
+        println!("Failed to open browser!\nPlease manually visit this URL:\n{}", auth_url);
     }
 
     println!("Listening for callback at: {}", redirect_uri);
