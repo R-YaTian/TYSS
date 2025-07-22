@@ -60,8 +60,13 @@ fn main() {
 }
 
 fn save_auth_code(code: &str) -> std::io::Result<()> {
+    let exe_path = env::current_exe()?;
+    let exe_dir = exe_path.parent().unwrap();
+
+    let file_path = exe_dir.join("drive.json");
     let content = format!("{{ \"driveAuthCode\": \"{}\" }}", code);
-    let mut file = File::create("drive.json")?;
+
+    let mut file = File::create(file_path)?;
     file.write_all(content.as_bytes())?;
     Ok(())
 }
