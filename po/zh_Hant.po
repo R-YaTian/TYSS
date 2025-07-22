@@ -608,7 +608,7 @@ msgstr "新建"
 
 #: /e/SrcPri/TYSS/src/ui/fld.cpp:491 /e/SrcPri/TYSS/src/ui/fld.cpp:534
 msgid "[云] "
-msgstr "[雲] "
+msgstr "[雲端] "
 
 #: /e/SrcPri/TYSS/src/ui/set.cpp:74
 msgid "浅色系"

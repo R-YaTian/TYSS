@@ -45,7 +45,7 @@ void cfg::initToDefault()
     cfg::config["bootwithcheatdb"] = (u8) false;
     cfg::config["swaplrfunc"] = (u8) false;
     cfg::config["titlelang"] = syslang;
-    cfg::config["uilang"] = (syslang == CFG_LANGUAGE_ZH ? 0 : 1);
+    cfg::config["uilang"] = (syslang == CFG_LANGUAGE_ZH ? 0 : (syslang == CFG_LANGUAGE_TW ? 2 : 1));
     cfg::config["cheatdblang"] = (syslang == CFG_LANGUAGE_ZH ? 0 : 1);
 }
 

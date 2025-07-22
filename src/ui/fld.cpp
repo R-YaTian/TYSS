@@ -473,7 +473,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
     targetDir = _path;
     uploadParent = _uploadParent;
 
-    fldMenu.addOpt(getText("新建"), 0);
+    fldMenu.addOpt(getTxt("新建"), 0);
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
@@ -488,7 +488,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
 
         for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt(getText("[云] ") + driveList[i]->name, 320);
+            fldMenu.addOpt(getTxt("[云] ") + driveList[i]->name, 320);
 
             fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, driveList[i]);
             fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, driveList[i]);
@@ -516,7 +516,7 @@ void ui::fldRefresh()
     fldMenu.reset();
     fldList.reassign(fs::getSDMCArch(), targetDir, true);
 
-    fldMenu.addOpt(getText("新建"), 0);
+    fldMenu.addOpt(getTxt("新建"), 0);
     fldMenu.addOptEvent(0, KEY_A, fldMenuNew, NULL);
 
     int fldInd = 1;
@@ -531,7 +531,7 @@ void ui::fldRefresh()
 
         for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt(getText("[云] ") + driveList[i]->name, 320);
+            fldMenu.addOpt(getTxt("[云] ") + driveList[i]->name, 320);
 
             fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, driveList[i]);
             fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, driveList[i]);
@@ -561,5 +561,5 @@ void ui::fldUpdate()
 
 void ui::fldDraw()
 {
-    fldMenu.draw(0, 2, gfx::txtCont, 320);
+    fldMenu.draw(0, 2, gfx::txtCont, 320, true);
 }

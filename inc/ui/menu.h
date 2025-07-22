@@ -50,7 +50,7 @@ namespace ui
             void setSelected(const int& newSel);
 
             void update();
-            void draw(const int& x, const int&y, const uint32_t& baseClr, const uint32_t& rectWidth);
+            void draw(const int& x, const int&y, const uint32_t& baseClr, const uint32_t& rectWidth, bool isFileMenu = false);
 
             int getSelected() { return selected; }
             unsigned getCount() { return opt.size(); }
