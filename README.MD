@@ -53,7 +53,7 @@ TYSS or RYaTian's Save Studio for 3DS.
 	* R Upload the highlighted zip/sav/bin file
 	* B Closes and returns to title selection
 
-## Others
+## Cloud Save
 * **Google Drive Instructions:** Follow the guide [here](./GD_INSTRUCTIONS.MD).
 	* NOTE: Cloud Drive feature requires backup created with the `Export To Zip` option turned on are uploadable.
 
@@ -69,9 +69,9 @@ TYSS or RYaTian's Save Studio for 3DS.
 * Then simply run `make`
 
 ## License
-Distributed under the GNU GPLv3. See [LICENSE](./LICENSE) for more information.
+**Distributed under the GNU GPLv3. See [LICENSE](./LICENSE) for more information.**
 
-Copyright © 2024-2025 R-YaTian.
+**Copyright © 2024-2025 R-YaTian.**
 
 ## Credits
 * [R-YaTian](https://github.com/R-YaTian): Main Developer

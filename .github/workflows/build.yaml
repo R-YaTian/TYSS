@@ -19,8 +19,7 @@ jobs:
         run: |
           sudo -n apt-get update
           sudo -n apt-get upgrade -y python3-pip gettext
-          python3 -m pip install --no-cache-dir --upgrade setuptools
-          python3 -m pip install --no-cache-dir zopflipy
+          python3 -m pip install zopflipy --no-cache-dir --break-system-packages
 
       - name: Silence all git safe directory warnings
         run: git config --system --add safe.directory '*'
