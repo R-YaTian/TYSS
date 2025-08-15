@@ -11,7 +11,7 @@ TYSS or RYaTian's Save Studio for 3DS.
 <p align="center"><img src="res/preview.png" />
 
 <h4 align="right">
-  <a href="README_zh.md">简体中文</a> | English
+  <a href="README_zh.MD">简体中文</a> | English
 </h4>
 
 ## Features

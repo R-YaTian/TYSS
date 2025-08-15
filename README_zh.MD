@@ -11,7 +11,7 @@ TYSS - 天涯的3DS存档工作室
 <p align="center"><img src="res/preview.png" />
 
 <h4 align="right">
-  简体中文 | <a href="README.md">English</a>
+  简体中文 | <a href="README.MD">English</a>
 </h4>
 
 ## 功能特性
