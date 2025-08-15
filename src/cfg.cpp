@@ -67,7 +67,7 @@ void cfg::setUILanguage(u8 langIndex)
 
 void cfg::load()
 {
-    FILE *cfgIn = fopen("/TYSS/cfg.bin", "rb");
+    FILE *cfgIn = fopen("/TYSS/config.bin", "rb");
     if(cfgIn)
     {
         u8 getVal = 0;
@@ -141,7 +141,7 @@ void cfg::load()
 
 void cfg::saveCommon()
 {
-    FILE *cfgOut = fopen("/TYSS/cfg.bin", "wb");
+    FILE *cfgOut = fopen("/TYSS/config.bin", "wb");
     if(cfgOut)
     {
         u8 cfgver = TYSS_CFG_VER;
