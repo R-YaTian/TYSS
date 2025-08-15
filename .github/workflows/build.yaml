@@ -18,9 +18,9 @@ jobs:
       - name: Update packages
         run: |
           sudo -n apt-get update
-          sudo -n apt-get upgrade -y fakeroot python3-pip gettext
-          python3 -m pip install --upgrade pip setuptools
-          python3 -m pip install zopflipy
+          sudo -n apt-get upgrade -y python3-pip gettext
+          python3 -m pip install --no-cache-dir --upgrade setuptools
+          python3 -m pip install --no-cache-dir zopflipy
 
       - name: Silence all git safe directory warnings
         run: git config --system --add safe.directory '*'

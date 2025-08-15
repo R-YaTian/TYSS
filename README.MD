@@ -1,10 +1,5 @@
 # TYSS for 3DS
-<h4>
-  TYSS or RYaTian's Save Studio for 3DS.
-  <span style="float: right;">
-  <a href="README_zh.md">简体中文</a> | English
-  </span>
-</h4>
+TYSS or RYaTian's Save Studio for 3DS.
 
 <p align="left">
 <a href="http://www.gnu.org/copyleft/gpl.html"><img alt="license" src="https://img.shields.io/badge/license-GPL%20V3-blue.svg?style=flat"/></a>
@@ -14,6 +9,10 @@
 </p>
 
 <p align="center"><img src="res/preview.png" />
+
+<h4 align="right">
+  <a href="README_zh.md">简体中文</a> | English
+</h4>
 
 ## Features
 * Support backup/restore 3DS and DS cartridge saves
