@@ -70,14 +70,15 @@ static void shrdViewCallback(void *)
         case KEY_A:
         {
             data::titleData *t = &shared[shrdView->getSelected()];
+            data::curData = *t;
             std::string uploadParent;
 #ifdef ENABLE_DRIVE
             if(fs::netDrive)
             {
                 fs::currentDirID = fs::sharedExtID;
-                std::string ttl = util::toUtf8(shared[shrdView->getSelected()].getTitle());
-                if(fs::netDrive->dirExists(ttl, fs::sharedExtID))
-                    uploadParent = fs::netDrive->getFolderID(ttl, fs::sharedExtID);
+                std::string ttlUTF8 = t->getTitleUTF8();
+                if(fs::netDrive->dirExists(ttlUTF8, fs::sharedExtID))
+                    uploadParent = fs::netDrive->getFolderID(ttlUTF8, fs::sharedExtID);
             }
 #endif
             if(fs::openArchive(*t, ARCHIVE_SHARED_EXTDATA, false))
