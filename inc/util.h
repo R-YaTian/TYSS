@@ -21,6 +21,7 @@
 #define UTIL_H
 
 #include <string>
+#include <sys/stat.h>
 
 #include "data.h"
 
@@ -81,6 +82,33 @@ namespace util
         size_t pos = 0;
         while((pos = _s.find(_c)) != _s.npos)
             _s.erase(pos, 1);
+    }
+
+    inline long getFileSize(FILE* file) {
+        struct stat st;
+        int fd = fileno(file);
+        if (fstat(fd, &st) != 0) return -1;
+        return st.st_size;
+    }
+
+    inline std::string formatSize(uint64_t sizeBytes) {
+        const char* units[] = {"B", "KB", "MB", "GB", "TB"};
+        double size = static_cast<double>(sizeBytes);
+        int unitIndex = 0;
+
+        while (size >= 1024.0 && unitIndex < 4) {
+            size /= 1024.0;
+            ++unitIndex;
+        }
+
+        char buf[32];
+        if (size - static_cast<int>(size) > 0.0) {
+            std::snprintf(buf, sizeof(buf), " (%.1f %s)", size, units[unitIndex]);
+        } else {
+            std::snprintf(buf, sizeof(buf), " (%d %s)", static_cast<int>(size), units[unitIndex]);
+        }
+
+        return std::string(buf);
     }
 }
 

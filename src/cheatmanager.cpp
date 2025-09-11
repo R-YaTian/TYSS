@@ -54,7 +54,7 @@ bool CheatManager::areCheatsAvailable(const std::string& key)
 {
     if (!mCheats || mCheats->empty())
         return false;
-    return mCheats->find(key) != mCheats->end();
+    return mCheats->contains(key);
 }
 
 bool CheatManager::install(const std::string& key)
@@ -88,8 +88,8 @@ bool CheatManager::install(const std::string& key)
 
 void CheatManager::init()
 {
-    if (util::fexists("/TYSS/cheats.json")) {
-        const std::string path = "/TYSS/cheats.json";
+    const std::string path = "/TYSS/cheats.json";
+    if (util::fexists(path)) {
         FILE* in               = fopen(path.c_str(), "rt");
         if (in != NULL) {
             mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(in, nullptr, false));

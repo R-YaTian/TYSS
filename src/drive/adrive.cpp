@@ -278,10 +278,10 @@ void drive::adrive::loadDriveList()
                 const auto& fileArray = parse["items"];
                 for (const auto& curFile : fileArray)
                 {
-                    std::string name = curFile.value("name", "");
-                    std::string id = curFile.value("file_id", "");
-                    std::string type = curFile.value("type", "");
-                    std::string parent = curFile.value("parent_file_id", "");
+                    std::string name = curFile.value("name", std::string(""));
+                    std::string id = curFile.value("file_id", std::string(""));
+                    std::string type = curFile.value("type", std::string(""));
+                    std::string parent = curFile.value("parent_file_id", std::string(""));
                     unsigned int size = 0;
                     if (curFile.contains("size") && curFile["size"].is_number())
                         size = curFile["size"].get<unsigned int>();
@@ -305,7 +305,7 @@ void drive::adrive::loadDriveList()
 
             nextPageToken.clear();
             if (parse.contains("next_marker") && parse["next_marker"].is_string())
-                nextPageToken = parse["next_marker"];
+                nextPageToken = parse["next_marker"].get<std::string>();
         }
 
         delete jsonResp;
@@ -458,6 +458,7 @@ void drive::adrive::uploadFile(const std::string& _filename, const std::string& 
                     uploadData.name = respParse["file_name"].get<std::string>();
                     uploadData.isDir = false;
                     uploadData.parent = _parent;
+                    uploadData.size = (unsigned int) util::getFileSize(_upload);
 
                     // Complete URL
                     std::string url = adriveURL;

@@ -173,7 +173,7 @@ void cfg::saveDrive()
             drvCfg["driveDiskID"] = driveDiskID;
         drvCfg["driveRefreshToken"] = driveRefreshToken;
         drvCfg["driveInitOnBoot"] = driveInitOnBoot;
-        auto json_str = drvCfg.dump();
+        auto json_str = drvCfg.dump(2);
 
         FILE *drvOut = fopen("/TYSS/drive.json", "w");
         fputs(json_str.c_str(), drvOut);

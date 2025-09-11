@@ -232,9 +232,9 @@ void drive::gd::loadDriveList()
                 const auto& fileArray = parse["files"];
                 for (const auto& curFile : fileArray)
                 {
-                    std::string name = curFile.value("name", "");
-                    std::string id = curFile.value("id", "");
-                    std::string mimeType = curFile.value("mimeType", "");
+                    std::string name = curFile.value("name", std::string(""));
+                    std::string id = curFile.value("id", std::string(""));
+                    std::string mimeType = curFile.value("mimeType", std::string(""));
                     unsigned int size = 0;
                     if (curFile.contains("size") && curFile["size"].is_number())
                         size = curFile["size"].get<unsigned int>();
@@ -418,6 +418,7 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
                     uploadData.name = respParse["name"].get<std::string>();
                     uploadData.isDir = false;
                     uploadData.parent = _parent;
+                    uploadData.size = (unsigned int) util::getFileSize(_upload);
                     driveList.push_back(uploadData);
                 }
             }

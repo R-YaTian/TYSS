@@ -540,7 +540,7 @@ void ui::setDrawBottom()
                 setOptsDesc = getText("选择 UI 界面显示语言。");
                 break;
             case 5:
-                setOptsDesc = getText("以何种语言显示应用程序标题。\n这将影响存放应用程序数据备份的文件夹名称,\n一经设置不建议再修改,并且需要重载Titles才生效!");
+                setOptsDesc = getText("以何种语言显示应用程序标题。\n这将影响存放应用程序数据备份的文件夹名称,\n一经设置不建议再修改,并且需要重载Titles才生效!\n该选项同样会影响云端存储数据的保存路径,请确保\n在多个设备上保持该项一致!");
                 break;
             case 6:
                 setOptsDesc = getText("选择内置金手指数据库语言(目前仅支持简中与英语)\n软件优先加载TYSS文件夹中外置金手指数据库文件\ncheats.json,该选项仅决定内置金手指数据库语言,\n当外置数据库存在时无效!\n该项设置更改时,已载入的金手指数据库会被卸载,\n并且将在需要使用时重载!");

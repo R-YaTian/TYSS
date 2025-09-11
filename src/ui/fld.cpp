@@ -323,6 +323,8 @@ void fldMenuDriveDownload_t(void *a)
 
     t->status->setStatus(getTxt("正在下载 ") + in->name + "...");
 
+    FSUSER_CreateDirectory(fs::getSDMCArch(), fsMakePath(PATH_UTF16, targetDir.data()), 0);
+
     std::u16string target = targetDir + util::toUtf16(in->name);
     FS_Path targetPath = fsMakePath(PATH_UTF16, target.c_str());
     FS_Path tmpPath = fsMakePath(PATH_ASCII, "/TYSS/tmp.zip");
@@ -488,7 +490,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
 
         for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt(getTxt("[云] ") + driveList[i]->name, 320);
+            fldMenu.addOpt(getTxt("[云] ") + driveList[i]->name + util::formatSize(driveList[i]->size), 320);
 
             fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, driveList[i]);
             fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, driveList[i]);
@@ -531,7 +533,7 @@ void ui::fldRefresh()
 
         for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt(getTxt("[云] ") + driveList[i]->name, 320);
+            fldMenu.addOpt(getTxt("[云] ") + driveList[i]->name + util::formatSize(driveList[i]->size), 320);
 
             fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, driveList[i]);
             fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, driveList[i]);
