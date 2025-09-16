@@ -46,8 +46,8 @@
 #define CHEATMANAGER_H
 
 #include "fs.h"
-#include "json.h"
 
+#include <jtjson.h>
 #include <3ds.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -67,7 +67,7 @@ public:
     bool areCheatsAvailable(const std::string& key);
     bool install(const std::string& key);
 
-    std::shared_ptr<nlohmann::ordered_json> cheats(void) { return mCheats; }
+    std::shared_ptr<jt::Json> cheats(void) { return mCheats; }
 
 private:
     CheatManager(void);
@@ -76,7 +76,7 @@ private:
     CheatManager(CheatManager const&) = delete;
     void operator=(CheatManager const&) = delete;
 
-    std::shared_ptr<nlohmann::ordered_json> mCheats;
+    std::shared_ptr<jt::Json> mCheats;
 };
 
 #endif

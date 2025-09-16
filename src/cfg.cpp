@@ -24,7 +24,7 @@
 #include "3dsgettext.h"
 
 #ifdef ENABLE_DRIVE
-#include "json.h"
+#include <jtjson.h>
 std::string cfg::driveClientID, cfg::driveClientSecret, cfg::driveAuthCode, cfg::driveRefreshToken, cfg::driveDiskID;
 bool cfg::driveInitOnBoot = true;
 #endif
@@ -114,7 +114,7 @@ void cfg::load()
         drvCfg.read(jsonBuff, size);
         jsonBuff[size] = '\0';
 
-        nlohmann::json parse = nlohmann::json::parse(jsonBuff);
+        jt::Json parse = jt::Json::parse(jsonBuff);
 
         if(parse.contains("driveClientID"))
             driveClientID = parse["driveClientID"];
@@ -164,7 +164,7 @@ void cfg::saveDrive()
 {
     if(!driveRefreshToken.empty())
     {
-        nlohmann::json drvCfg;
+        jt::Json drvCfg;
         if (!driveClientID.empty())
             drvCfg["driveClientID"] = driveClientID;
         if (!driveClientSecret.empty())

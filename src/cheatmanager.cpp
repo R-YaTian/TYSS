@@ -62,8 +62,9 @@ bool CheatManager::install(const std::string& key)
     std::string cheatFile = "";
     auto cheats           = *CheatManager::getInstance().cheats().get();
     bool first            = true;
-    for (auto it = cheats[key].begin(); it != cheats[key].end(); ++it) {
-        std::string value = it.key();
+    auto order = cheats[key].getObjectOrder();
+    for (auto it = order.begin(); it != order.end(); ++it) {
+        std::string value = *it;
         if (!first)
             cheatFile += "\n";
         cheatFile += "[" + value + "]\n";
@@ -92,7 +93,7 @@ void CheatManager::init()
     if (util::fexists(path)) {
         FILE* in               = fopen(path.c_str(), "rt");
         if (in != NULL) {
-            mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(in, nullptr, false));
+            mCheats = std::make_shared<jt::Json>(jt::Json::parse(in, true));
             fclose(in);
         }
     } else {
@@ -123,7 +124,7 @@ void CheatManager::loadBuiltIn()
                 std::vector<char> buffer(info.uncompressed_size + 1, 0);
                 int bytesRead = unzReadCurrentFile(zipFile, buffer.data(), info.uncompressed_size);
                 if (bytesRead == static_cast<int>(info.uncompressed_size))
-                    mCheats = std::make_shared<nlohmann::ordered_json>(nlohmann::ordered_json::parse(buffer.data()));
+                    mCheats = std::make_shared<jt::Json>(jt::Json::parse(buffer.data(), true));
             }
         }
         unzClose(zipFile);

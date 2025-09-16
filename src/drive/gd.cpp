@@ -17,8 +17,8 @@
  */
 
 #include <curl/curl.h>
+#include <jtjson.h>
 
-#include "json.h"
 #include "drive/gd.h"
 #include "util.h"
 
@@ -55,7 +55,7 @@ void drive::gd::exhangeAuthCode(const std::string& _authCode)
     postHeader = curl_slist_append(postHeader, HEADER_CONTENT_TYPE_APP_JSON);
 
     // Post json
-    nlohmann::json post;
+    jt::Json post;
     post["client_id"] = clientID;
     post["client_secret"] = secretID;
     post["code"] = _authCode;
@@ -88,7 +88,7 @@ void drive::gd::exhangeAuthCode(const std::string& _authCode)
 
     if (error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if(respParse.contains("access_token") && respParse.contains("refresh_token"))
         {
             token = respParse["access_token"].get<std::string>();
@@ -106,7 +106,7 @@ void drive::gd::refreshToken()
     header = curl_slist_append(header, HEADER_CONTENT_TYPE_APP_JSON);
 
     // Post Json
-    nlohmann::json post;
+    jt::Json post;
     post["client_id"] = clientID;
     post["client_secret"] = secretID;
     post["refresh_token"] = rToken;
@@ -137,7 +137,7 @@ void drive::gd::refreshToken()
 
     if (error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if (respParse.contains("access_token"))
             token = respParse["access_token"].get<std::string>();
     }
@@ -172,7 +172,7 @@ bool drive::gd::tokenIsValid()
 
     if (error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if(!respParse.contains("error"))
             ret = true;
     }
@@ -225,7 +225,7 @@ void drive::gd::loadDriveList()
 
         if (error == CURLE_OK)
         {
-            nlohmann::json parse = nlohmann::json::parse(*jsonResp);
+            jt::Json parse = jt::Json::parse(*jsonResp);
 
             if (parse.contains("files") && parse["files"].is_array())
             {
@@ -285,12 +285,12 @@ bool drive::gd::createDir(const std::string& _dirName, const std::string& _paren
     postHeaders = curl_slist_append(postHeaders, HEADER_CONTENT_TYPE_APP_JSON);
 
     // JSON To Post
-    nlohmann::json post;
+    jt::Json post;
     post["name"] = _dirName;
     post["mimeType"] = MIMETYPE_FOLDER;
     if (!_parent.empty())
     {
-        nlohmann::json parentsArray = nlohmann::json::array();
+        jt::Json parentsArray;
         parentsArray.push_back(_parent);
         post["parents"] = parentsArray;
     }
@@ -320,7 +320,7 @@ bool drive::gd::createDir(const std::string& _dirName, const std::string& _paren
 
     if (error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if(!respParse.contains("error"))
         {
             drive::driveItem newDir;
@@ -352,11 +352,11 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
     postHeaders = curl_slist_append(postHeaders, HEADER_CONTENT_TYPE_APP_JSON);
 
     // Post JSON
-    nlohmann::json post;
+    jt::Json post;
     post["name"] = _filename;
     if (!_parent.empty())
     {
-        nlohmann::json parentsArray = nlohmann::json::array();
+        jt::Json parentsArray;
         parentsArray.push_back(_parent);
         post["parents"] = parentsArray;
     }
@@ -410,7 +410,7 @@ void drive::gd::uploadFile(const std::string& _filename, const std::string& _par
 
             if (upError == CURLE_OK)
             {
-                nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+                jt::Json respParse = jt::Json::parse(*jsonResp);
                 if (respParse.contains("id") && respParse.contains("name") && respParse.contains("mimeType"))
                 {
                     drive::driveItem uploadData;

@@ -17,8 +17,8 @@
  */
 
 #include <curl/curl.h>
+#include <jtjson.h>
 
-#include "json.h"
 #include "drive/adrive.h"
 #include "util.h"
 #include "cfg.h"
@@ -75,7 +75,7 @@ void drive::adrive::getUserDriveID()
 
     if (error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if(respParse.contains("default_drive_id"))
             driveID = respParse["default_drive_id"].get<std::string>();
     }
@@ -90,7 +90,7 @@ void drive::adrive::exhangeAuthCode(const std::string& _authCode)
     postHeader = curl_slist_append(postHeader, HEADER_CONTENT_TYPE_APP_JSON);
 
     // Post json
-    nlohmann::json post;
+    jt::Json post;
     post["client_id"] = clientID;
     post["client_secret"] = secretID;
     post["code"] = _authCode;
@@ -121,7 +121,7 @@ void drive::adrive::exhangeAuthCode(const std::string& _authCode)
 
     if (error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if(respParse.contains("access_token") && respParse.contains("refresh_token"))
         {
             token = respParse["access_token"].get<std::string>();
@@ -139,7 +139,7 @@ void drive::adrive::refreshToken()
     header = curl_slist_append(header, HEADER_CONTENT_TYPE_APP_JSON);
 
     // Post Json
-    nlohmann::json post;
+    jt::Json post;
     post["client_id"] = clientID;
     post["client_secret"] = secretID;
     post["refresh_token"] = rToken;
@@ -170,7 +170,7 @@ void drive::adrive::refreshToken()
 
     if (error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if(respParse.contains("access_token") && respParse.contains("refresh_token"))
         {
             token = respParse["access_token"].get<std::string>();
@@ -212,7 +212,7 @@ bool drive::adrive::tokenIsValid()
 
     if (error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if(!respParse.contains("code"))
             ret = true;
     }
@@ -235,7 +235,7 @@ void drive::adrive::loadDriveList()
         url.append("/search");
 
         // JSON To Post
-        nlohmann::json post;
+        jt::Json post;
         post["drive_id"] = driveID;
         post["query"] = "type = 'folder' or category = 'zip' or file_extension = 'bin' or file_extension = 'sav' or file_extension = 'sv'";
         if (!nextPageToken.empty())
@@ -271,7 +271,7 @@ void drive::adrive::loadDriveList()
 
         if (error == CURLE_OK)
         {
-            nlohmann::json parse = nlohmann::json::parse(*jsonResp);
+            jt::Json parse = jt::Json::parse(*jsonResp);
 
             if (parse.contains("items") && parse["items"].is_array())
             {
@@ -325,7 +325,7 @@ bool drive::adrive::createDir(const std::string& _dirName, const std::string& _p
     postHeaders = curl_slist_append(postHeaders, HEADER_CONTENT_TYPE_APP_JSON);
 
     // JSON To Post
-    nlohmann::json post;
+    jt::Json post;
     post["drive_id"] = driveID;
     post["name"] = _dirName;
     post["type"] = "folder";
@@ -360,7 +360,7 @@ bool drive::adrive::createDir(const std::string& _dirName, const std::string& _p
 
     if (error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if(!respParse.contains("code"))
         {
             drive::driveItem newDir;
@@ -391,7 +391,7 @@ void drive::adrive::uploadFile(const std::string& _filename, const std::string& 
     postHeaders = curl_slist_append(postHeaders, HEADER_CONTENT_TYPE_APP_JSON);
 
     // Post JSON
-    nlohmann::json post;
+    jt::Json post;
     post["drive_id"] = driveID;
     post["name"] = _filename;
     post["type"] = "file";
@@ -423,7 +423,7 @@ void drive::adrive::uploadFile(const std::string& _filename, const std::string& 
 
     if (error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if (respParse.contains("part_info_list") && respParse["part_info_list"].is_array())
         {
             // Get upload URL
@@ -470,7 +470,7 @@ void drive::adrive::uploadFile(const std::string& _filename, const std::string& 
                     header = curl_slist_append(header, HEADER_CONTENT_TYPE_APP_JSON);
 
                     // Post JSON
-                    nlohmann::json postComplete;
+                    jt::Json postComplete;
                     postComplete["drive_id"] = driveID;
                     postComplete["file_id"] = uploadData.id;
                     postComplete["upload_id"] = respParse["upload_id"].get<std::string>();
@@ -524,7 +524,7 @@ void drive::adrive::downloadFile(const std::string& _fileID, FILE *_download)
     postHeaders = curl_slist_append(postHeaders, HEADER_CONTENT_TYPE_APP_JSON);
 
     // JSON To Post
-    nlohmann::json post;
+    jt::Json post;
     post["drive_id"] = driveID;
     post["file_id"] = _fileID;
     auto json_str = post.dump();
@@ -553,7 +553,7 @@ void drive::adrive::downloadFile(const std::string& _fileID, FILE *_download)
 
     if(error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if(respParse.contains("url"))
         {
             // Download URL
@@ -602,7 +602,7 @@ void drive::adrive::deleteFile(const std::string& _fileID)
     postHeaders = curl_slist_append(postHeaders, HEADER_CONTENT_TYPE_APP_JSON);
 
     // JSON To Post
-    nlohmann::json post;
+    jt::Json post;
     post["drive_id"] = driveID;
     post["file_id"] = _fileID;
     auto json_str = post.dump();
@@ -631,7 +631,7 @@ void drive::adrive::deleteFile(const std::string& _fileID)
 
     if(error == CURLE_OK)
     {
-        nlohmann::json respParse = nlohmann::json::parse(*jsonResp);
+        jt::Json respParse = jt::Json::parse(*jsonResp);
         if(!respParse.contains("code"))
         {
             for(size_t i = 0; i < driveList.size(); i++)
