@@ -28,12 +28,21 @@ jobs:
         run: |
           git clone --recurse-submodules https://github.com/devkitPro/citro2d.git
 
+      - name: Checkout latest 3ds-jtjson commit
+        run: |
+          git clone -b 3ds-jtjson https://github.com/R-YaTian/3ds-jtjson.git
+
       - name: Set workspace permissions
         run: chmod 777 -R "$GITHUB_WORKSPACE"
 
       - name: Build and install citro2d
         run: |
           cd citro2d
+          catnip -T 3ds -S . -B build install
+
+      - name: Build and install 3ds-jtjson
+        run: |
+          cd 3ds-jtjson
           catnip -T 3ds -S . -B build install
 
       - name: Build TYSS
