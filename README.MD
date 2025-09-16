@@ -66,6 +66,7 @@ TYSS or RYaTian's Save Studio for 3DS.
 	* `dkp-pacman -S 3ds-curl 3ds-mbedtls 3ds-zlib` (You may need to remove `dkp`)
 	* `pip install zopflipy` (You may need to install python and pip first)
 	* Install `gettext` toolchain via your package manager
+  * `git clone -b 3ds-jtjson https://github.com/R-YaTian/3ds-jtjson.git && cd 3ds-jtjson && catnip -T 3ds -S . -B build install`
 * Then simply run `make`
 
 ## License

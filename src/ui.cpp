@@ -51,7 +51,7 @@ ui::progressBar *ui::prog;
 static ui::threadProcMngr *thrdMgr;
 static ui::button *ok, *yes, *no;
 
-const std::string TITLE_TEXT = "TY Save Studio - v1.1.2 ";
+const std::string TITLE_TEXT = "TY Save Studio - v1.1.4 ";
 
 uint32_t ui::down = 0, ui::held = 0;
 touchPosition ui::pos;

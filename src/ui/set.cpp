@@ -67,6 +67,20 @@ static void toggleUInt(void *b, int step, int max, const std::vector<int>& black
         *in = max;
 }
 
+static std::string getUILangMessage(const int& g)
+{
+    std::string s;
+
+    if (g == 0)
+        s = "请等待...";
+    else if (g == 1)
+        s = "Please wait...";
+    else if (g == 2)
+        s = "請稍等...";
+
+    return s;
+}
+
 #define getText getTxt
 
 static std::string getLightDarkText(const bool& g)
@@ -335,16 +349,42 @@ static void setMenuDecreaseTitleLang(void *a)
     toggleUInt(a, -1, 11);
 }
 
+static void setMenuIncreaseUILang_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    int* in = (int*)t->argPtr;
+    toggleUInt(in, 1, 2);
+    t->status->setStatus(getUILangMessage(*in));
+    cfg::setUILanguage(*in);
+    svcSleepThread(1e+9 / 4);
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
+}
+
 static void setMenuIncreaseUILang(void *a)
 {
-    toggleUInt(a, 1, 2);
-    cfg::setUILanguage(*(int*)a);
+    ui::newThread(setMenuIncreaseUILang_t, a, NULL);
+}
+
+static void setMenuDecreaseUILang_t(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+    int* in = (int*)t->argPtr;
+    toggleUInt(in, -1, 2);
+    t->status->setStatus(getUILangMessage(*in));
+    cfg::setUILanguage(*in);
+    svcSleepThread(1e+9 / 4);
+    t->lock();
+    t->argPtr = NULL;
+    t->unlock();
+    t->finished = true;
 }
 
 static void setMenuDecreaseUILang(void *a)
 {
-    toggleUInt(a, -1, 2);
-    cfg::setUILanguage(*(int*)a);
+    ui::newThread(setMenuDecreaseUILang_t, a, NULL);
 }
 
 static void setMenuToggleCheatLang(void *a)

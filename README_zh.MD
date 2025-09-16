@@ -67,6 +67,7 @@ TYSS - 天涯的3DS存档工作室
 	* `dkp-pacman -S 3ds-curl 3ds-mbedtls 3ds-zlib` (根据操作系统的不同可能需要移除 `dkp`)
 	* `pip install zopflipy` (如果没有 python 和 pip, 请先安装)
 	* 使用任意包管理器安装 `gettext` 工具链
+  * 执行 `git clone -b 3ds-jtjson https://github.com/R-YaTian/3ds-jtjson.git && cd 3ds-jtjson && catnip -T 3ds -S . -B build install`
 * 直接执行 `make`
 
 ## 许可证
