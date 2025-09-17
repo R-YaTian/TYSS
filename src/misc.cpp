@@ -24,6 +24,31 @@
 
 static u32 homemenuID[] = {0x00000082, 0x0000008f, 0x00000098, 0x00000098, 0x000000a1, 0x000000a9, 0x000000b1};
 
+static Result Loader_SetAppModeToMode3()
+{
+    Handle loaderHandle;
+    Result res = srvGetServiceHandle(&loaderHandle, "Loader");
+
+    if (R_FAILED(res)) return res;
+
+    u32 *cmdbuf = getThreadCommandBuffer();
+
+    ControlApplicationMemoryModeOverrideConfig* mode = (ControlApplicationMemoryModeOverrideConfig*)&cmdbuf[1];
+
+    memset(mode, 0, sizeof(ControlApplicationMemoryModeOverrideConfig));
+    mode->enable_o3ds = true;
+    mode->o3ds_mode = SYSMODE_DEV2;
+    cmdbuf[0] = IPC_MakeHeader(0x101, 1, 0); // ControlApplicationMemoryModeOverride
+
+    res = svcSendSyncRequest(loaderHandle);
+
+    if (R_SUCCEEDED(res))
+        res = cmdbuf[1];
+
+    svcCloseHandle(loaderHandle);
+    return res;
+}
+
 void misc::setPC()
 {
     data::titleData tmp;
@@ -92,7 +117,7 @@ void misc::clearSoftwareLibraryAndPlayHistory(void *a)
         res = FSUSER_DeleteFile(fs::getSaveArch(), (FS_Path) fsMakePath(PATH_ASCII, "/pld.dat"));
         fs::commitData(fs::getSaveMode());
         fs::closeSaveArch();
-        if (R_FAILED(res)) 
+        if (R_FAILED(res))
         {
             ui::showMessage(getTxt("清除软件图鉴记录失败!\n错误: 0x%08X"), (unsigned) res);
             t->finished = true;
@@ -347,6 +372,27 @@ void misc::hackStepCount(void *a)
     } else {
         ui::showMessage(getTxt("修改当前小时步数成功!\n今日总步数: %d"), stepValue + stepCount);
     }
+
+    t->finished = true;
+}
+
+void misc::rebootToMode3(void *a)
+{
+    threadInfo *t = (threadInfo *)a;
+
+    Result res = Loader_SetAppModeToMode3();
+
+    if (R_SUCCEEDED(res))
+    {
+        nsInit();
+        res = NS_RebootToTitle(1, 0x000400000B549300LL);
+        nsExit();
+    } else {
+        ui::showMessage(getTxt("扩展内存模式配置失败!\n错误: 0x%08X"), (unsigned) res);
+    }
+
+    if (R_FAILED(res))
+        ui::showMessage(getTxt("无法重启到扩展内存模式!\n错误: 0x%08X"), (unsigned) res);
 
     t->finished = true;
 }

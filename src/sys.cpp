@@ -24,6 +24,7 @@
 bool run = true;
 int8_t sys::threadCore = -2;
 bool sys::isNew3DS = false;
+bool sys::isInstalled = false;
 int sys::threadPrio = 0;
 
 void sys::init()
@@ -45,6 +46,11 @@ void sys::init()
         sys::threadCore = 2;
         sys::isNew3DS = true;
     }
+
+    char tmp[16];
+    Result res = AM_GetTitleProductCode(MEDIATYPE_SD, 0x000400000B549300LL, tmp);
+    if (R_SUCCEEDED(res))
+        sys::isInstalled = true;
 }
 
 void sys::exit()

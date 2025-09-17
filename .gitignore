@@ -8,6 +8,7 @@ adrivehelper/target
 *.elf
 *.3dsx
 *.cia
+*.zcia
 *.smdh
 3dslink.exe
 Cargo.lock

@@ -25,6 +25,7 @@
 #include "util.h"
 #include "misc.h"
 #include "cheatmanager.h"
+#include "sys.h"
 
 static ui::menu setMenu, setSubMenu;
 static bool setSubMenuOpen = false;
@@ -261,6 +262,12 @@ static void setMenuClearBlackList(void *a)
     ui::confirm(q, data::clearBlacklist, NULL, NULL);
 }
 
+static void setMenuRebootToMode3(void *a)
+{
+    std::string q = getText("你确定要以扩展内存模式重启TYSS吗?");
+    ui::confirm(q, misc::rebootToMode3, NULL, NULL);
+}
+
 static void setMenuReloadTitles(void *a)
 {
     remove("/TYSS/cache.bin");
@@ -490,6 +497,12 @@ void ui::setInit(void *a)
     setSubMenu.addOpt(getText("重置 TYSS 黑名单"), 320);
     setSubMenu.addOptEvent(11, KEY_A, setMenuClearBlackList, NULL);
 
+    if (!sys::isNew3DS && sys::isInstalled)
+    {
+        setSubMenu.addOpt(getText("以扩展内存模式重启 TYSS"), 320);
+        setSubMenu.addOptEvent(12, KEY_A, setMenuRebootToMode3, NULL);
+    }
+
     setSubMenu.setCallback(setSubMenuCallback, NULL);
 
     t->finished = true;
@@ -643,6 +656,9 @@ void ui::setDrawBottom()
                 break;
             case 11:
                 setOptsDesc = getText("清空本程序黑名单列表, 随后将自动执行重载 Titles");
+                break;
+            case 12:
+                setOptsDesc = getText("重启本程序到扩展内存模式, 以便于执行主菜单图标\n缓存清除操作");
                 break;
         }
         ui::drawUIBar(getText("\ue000 选择 \ue001 退出工具箱"), ui::SCREEN_BOT, false);

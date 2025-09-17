@@ -30,6 +30,7 @@ namespace sys
     extern int8_t threadCore;
     extern int threadPrio;
     extern bool isNew3DS;
+    extern bool isInstalled;
 }
 
 #endif // SYS_H
