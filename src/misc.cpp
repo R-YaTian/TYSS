@@ -201,7 +201,7 @@ void misc::resetDemoPlayCount(void *a)
     threadInfo *t = (threadInfo *)a;
     t->status->setStatus(getTxt("正在重置试玩版游戏游玩计数..."));
 
-    Result res = AM_DeleteAllDemoLaunchInfos();
+    Result res = AMNET_DeleteAllDemoLaunchInfos();
 
     if (R_FAILED(res))
         ui::showMessage(getTxt("重置试玩版游戏游玩计数失败!\n错误: 0x%08X"), (unsigned) res);
@@ -385,7 +385,7 @@ void misc::rebootToMode3(void *a)
     if (R_SUCCEEDED(res))
     {
         nsInit();
-        res = NS_RebootToTitle(1, 0x000400000B549300LL);
+        res = NS_RebootToTitle(1, 0x000400000B549300LL, SYSMODE_DEV2);
         nsExit();
     } else {
         ui::showMessage(getTxt("扩展内存模式配置失败!\n错误: 0x%08X"), (unsigned) res);
