@@ -26,10 +26,14 @@ int ui::menu::addOpt(const std::string &add, int maxWidth, const std::string& de
 {
     menuOpt newOpt;
     std::string _desc = "";
+    std::u16string replaceStr = u"⋯";
     int descWidth = 0;
     int ofs = 2;
     if (util::endsWith(add, std::string(".zip")) || util::endsWith(add, std::string(".sav")) || util::endsWith(add, std::string(".bin")))
-        ofs += 3;
+    {
+        replaceStr += util::toUtf16(add.substr(add.size() - 4));
+        ofs += 4;
+    }
 
     if (!desc.empty() && desc != "")
     {
@@ -48,7 +52,7 @@ int ui::menu::addOpt(const std::string &add, int maxWidth, const std::string& de
             tmp += _add[i];
             if ((int)gfx::getTextWidth(util::toUtf8(tmp)) >= maxWidth - 16 - descWidth)
             {
-                tmp.replace(i - ofs, 3, u"···");
+                tmp.replace(i - ofs, ofs + 1, replaceStr);
                 newOpt.txt = util::toUtf8(tmp) + _desc;
                 break;
             }
