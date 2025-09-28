@@ -490,7 +490,7 @@ void ui::fldInit(const std::u16string& _path, const std::string& _uploadParent, 
 
         for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt(getTxt("[云] ") + driveList[i]->name + util::formatSize(driveList[i]->size), 320);
+            fldMenu.addOpt(getTxt("[云] ") + driveList[i]->name, 320, util::formatSize(driveList[i]->size));
 
             fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, driveList[i]);
             fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, driveList[i]);
@@ -533,7 +533,7 @@ void ui::fldRefresh()
 
         for(unsigned i = 0; i < driveList.size(); i++, fldInd++)
         {
-            fldMenu.addOpt(getTxt("[云] ") + driveList[i]->name + util::formatSize(driveList[i]->size), 320);
+            fldMenu.addOpt(getTxt("[云] ") + driveList[i]->name, 320, util::formatSize(driveList[i]->size));
 
             fldMenu.addOptEvent(fldInd, KEY_A, fldMenuDriveDownload, driveList[i]);
             fldMenu.addOptEvent(fldInd, KEY_X, fldMenuDriveDelete, driveList[i]);

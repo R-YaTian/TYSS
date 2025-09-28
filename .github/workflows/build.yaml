@@ -24,6 +24,10 @@ jobs:
       - name: Silence all git safe directory warnings
         run: git config --system --add safe.directory '*'
 
+      - name: Checkout latest libctru commit
+        run: |
+          git clone --recurse-submodules https://github.com/devkitPro/libctru.git
+
       - name: Checkout latest citro2d commit
         run: |
           git clone --recurse-submodules https://github.com/devkitPro/citro2d.git
@@ -34,6 +38,11 @@ jobs:
 
       - name: Set workspace permissions
         run: chmod 777 -R "$GITHUB_WORKSPACE"
+
+      - name: Build and install libctru
+        run: |
+          cd libctru/libctru
+          make install -j$(nproc)
 
       - name: Build and install citro2d
         run: |

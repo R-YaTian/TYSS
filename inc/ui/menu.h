@@ -42,7 +42,7 @@ namespace ui
     class menu
     {
         public:
-            int addOpt(const std::string& add, int maxWidth);
+            int addOpt(const std::string& add, int maxWidth, const std::string& desc = "");
             void addOptEvent(unsigned ind, uint32_t _key, funcPtr _func, void *_args);
             void editOpt(int ind, const std::string& ch){ opt[ind].txt = ch; }
             void reset();

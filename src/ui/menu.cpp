@@ -20,22 +20,36 @@
 
 #include "ui.h"
 #include "gfx.h"
+#include "util.h"
 
-int ui::menu::addOpt(const std::string &add, int maxWidth)
+int ui::menu::addOpt(const std::string &add, int maxWidth, const std::string& desc)
 {
     menuOpt newOpt;
-    if ((int)gfx::getTextWidth(add) < maxWidth - 32 || maxWidth == 0)
-        newOpt.txt = add;
+    std::string _desc = "";
+    int descWidth = 0;
+    int ofs = 2;
+    if (util::endsWith(add, std::string(".zip")) || util::endsWith(add, std::string(".sav")) || util::endsWith(add, std::string(".bin")))
+        ofs += 3;
+
+    if (!desc.empty() && desc != "")
+    {
+        _desc = " (" + desc + ")";
+        descWidth = gfx::getTextWidth(_desc);
+    }
+
+    int strWidth = gfx::getTextWidth(add) + descWidth;
+    if (strWidth < maxWidth - 16 || maxWidth == 0)
+        newOpt.txt = add + _desc;
     else
     {
-        std::string tmp;
-        for (unsigned i = 0; i < add.length(); i++)
+        std::u16string tmp, _add = util::toUtf16(add);
+        for (unsigned i = 0; i < _add.length(); i++)
         {
-            tmp += add[i];
-            if ((int)gfx::getTextWidth(tmp) >= maxWidth)
+            tmp += _add[i];
+            if ((int)gfx::getTextWidth(util::toUtf8(tmp)) >= maxWidth - 16 - descWidth)
             {
-                tmp.replace(i - 2, 3, "...");
-                newOpt.txt = add;
+                tmp.replace(i - ofs, 3, u"···");
+                newOpt.txt = util::toUtf8(tmp) + _desc;
                 break;
             }
         }

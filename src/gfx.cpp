@@ -98,78 +98,73 @@ void gfx::drawText(const std::string& str, const int& x, const int& y, const flo
 
 void gfx::drawTextWrap(const std::string& str, const int& x, int y, const float& depth, const float& txtScale, const int& maxWidth, const uint32_t& clr)
 {
+    if (str.empty()) return;
+
     C2D_Text tmpTxt;
     C2D_TextBuf tmpBuf = C2D_TextBufNew(512);
 
     int tmpX = x;
-    for(int i = 0; i < (int)str.length(); )
-    {
-        size_t forceBreak = str.find_first_of("\n", i);
-        size_t nextBreak = str.find_first_of(" /_.", i);
-        if(forceBreak != str.npos && forceBreak < nextBreak)
-        {
-            std::string temp = str.substr(i, forceBreak - i);
-            size_t width = getTextWidth(temp);
-            if((int)(tmpX + width) > (x + maxWidth))
-            {
-                tmpX = x;
-                y += 16;
-            }
-            if (font)
-                C2D_TextFontParse(&tmpTxt, font, tmpBuf, temp.c_str());
-            else
-                C2D_TextParse(&tmpTxt, tmpBuf, temp.c_str());
+    std::u16string line, word, u16str = util::toUtf16(str);
 
-            C2D_TextOptimize(&tmpTxt);
-            C2D_DrawText(&tmpTxt, C2D_WithColor, (float)tmpX, (float)y, depth, txtScale, txtScale, clr);
+    auto flushLine = [&](const std::u16string& u16line) {
+        if (u16line.empty()) return;
+        std::string utf8Line = util::toUtf8(u16line);
+        if (font)
+            C2D_TextFontParse(&tmpTxt, font, tmpBuf, utf8Line.c_str());
+        else
+            C2D_TextParse(&tmpTxt, tmpBuf, utf8Line.c_str());
+        C2D_TextOptimize(&tmpTxt);
+        C2D_DrawText(&tmpTxt, C2D_WithColor, (float)tmpX, (float)y, depth, txtScale, txtScale, clr);
+    };
+
+    for (size_t i = 0; i < u16str.size(); i++)
+    {
+        char16_t ch = u16str[i];
+
+        // Force Linebreak
+        if (ch == u'\n')
+        {
+            if (!word.empty()) {
+                line += word;
+                word.clear();
+            }
+            flushLine(line);
+            line.clear();
             tmpX = x;
             y += 16;
-            i += temp.length() + 1;
-            continue;
-        } else if (forceBreak == 0)
-        {
-            y += 16;
             continue;
         }
 
-        if(nextBreak == str.npos)
+        // Check break char
+        bool isBreakChar = (ch == u' ' || ch == u'/' || ch == u'_');
+
+        word.push_back(ch);
+        int newWidth = getTextWidth(util::toUtf8(line + word));
+
+        if (tmpX + newWidth > x + maxWidth)
         {
-            std::string temp = str.substr(i, str.length() - i);
-            size_t width = getTextWidth(temp);
-            if((int)(tmpX + width) > (x + maxWidth))
+            if (!line.empty())
             {
+                flushLine(line);
                 tmpX = x;
                 y += 16;
-            }
-            if (font)
-                C2D_TextFontParse(&tmpTxt, font, tmpBuf, str.substr(i, str.length() - i).c_str());
-            else
-                C2D_TextParse(&tmpTxt, tmpBuf, str.substr(i, str.length() - i).c_str());
-            C2D_TextOptimize(&tmpTxt);
-            C2D_DrawText(&tmpTxt, C2D_WithColor, (float)tmpX, (float)y, depth, txtScale, txtScale, clr);
-            break;
-        }
-        else
-        {
-            std::string temp = str.substr(i, (nextBreak + 1) - i);
-            size_t width = getTextWidth(temp);
-            if((int)(tmpX + width) > (x + maxWidth))
-            {
+                line.clear();
+            } else {
+                flushLine(word.substr(0, word.size() - 1));
                 tmpX = x;
                 y += 16;
+                word = word.substr(word.size() - 1);
             }
-
-            if (font)
-                C2D_TextFontParse(&tmpTxt, font, tmpBuf, temp.c_str());
-            else
-                C2D_TextParse(&tmpTxt, tmpBuf, temp.c_str());
-
-            C2D_TextOptimize(&tmpTxt);
-            C2D_DrawText(&tmpTxt, C2D_WithColor, (float)tmpX, (float)y, depth, txtScale, txtScale, clr);
-            tmpX += width;
-            i += temp.length();
+        } else if (isBreakChar) {
+            line += word;
+            word.clear();
         }
     }
+
+    // Flush remaining
+    if (!word.empty()) line += word;
+    if (!line.empty()) flushLine(line);
+
     C2D_TextBufDelete(tmpBuf);
 }
 

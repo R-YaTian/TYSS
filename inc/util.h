@@ -103,9 +103,9 @@ namespace util
 
         char buf[32];
         if (size - static_cast<int>(size) > 0.0) {
-            std::snprintf(buf, sizeof(buf), " (%.1f %s)", size, units[unitIndex]);
+            std::snprintf(buf, sizeof(buf), "%.1f %s", size, units[unitIndex]);
         } else {
-            std::snprintf(buf, sizeof(buf), " (%d %s)", static_cast<int>(size), units[unitIndex]);
+            std::snprintf(buf, sizeof(buf), "%d %s", static_cast<int>(size), units[unitIndex]);
         }
 
         return std::string(buf);
