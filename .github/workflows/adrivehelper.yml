@@ -37,10 +37,17 @@ jobs:
         if: matrix.target != 'universal2-apple-darwin'
         run: rustup target add ${{ matrix.target }}
 
-      - name: Build (Linux/Windows)
-        if: matrix.target != 'universal2-apple-darwin'
+      - name: Build (Linux)
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
         working-directory: ./adrivehelper
         run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Build (Windows)
+        if: matrix.target == 'i686-pc-windows-msvc'
+        working-directory: ./adrivehelper
+        run: |
+          cargo install thunk-cli
+          build.cmd
 
       # macOS: build x86_64 and aarch64 separately, then lipo merge
       - name: Install Rust targets (macOS)
@@ -69,13 +76,21 @@ jobs:
             target/aarch64-apple-darwin/release/adrivehelper \
             -output target/universal2-apple-darwin/adrivehelper
 
-      - name: Upload artifact (Linux/Windows)
-        if: matrix.target != 'universal2-apple-darwin'
+      - name: Upload artifact (Linux)
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: |
-            ./adrivehelper/target/${{ matrix.target }}/release/adrivehelper${{ matrix.target == 'i686-pc-windows-msvc' && '.exe' || '' }}
+            ./adrivehelper/target/${{ matrix.target }}/release/adrivehelper
+
+      - name: Upload artifact (Windows)
+        if: matrix.target == 'i686-pc-windows-msvc'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: |
+            ./adrivehelper/target/winxp_build/${{ matrix.target }}/release/adrivehelper.exe
 
       - name: Upload artifact (macOS universal2)
         if: matrix.target == 'universal2-apple-darwin'

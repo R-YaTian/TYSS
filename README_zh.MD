@@ -57,6 +57,7 @@ TYSS - 天涯的3DS存档工作室
 * **请前往[发布页面](https://github.com/R-YaTian/TYSS/releases)获取 `adrivehelper`，该实用程序将会调用浏览器导航至阿里云盘账号登录页，请登录后按照网页指示完成授权。**
 * **自建 Google Drive 说明：** 请按照[此处](./GD_INSTRUCTIONS.MD)的指南操作(仅提供英文指南)。
 * **注意：** 云端存储功能需要启用 `导出到 ZIP` 选项创建的备份才能上传。
+* `adrivehelper` 实用程序的 `Windows` 版本使用 `VC-LTL5` 以及 `YY-Thunks` 进行构建, 以提高对旧版 Windows 的兼容性。(`Windows XP SP3` 下测试通过)
 
 ## 下载和安装
 **请查看[发布页面](https://github.com/R-YaTian/TYSS/releases)获取最新版本。** 

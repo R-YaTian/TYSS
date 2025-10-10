@@ -3,6 +3,8 @@ build/
 romfs/gfx
 romfs/cheats
 adrivehelper/target
+adrivehelper/VC-LTL
+adrivehelper/YY-Thunks
 *.cbp
 *.layout
 *.elf
