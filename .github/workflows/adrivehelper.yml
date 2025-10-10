@@ -47,7 +47,7 @@ jobs:
         working-directory: ./adrivehelper
         run: |
           cargo install thunk-cli
-          build.cmd
+          .\build.cmd
 
       # macOS: build x86_64 and aarch64 separately, then lipo merge
       - name: Install Rust targets (macOS)
